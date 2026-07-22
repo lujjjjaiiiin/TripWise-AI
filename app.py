@@ -1,9 +1,4 @@
 
-TripWise AI — Premium Streamlit Travel Assistant
-Splash screen (SVG heart-path flight animation) -> Main App (Home / nav pages)
-Destination Explorer page runs the real Cosine Similarity recommendation engine.
-"""
-
 import time
 import pandas as pd
 import streamlit as st
