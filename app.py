@@ -1,4 +1,3 @@
-%%writefile app.py
 """
 TripWise AI — Premium Streamlit Travel Assistant
 Splash screen (SVG heart-path flight animation) -> Main App (Home / nav pages)
