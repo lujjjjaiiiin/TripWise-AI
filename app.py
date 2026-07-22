@@ -32,6 +32,25 @@ REGION_COLS = [
     "region_north_america", "region_oceania", "region_south_america",
 ]
 
+# Heart-shaped flight path (SVG user units, viewBox 0 0 1200 750).
+# The SAME string is drawn on screen AND fed to <animateMotion><mpath>, so the
+# plane rides exactly on the drawn line at any screen size — no CSS offset-path
+# drift between the guide and the aircraft.
+HEART_PATH = (
+    "M 120 660 C 230 600 300 520 360 460 C 300 430 250 380 255 310 "
+    "C 260 220 340 155 430 165 C 490 172 535 210 555 260 "
+    "C 575 210 620 172 680 165 C 770 155 850 220 855 310 "
+    "C 860 380 810 430 750 460 C 820 500 900 500 940 430 "
+    "C 985 355 985 270 940 200 C 1005 165 1060 130 1120 90"
+)
+
+# Top-view jet silhouette, nose pointing +x so rotate="auto" aligns it perfectly.
+PLANE_SHAPE = (
+    "M22,0 L8,-3.4 L-2,-16.5 L-8,-16.5 L-4,-3.4 L-14,-3.4 L-19,-8 L-22.5,-8 "
+    "L-20,-2.6 L-20,2.6 L-22.5,8 L-19,8 L-14,3.4 L-4,3.4 L-8,16.5 L-2,16.5 "
+    "L8,3.4 Z"
+)
+
 
 # ----------------------------------------------------------------------------
 # DATA LOADING
@@ -221,6 +240,15 @@ def inject_css():
             display:inline-block; padding:.35rem .9rem; border-radius:999px;
             background: rgba(30,58,138,.14); color:var(--blue); font-weight:800; font-size:.9rem;
         }
+
+        /* ---------------- RESULT DETAIL ROWS (hotel + airport) ---------------- */
+        .tw-detail{
+            display:flex; align-items:flex-start; gap:.6rem;
+            margin-top:.6rem; color:#1E293B; font-size:1.04rem; line-height:1.5;
+        }
+        .tw-detail b{ color:#0F172A; }
+        .tw-detail-ic{ font-size:1.15rem; line-height:1.4; flex:0 0 auto; }
+        .tw-detail-muted{ color:#64748B; }
         </style>
         """,
         unsafe_allow_html=True,
@@ -232,63 +260,80 @@ def inject_css():
 # ----------------------------------------------------------------------------
 def render_splash():
     st.markdown(
-        """
+        f"""
         <style>
-        .tw-splash-wrap{
+        .tw-splash-wrap{{
             position:fixed; inset:0; z-index:9999;
             background: linear-gradient(180deg, #DFF6FB 0%, #B9E7F2 35%, #79CFE0 70%, #4CB8CE 100%);
             display:flex; align-items:center; justify-content:center;
             animation: splashFade 5s ease forwards;
             overflow:hidden;
-        }
-        .tw-wave{
+        }}
+        .tw-wave{{
             position:absolute; bottom:-10%; left:-10%; width:120%; height:40%;
             background: rgba(255,255,255,0.25);
             border-radius:45%;
             animation: waveSway 8s ease-in-out infinite;
-        }
-        .tw-wave.tw-wave-2{
+        }}
+        .tw-wave.tw-wave-2{{
             bottom:-16%; background: rgba(255,255,255,0.18);
             animation: waveSway 10s ease-in-out infinite reverse;
-        }
-        @keyframes waveSway{
-            0%,100%{ transform: translateX(0) translateY(0) rotate(0deg); }
-            50%{ transform: translateX(-3%) translateY(1%) rotate(1deg); }
-        }
-        @keyframes splashFade{ 0%{opacity:0;} 8%{opacity:1;} 88%{opacity:1;} 100%{opacity:0;} }
-        .tw-splash-canvas{
+        }}
+        @keyframes waveSway{{
+            0%,100%{{ transform: translateX(0) translateY(0) rotate(0deg); }}
+            50%{{ transform: translateX(-3%) translateY(1%) rotate(1deg); }}
+        }}
+        @keyframes splashFade{{ 0%{{opacity:0;}} 8%{{opacity:1;}} 88%{{opacity:1;}} 100%{{opacity:0;}} }}
+        .tw-splash-canvas{{
             position:relative; width:min(90vw,1100px); aspect-ratio:1200/750;
             animation: mapZoom 5s ease forwards;
-        }
-        @keyframes mapZoom{ 0%{transform:scale(1.12);} 100%{transform:scale(1);} }
-        .tw-flight-scale{
+        }}
+        @keyframes mapZoom{{ 0%{{transform:scale(1.12);}} 100%{{transform:scale(1);}} }}
+        .tw-flight-scale{{
             position:absolute; inset:0;
             transform: scale(0.72);
             transform-origin: 50% 50%;
-        }
-        .tw-cloud{ position:absolute; opacity:.55; filter:blur(0.5px); animation: cloudDrift linear infinite; }
-        @keyframes cloudDrift{ from{transform: translateX(0);} to{transform: translateX(60px);} }
-        .tw-plane{
-            position:absolute; top:0; left:0; font-size:2.6rem;
-            offset-path: path("M 120 660 C 230 600 300 520 360 460 C 300 430 250 380 255 310 C 260 220 340 155 430 165 C 490 172 535 210 555 260 C 575 210 620 172 680 165 C 770 155 850 220 855 310 C 860 380 810 430 750 460 C 820 500 900 500 940 430 C 985 355 985 270 940 200 C 1005 165 1060 130 1120 90");
-            offset-rotate: auto;
-            animation: flyMotion 4.6s cubic-bezier(.45,.05,.55,.95) forwards, planeFloat 1.4s ease-in-out infinite;
-        }
-        @keyframes flyMotion{ 0%{offset-distance:0%; opacity:0;} 5%{opacity:1;} 96%{offset-distance:100%; opacity:1;} 100%{offset-distance:100%; opacity:0;} }
-        @keyframes planeFloat{ 0%,100%{margin-top:0px;} 50%{margin-top:-6px;} }
-        .tw-splash-logo{
+        }}
+        .tw-cloud{{ position:absolute; opacity:.55; filter:blur(0.5px); animation: cloudDrift linear infinite; }}
+        @keyframes cloudDrift{{ from{{transform: translateX(0);}} to{{transform: translateX(60px);}} }}
+
+        /* glowing gradient trail that draws itself as the plane advances */
+        .tw-trail, .tw-trail-glow{{
+            stroke-dasharray:1; stroke-dashoffset:1;
+            animation: trailDraw 4s cubic-bezier(.45,.05,.55,.95) .3s forwards;
+        }}
+        @keyframes trailDraw{{ to{{ stroke-dashoffset:0; }} }}
+
+        /* the aircraft — hidden until motion begins, then a gentle bob */
+        .tw-carrier{{ opacity:0; animation: carrierShow .01s .3s forwards; }}
+        @keyframes carrierShow{{ to{{ opacity:1; }} }}
+        .tw-bob{{ animation: bob 1.5s ease-in-out infinite; }}
+        @keyframes bob{{ 0%,100%{{ transform: translateY(0); }} 50%{{ transform: translateY(-2.4px); }} }}
+
+        /* arrival marker glowing in when the plane lands */
+        .tw-arrive{{ opacity:0; animation: arriveIn .6s ease 4.05s forwards; transform-origin:center; }}
+        .tw-arrive .halo{{ animation: arriveHalo 1.8s ease-out 4.1s infinite; transform-origin:center; }}
+        @keyframes arriveIn{{ from{{ opacity:0; }} to{{ opacity:1; }} }}
+        @keyframes arriveHalo{{ 0%{{ r:6; opacity:.6; }} 70%,100%{{ r:24; opacity:0; }} }}
+
+        .tw-splash-logo{{
             position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
             flex-direction:column; opacity:0; animation: logoIn 1.1s ease 4.0s forwards;
-        }
-        @keyframes logoIn{ 0%{opacity:0; transform:scale(.88);} 100%{opacity:1; transform:scale(1);} }
-        .tw-splash-logo .tw-splash-title{
+        }}
+        @keyframes logoIn{{ 0%{{opacity:0; transform:scale(.88);}} 100%{{opacity:1; transform:scale(1);}} }}
+        .tw-splash-logo .tw-splash-title{{
             font-family:'Outfit', sans-serif; font-weight:800; font-size:2.8rem; color:white;
             letter-spacing:.03em; text-shadow: 0 8px 30px rgba(0,0,0,.18);
-        }
-        .tw-splash-logo .tw-splash-sub{
+        }}
+        .tw-splash-logo .tw-splash-sub{{
             font-family:'Inter', sans-serif; color:rgba(255,255,255,.92); margin-top:.5rem;
             font-size:1.05rem; letter-spacing:.06em; text-transform:uppercase; font-weight:500;
-        }
+        }}
+
+        @media (prefers-reduced-motion: reduce){{
+            .tw-splash-wrap{{ animation: splashFade 5s linear forwards; }}
+            .tw-trail, .tw-trail-glow, .tw-carrier{{ animation: none; opacity:1; stroke-dashoffset:0; }}
+        }}
         </style>
 
         <div class="tw-splash-wrap">
@@ -296,7 +341,30 @@ def render_splash():
           <div class="tw-wave tw-wave-2"></div>
           <div class="tw-splash-canvas">
             <div class="tw-flight-scale">
-              <svg viewBox="0 0 1200 750" width="100%" height="100%" style="position:absolute; inset:0;">
+              <svg viewBox="0 0 1200 750" width="100%" height="100%"
+                   xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                   style="position:absolute; inset:0; overflow:visible;">
+                <defs>
+                  <linearGradient id="twTrailGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%"  stop-color="#0EA5E9"/>
+                    <stop offset="100%" stop-color="#2563EB"/>
+                  </linearGradient>
+                  <radialGradient id="twArrive">
+                    <stop offset="0%"  stop-color="#38BDF8"/>
+                    <stop offset="100%" stop-color="#2563EB"/>
+                  </radialGradient>
+                  <!-- soft neon bloom for the trail -->
+                  <filter id="twTrailGlow" x="-40%" y="-40%" width="180%" height="180%">
+                    <feGaussianBlur stdDeviation="6"/>
+                  </filter>
+                  <!-- glow that hugs the aircraft -->
+                  <filter id="twPlaneGlow" x="-90%" y="-90%" width="280%" height="280%">
+                    <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#38BDF8" flood-opacity=".9"/>
+                    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0B3B5C" flood-opacity=".45"/>
+                  </filter>
+                </defs>
+
+                <!-- decorative cloud blobs -->
                 <g fill="#ffffff" opacity="0.28">
                   <ellipse cx="180" cy="180" rx="150" ry="90"/>
                   <ellipse cx="420" cy="140" rx="120" ry="70"/>
@@ -306,18 +374,54 @@ def render_splash():
                   <ellipse cx="1020" cy="250" rx="150" ry="90"/>
                   <ellipse cx="980" cy="560" rx="120" ry="80"/>
                 </g>
-                <path d="M 120 660 C 230 600 300 520 360 460 C 300 430 250 380 255 310 C 260 220 340 155 430 165 C 490 172 535 210 555 260 C 575 210 620 172 680 165 C 770 155 850 220 855 310 C 860 380 810 430 750 460 C 820 500 900 500 940 430 C 985 355 985 270 940 200 C 1005 165 1060 130 1120 90"
-                      fill="none" stroke="#0F172A" stroke-width="4" stroke-dasharray="2 14" stroke-linecap="round" opacity="0.75"/>
+
+                <!-- dotted guide path (the reference the plane rides on) -->
+                <path id="twHeartPath" d="{HEART_PATH}"
+                      fill="none" stroke="#0F172A" stroke-width="4"
+                      stroke-dasharray="2 14" stroke-linecap="round" opacity="0.5"/>
+
+                <!-- glowing trail drawn along the exact same curve -->
+                <path class="tw-trail-glow" d="{HEART_PATH}" pathLength="1"
+                      fill="none" stroke="url(#twTrailGrad)" stroke-width="10"
+                      stroke-linecap="round" filter="url(#twTrailGlow)" opacity="0.55"/>
+                <path class="tw-trail" d="{HEART_PATH}" pathLength="1"
+                      fill="none" stroke="url(#twTrailGrad)" stroke-width="4.5"
+                      stroke-linecap="round"/>
+
+                <!-- departure pin -->
                 <g transform="translate(105,635)">
                   <path d="M15 0 C24 0 30 7 30 15 C30 26 15 40 15 40 C15 40 0 26 0 15 C0 7 6 0 15 0 Z" fill="#EF4444"/>
                   <circle cx="15" cy="15" r="7" fill="white"/>
                 </g>
+
+                <!-- arrival marker (glows in on landing) -->
+                <g class="tw-arrive" transform="translate(1120,90)">
+                  <circle class="halo" r="6" fill="#38BDF8"/>
+                  <circle r="8.5" fill="#ffffff"/>
+                  <circle r="5" fill="url(#twArrive)"/>
+                </g>
+
+                <!-- the aircraft: rides #twHeartPath via animateMotion + mpath -->
+                <g class="tw-carrier" filter="url(#twPlaneGlow)">
+                  <g class="tw-bob">
+                    <g transform="scale(1.05)">
+                      <path d="{PLANE_SHAPE}" fill="#0B3B5C"/>
+                      <path d="M22,0 L8,-3.4 L-4,-3.4 L-4,3.4 L8,3.4 Z" fill="#EAF7FE" opacity=".75"/>
+                    </g>
+                  </g>
+                  <animateMotion dur="4s" begin=".3s" fill="freeze" rotate="auto"
+                                 calcMode="spline" keyPoints="0;1" keyTimes="0;1"
+                                 keySplines=".45 .05 .55 .95">
+                    <mpath href="#twHeartPath" xlink:href="#twHeartPath"/>
+                  </animateMotion>
+                </g>
               </svg>
-              <div class="tw-plane">✈️</div>
             </div>
+
             <div class="tw-cloud" style="top:12%; left:8%; font-size:2.2rem; animation-duration:9s;">☁️</div>
             <div class="tw-cloud" style="top:28%; left:60%; font-size:1.6rem; animation-duration:12s;">☁️</div>
             <div class="tw-cloud" style="top:65%; left:20%; font-size:1.8rem; animation-duration:10s;">☁️</div>
+
             <div class="tw-splash-logo">
               <div class="tw-splash-title">✈️ TripWise AI</div>
               <div class="tw-splash-sub">Plan smarter. Travel further.</div>
@@ -510,6 +614,16 @@ def render_insights(df: pd.DataFrame):
 # ----------------------------------------------------------------------------
 # PAGE: DESTINATION EXPLORER (real recommendation engine)
 # ----------------------------------------------------------------------------
+def _clean(value):
+    """Return a stripped string, or None for missing / placeholder values."""
+    if value is None or pd.isna(value):
+        return None
+    text = str(value).strip()
+    if text == "" or text.lower() in {"unknown", "not specified", "nan", "none"}:
+        return None
+    return text
+
+
 def page_destination_explorer(df: pd.DataFrame):
     st.markdown('<div class="tw-section-title">📍 Destination Explorer</div>', unsafe_allow_html=True)
     st.markdown('<p class="tw-muted">Tell us what you love, and we\'ll match you with the best destinations.</p>', unsafe_allow_html=True)
@@ -589,17 +703,54 @@ def page_destination_explorer(df: pd.DataFrame):
         )
 
         st.markdown('<div class="tw-section-title">Top matches for you</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<p class="tw-muted" style="margin-top:-.6rem;">'
+            'Each card is a suggested hotel in that city, with its nearest airport.</p>',
+            unsafe_allow_html=True,
+        )
+
         for _, row in top.iterrows():
             match_pct = round(row["similarity_score"] * 100, 1)
-            hotel_name = row["HotelName"] if "HotelName" in row and pd.notna(row["HotelName"]) else ""
+
+            hotel_name = _clean(row.get("HotelName"))
+            airport_name = _clean(row.get("name"))       # airport name from the airports merge
+            airport_iata = _clean(row.get("iata"))
+            has_air = int(row.get("has_airport", 0)) == 1 and airport_name is not None
+
+            # Line 1 — make it explicit this is a hotel pick for this city.
+            if hotel_name:
+                hotel_html = (
+                    f'<div class="tw-detail"><span class="tw-detail-ic">🏨</span>'
+                    f'<span><b>Suggested hotel</b> in {row["city"]} — {hotel_name}</span></div>'
+                )
+            else:
+                hotel_html = (
+                    f'<div class="tw-detail"><span class="tw-detail-ic">🏨</span>'
+                    f'<span><b>Suggested stay</b> in {row["city"]}</span></div>'
+                )
+
+            # Line 2 — nearest airport, name + IATA code, or a clear fallback.
+            if has_air:
+                code = f' <span class="tw-score-pill" style="font-size:.78rem;">{airport_iata}</span>' if airport_iata else ""
+                airport_html = (
+                    f'<div class="tw-detail"><span class="tw-detail-ic">🛫</span>'
+                    f'<span><b>Nearest airport</b> — {airport_name}{code}</span></div>'
+                )
+            else:
+                airport_html = (
+                    '<div class="tw-detail tw-detail-muted"><span class="tw-detail-ic">🛫</span>'
+                    '<span>No major airport on record for this city</span></div>'
+                )
+
             st.markdown(
                 f"""
                 <div class="tw-result-card">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem;">
-                        <div style="font-weight:800; font-size:1.3rem; color:#0F172A;">📍 {row['city']}, {row['country']}</div>
+                        <div style="font-weight:800; font-size:1.35rem; color:#0F172A;">📍 {row['city']}, {row['country']}</div>
                         <span class="tw-score-pill">{match_pct}% match</span>
                     </div>
-                    <div class="tw-muted" style="margin-top:.5rem; font-size:1rem;">{hotel_name}</div>
+                    {hotel_html}
+                    {airport_html}
                 </div>
                 """,
                 unsafe_allow_html=True,
