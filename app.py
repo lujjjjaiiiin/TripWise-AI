@@ -113,10 +113,10 @@ def inject_css():
         .stButton>button:hover{ transform: translateY(-2px) scale(1.02); box-shadow:0 14px 36px rgba(37,99,235,.45); }
 
         .tw-glass{
-            background: rgba(255,255,255,0.65);
+            background: rgba(219,234,254,0.55);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.6);
+            border: 1px solid rgba(30,58,138,0.15);
             border-radius: 24px;
             padding: 1.8rem;
             box-shadow: var(--shadow);
@@ -147,26 +147,27 @@ def inject_css():
         .tw-float{ animation: floaty 5s ease-in-out infinite; display:inline-block; }
         .tw-float-slow{ animation: floaty 7s ease-in-out infinite; display:inline-block; }
 
-        .tw-illustration-row{ display:flex; justify-content:center; gap:2.2rem; font-size:2.6rem; margin: 1.2rem 0 2.4rem 0; }
+        .tw-illustration-row{ display:flex; justify-content:center; gap:1.8rem; font-size:1.9rem; margin: 1.2rem 0 2.4rem 0; }
         .tw-section-title{ font-weight:700; font-size:1.6rem; color:var(--text-dark); margin: 2.2rem 0 1rem 0;}
         .tw-muted{ color:var(--text-muted); }
 
         .tw-icon-circle{
-            width:52px; height:52px; border-radius:16px;
+            width:42px; height:42px; border-radius:13px;
             background: linear-gradient(135deg, var(--sky), var(--blue));
             display:flex; align-items:center; justify-content:center;
-            font-size:1.4rem; margin-bottom:.8rem; color:white;
-            box-shadow: 0 10px 24px rgba(14,165,233,.3);
+            font-size:1.1rem; margin-bottom:.7rem; color:white;
+            box-shadow: 0 8px 18px rgba(14,165,233,.28);
         }
 
         .tw-result-card{
-            background:white; border-radius:20px; padding:1.4rem 1.6rem;
+            background: linear-gradient(135deg, #EEF4FC 0%, #E1EBFA 100%);
+            border-radius:20px; padding:1.4rem 1.6rem;
             box-shadow: var(--shadow); margin-bottom:1rem;
-            border-left: 6px solid var(--sky);
+            border-left: 6px solid var(--blue);
         }
         .tw-score-pill{
             display:inline-block; padding:.25rem .7rem; border-radius:999px;
-            background: rgba(37,99,235,.1); color:var(--blue); font-weight:700; font-size:.8rem;
+            background: rgba(30,58,138,.12); color:var(--blue); font-weight:700; font-size:.8rem;
         }
         </style>
         """,
