@@ -322,7 +322,7 @@ for c in sorted(final_df["cluster"].unique()):
 Streamlet
 """
 
-!pip install streamlit
+
 
 # Commented out IPython magic to ensure Python compatibility.
 
