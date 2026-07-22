@@ -201,14 +201,14 @@ def inject_css():
         .tw-float{ animation: floaty 5s ease-in-out infinite; display:inline-block; }
         .tw-float-slow{ animation: floaty 7s ease-in-out infinite; display:inline-block; }
 
-        .tw-illustration-row{ display:flex; justify-content:center; gap:2rem; font-size:3.4rem; margin: 1.2rem 0 2.4rem 0; }
+        .tw-illustration-row{ display:flex; justify-content:center; gap:2.2rem; font-size:4.4rem; margin: 1.4rem 0 2.6rem 0; }
 
         .tw-icon-circle{
-            width:68px; height:68px; border-radius:18px;
+            width:84px; height:84px; border-radius:22px;
             background: linear-gradient(135deg, var(--sky), var(--blue));
             display:flex; align-items:center; justify-content:center;
-            font-size:1.9rem; margin-bottom:.8rem; color:white;
-            box-shadow: 0 10px 24px rgba(14,165,233,.3);
+            font-size:2.4rem; margin-bottom:.9rem; color:white;
+            box-shadow: 0 12px 28px rgba(14,165,233,.32);
         }
 
         .tw-result-card{
@@ -236,10 +236,24 @@ def render_splash():
         <style>
         .tw-splash-wrap{
             position:fixed; inset:0; z-index:9999;
-            background: radial-gradient(circle at 30% 20%, #BFEFFF 0%, #7FD9F0 45%, #4FC3E0 100%);
+            background: linear-gradient(180deg, #DFF6FB 0%, #B9E7F2 35%, #79CFE0 70%, #4CB8CE 100%);
             display:flex; align-items:center; justify-content:center;
             animation: splashFade 5s ease forwards;
             overflow:hidden;
+        }
+        .tw-wave{
+            position:absolute; bottom:-10%; left:-10%; width:120%; height:40%;
+            background: rgba(255,255,255,0.25);
+            border-radius:45%;
+            animation: waveSway 8s ease-in-out infinite;
+        }
+        .tw-wave.tw-wave-2{
+            bottom:-16%; background: rgba(255,255,255,0.18);
+            animation: waveSway 10s ease-in-out infinite reverse;
+        }
+        @keyframes waveSway{
+            0%,100%{ transform: translateX(0) translateY(0) rotate(0deg); }
+            50%{ transform: translateX(-3%) translateY(1%) rotate(1deg); }
         }
         @keyframes splashFade{ 0%{opacity:0;} 8%{opacity:1;} 88%{opacity:1;} 100%{opacity:0;} }
         .tw-splash-canvas{
@@ -247,6 +261,11 @@ def render_splash():
             animation: mapZoom 5s ease forwards;
         }
         @keyframes mapZoom{ 0%{transform:scale(1.12);} 100%{transform:scale(1);} }
+        .tw-flight-scale{
+            position:absolute; inset:0;
+            transform: scale(0.72);
+            transform-origin: 50% 50%;
+        }
         .tw-cloud{ position:absolute; opacity:.55; filter:blur(0.5px); animation: cloudDrift linear infinite; }
         @keyframes cloudDrift{ from{transform: translateX(0);} to{transform: translateX(60px);} }
         .tw-plane{
@@ -262,33 +281,43 @@ def render_splash():
             flex-direction:column; opacity:0; animation: logoIn 1.1s ease 4.0s forwards;
         }
         @keyframes logoIn{ 0%{opacity:0; transform:scale(.88);} 100%{opacity:1; transform:scale(1);} }
-        .tw-splash-logo .tw-splash-title{ font-family:'Outfit', sans-serif; font-weight:800; font-size:2.6rem; color:white; text-shadow: 0 8px 30px rgba(0,0,0,.15); }
-        .tw-splash-logo .tw-splash-sub{ font-family:'Inter', sans-serif; color:rgba(255,255,255,.9); margin-top:.4rem; font-size:1rem; }
+        .tw-splash-logo .tw-splash-title{
+            font-family:'Outfit', sans-serif; font-weight:800; font-size:2.8rem; color:white;
+            letter-spacing:.03em; text-shadow: 0 8px 30px rgba(0,0,0,.18);
+        }
+        .tw-splash-logo .tw-splash-sub{
+            font-family:'Inter', sans-serif; color:rgba(255,255,255,.92); margin-top:.5rem;
+            font-size:1.05rem; letter-spacing:.06em; text-transform:uppercase; font-weight:500;
+        }
         </style>
 
         <div class="tw-splash-wrap">
+          <div class="tw-wave"></div>
+          <div class="tw-wave tw-wave-2"></div>
           <div class="tw-splash-canvas">
-            <svg viewBox="0 0 1200 750" width="100%" height="100%" style="position:absolute; inset:0;">
-              <g fill="#ffffff" opacity="0.28">
-                <ellipse cx="180" cy="180" rx="150" ry="90"/>
-                <ellipse cx="420" cy="140" rx="120" ry="70"/>
-                <ellipse cx="230" cy="420" rx="140" ry="110"/>
-                <ellipse cx="650" cy="200" rx="180" ry="100"/>
-                <ellipse cx="780" cy="450" rx="160" ry="120"/>
-                <ellipse cx="1020" cy="250" rx="150" ry="90"/>
-                <ellipse cx="980" cy="560" rx="120" ry="80"/>
-              </g>
-              <path d="M 120 660 C 230 600 300 520 360 460 C 300 430 250 380 255 310 C 260 220 340 155 430 165 C 490 172 535 210 555 260 C 575 210 620 172 680 165 C 770 155 850 220 855 310 C 860 380 810 430 750 460 C 820 500 900 500 940 430 C 985 355 985 270 940 200 C 1005 165 1060 130 1120 90"
-                    fill="none" stroke="#0F172A" stroke-width="4" stroke-dasharray="2 14" stroke-linecap="round" opacity="0.75"/>
-              <g transform="translate(105,635)">
-                <path d="M15 0 C24 0 30 7 30 15 C30 26 15 40 15 40 C15 40 0 26 0 15 C0 7 6 0 15 0 Z" fill="#EF4444"/>
-                <circle cx="15" cy="15" r="7" fill="white"/>
-              </g>
-            </svg>
+            <div class="tw-flight-scale">
+              <svg viewBox="0 0 1200 750" width="100%" height="100%" style="position:absolute; inset:0;">
+                <g fill="#ffffff" opacity="0.28">
+                  <ellipse cx="180" cy="180" rx="150" ry="90"/>
+                  <ellipse cx="420" cy="140" rx="120" ry="70"/>
+                  <ellipse cx="230" cy="420" rx="140" ry="110"/>
+                  <ellipse cx="650" cy="200" rx="180" ry="100"/>
+                  <ellipse cx="780" cy="450" rx="160" ry="120"/>
+                  <ellipse cx="1020" cy="250" rx="150" ry="90"/>
+                  <ellipse cx="980" cy="560" rx="120" ry="80"/>
+                </g>
+                <path d="M 120 660 C 230 600 300 520 360 460 C 300 430 250 380 255 310 C 260 220 340 155 430 165 C 490 172 535 210 555 260 C 575 210 620 172 680 165 C 770 155 850 220 855 310 C 860 380 810 430 750 460 C 820 500 900 500 940 430 C 985 355 985 270 940 200 C 1005 165 1060 130 1120 90"
+                      fill="none" stroke="#0F172A" stroke-width="4" stroke-dasharray="2 14" stroke-linecap="round" opacity="0.75"/>
+                <g transform="translate(105,635)">
+                  <path d="M15 0 C24 0 30 7 30 15 C30 26 15 40 15 40 C15 40 0 26 0 15 C0 7 6 0 15 0 Z" fill="#EF4444"/>
+                  <circle cx="15" cy="15" r="7" fill="white"/>
+                </g>
+              </svg>
+              <div class="tw-plane">✈️</div>
+            </div>
             <div class="tw-cloud" style="top:12%; left:8%; font-size:2.2rem; animation-duration:9s;">☁️</div>
             <div class="tw-cloud" style="top:28%; left:60%; font-size:1.6rem; animation-duration:12s;">☁️</div>
             <div class="tw-cloud" style="top:65%; left:20%; font-size:1.8rem; animation-duration:10s;">☁️</div>
-            <div class="tw-plane">✈️</div>
             <div class="tw-splash-logo">
               <div class="tw-splash-title">✈️ TripWise AI</div>
               <div class="tw-splash-sub">Plan smarter. Travel further.</div>
