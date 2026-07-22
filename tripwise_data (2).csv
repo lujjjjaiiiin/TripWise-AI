@@ -1,0 +1,317 @@
+city,country,HotelName,latitude,longitude,culture,adventure,nature,beaches,nightlife,cuisine,wellness,urban,seclusion,has_airport,is_short_trip,is_one_week,temp_avg_yearly,budget_level_encoded,HotelRating_encoded,rating_was_unknown,region_africa,region_asia,region_europe,region_middle_east,region_north_america,region_oceania,region_south_america
+Milan,Italy,Worldhotel Cristoforo Colombo,45.4641943,9.1896346,5,2,2,1,4,5,3,5,2,1,1,1,14.75,3,4.0,0,False,False,True,False,False,False,False
+Guanajuato,Mexico,Edelmira Hotel Boutique,20.9876996,-101.0,5,3,3,1,3,4,3,4,2,0,1,1,19.533333333333335,2,4.0,0,False,False,False,False,True,False,False
+Surabaya,Indonesia,ibis budget Surabaya Airport,-7.2459717,112.7378266,4,3,3,2,3,4,3,4,2,1,1,0,28.758333333333336,1,3.0,0,False,True,False,False,False,False,False
+Windhoek,Namibia,Klein Windhoek Guesthouse,-22.53356015,17.045477525861745,3,4,4,1,3,3,3,3,4,1,1,1,21.016666666666666,2,3.0,0,True,False,False,False,False,False,False
+Kingston,Jamaica,The Liguanea Club,17.9712148,-76.7928128,4,3,3,3,4,4,3,3,2,1,1,1,28.400000000000002,2,3.0,0,False,False,False,False,True,False,False
+Heidelberg,Germany,Leonardo Hotel Heidelberg,49.4093582,8.694724,5,2,4,1,3,4,3,3,4,0,1,0,11.816666666666668,2,3.0,1,False,False,True,False,False,False,False
+Nagasaki,Japan,Yataro & Yataro Minamikan,33.1154683,129.7874339,4,2,3,2,3,4,3,3,3,1,1,0,17.666666666666668,2,3.0,0,False,True,False,False,False,False,False
+Utrecht,Netherlands,Mercure Hotel Amersfoort Centre,52.0907006,5.1215634,4,2,3,1,4,4,3,4,3,0,1,0,11.174999999999999,2,4.0,0,False,False,True,False,False,False,False
+Bagan,Myanmar,Bagan Thiripyitsaya Sanctuary Resort,21.1317111,94.8623644,5,3,4,1,1,3,2,2,4,0,1,1,26.425,1,3.0,0,False,True,False,False,False,False,False
+Malmö,Sweden,Hotel Garden,55.6052931,13.0001566,4,3,3,3,3,4,3,4,2,0,1,0,9.924999999999999,2,3.0,0,False,False,True,False,False,False,False
+Amsterdam,Netherlands,Sir Albert Hotel,52.3730796,4.8924534,5,3,3,2,5,4,3,5,2,1,1,1,11.391666666666666,2,4.0,0,False,False,True,False,False,False,False
+Trondheim,Norway,Scandic Residence,63.4304475,10.3952118,4,3,4,2,3,3,3,3,4,1,1,1,7.859999999999999,3,1.0,0,False,False,True,False,False,False,False
+Bruges,Belgium,B&B Riche Terre,51.2085526,3.226772,5,2,3,1,3,4,3,3,4,0,1,0,11.516666666666666,2,4.0,0,False,False,True,False,False,False,False
+Reykjavik,Iceland,Reykjavik Lights by Keahotels,64.145981,-21.9422367,3,4,5,2,3,3,4,3,4,1,1,1,5.3,3,3.0,0,False,False,True,False,False,False,False
+Seoul,South Korea,Lotte City Hotel Gimpo Airport,37.5666791,126.9782914,5,3,3,2,5,5,4,5,2,1,1,1,14.936363636363637,2,3.0,0,False,True,False,False,False,False,False
+Kyoto,Japan,Hotel Avanshell Kyoto,35.0115754,135.7681441,5,2,4,1,2,5,3,3,4,0,1,1,16.916666666666668,3,3.0,0,False,True,False,False,False,False,False
+Livingstone,Zambia,Sanctuary Sussi and Chuma,-17.853135,25.861429,3,5,5,2,2,3,3,2,4,1,1,1,23.166666666666668,2,4.0,0,True,False,False,False,False,False,False
+Petra,Jordan,Petra Elite Hotel,30.3258363,35.4745669,5,4,4,1,1,3,2,1,4,0,1,1,19.925,2,5.0,0,False,False,False,True,False,False,False
+Athens,Greece,Hotel Arta,37.9755648,23.7348324,5,3,3,3,4,5,3,4,2,1,1,1,19.383333333333333,2,1.0,0,False,False,True,False,False,False,False
+Raja Ampat,Indonesia,Raja Ampat Dive Lodge,-0.7125553,130.30344727618905,2,4,5,5,1,3,3,1,5,0,0,1,27.224999999999998,3,3.0,0,False,True,False,False,False,False,False
+Puebla,Mexico,Sacristía de Fray Juan,18.833333,-98.0,5,3,3,1,3,5,3,4,2,1,1,1,17.666666666666668,2,3.0,0,False,False,False,False,True,False,False
+Bridgetown,Barbados,Sweetfield Manor Historic Inn and B&B,13.0977832,-59.6184184,3,3,4,5,4,4,4,3,2,1,1,1,27.325,2,4.0,0,False,False,False,False,True,False,False
+Tirana,Albania,De Paris Hotel,41.3281482,19.8184435,3,3,3,2,3,3,3,3,2,1,1,0,16.525000000000002,1,4.0,0,False,False,True,False,False,False,False
+Rio de Janeiro,Brazil,Pousada Cabore,-22.9110137,-43.2093727,4,4,5,5,5,4,3,4,2,1,1,1,24.233333333333334,2,3.0,0,False,False,False,False,False,False,True
+Curitiba,Brazil,Terrazas Hotel,-25.4295963,-49.2712724,4,3,4,1,3,4,3,4,3,1,1,1,18.675,2,3.0,0,False,False,False,False,False,False,True
+Phnom Penh,Cambodia,La Rose Boutique Hotel & Spa,11.5730391,104.857807,4,3,2,1,3,4,2,3,2,0,1,1,29.05,1,4.0,0,False,True,False,False,False,False,False
+Lucca,Italy,Albergo Pietrasanta,44.017763900000006,10.454430026192636,4,2,3,2,2,4,3,3,4,0,1,0,6.788888888888889,2,4.0,0,False,False,True,False,False,False,False
+Barcelona,Spain,Nh Numancia,41.3828939,2.1774322,5,3,3,4,5,5,3,5,2,1,1,1,16.858333333333334,2,4.0,0,False,False,True,False,False,False,False
+Santiago de Chile,Chile,Torre Tagle Santiago Centro Santo Domingo,-33.4377756,-70.6504502,4,4,4,2,4,4,3,4,2,0,1,1,15.299999999999999,2,3.0,0,False,False,False,False,False,False,True
+Shanghai,China,Lansheng,31.2312707,121.4700152,5,3,2,1,5,5,3,5,2,1,1,1,18.358333333333334,2,4.0,0,False,True,False,False,False,False,False
+Kathmandu,Nepal,Hotel Northfield,27.708317,85.3205817,5,4,4,1,2,4,3,3,2,1,1,1,18.591666666666665,1,3.0,0,False,True,False,False,False,False,False
+Auckland,New Zealand,"Fable Auckland, MGallery(Ex.Grand Windsor Hotel)",-36.852095,174.7631803,3,4,4,3,4,4,3,4,2,1,1,1,15.716666666666667,2,5.0,0,False,False,False,False,False,True,False
+Cartagena,Colombia,Radisson Cartagena Ocean Pavillion Hotel,10.4265566,-75.5441671,5,3,3,4,4,4,3,4,2,1,1,1,28.316666666666666,2,4.0,0,False,False,False,False,False,False,True
+Dubrovnik,Croatia,Villa Gloria,42.6491029,18.0939501,5,3,4,4,3,4,3,3,2,1,1,0,17.141666666666666,2,3.0,0,False,False,True,False,False,False,False
+Bergen,Norway,Augustin Hotel,60.3943055,5.3259192,4,4,5,2,3,3,3,3,4,1,1,1,8.799999999999999,3,3.0,0,False,False,True,False,False,False,False
+Bocas del Toro,Panama,Swans Cay Hotel,9.26847485,-81.99322424821933,3,4,5,5,3,3,3,2,4,0,1,1,25.958333333333332,2,3.0,0,False,False,False,False,True,False,False
+Santo Domingo,Dominican Republic,Bahia Principe Luxury Bouganville,18.4801972,-69.942111,4,3,3,4,4,4,3,4,2,1,1,1,26.316666666666666,2,4.0,0,False,False,False,False,True,False,False
+Cairo,Egypt,Sofitel Cairo Nile El Gezirah,30.0443879,31.2357257,5,3,3,2,3,4,3,4,2,1,1,1,23.458333333333332,1,5.0,0,True,False,False,False,False,False,False
+Iquitos,Peru,Pacaya Samiria Amazon Lodge,-3.749365,-73.2444145,3,5,5,1,2,3,2,2,4,1,1,1,26.150000000000002,1,3.0,1,False,False,False,False,False,False,True
+Marseille,France,B&b Marseille Centre La Timone,43.2961743,5.3699525,4,3,3,3,4,4,3,4,2,1,1,1,16.349999999999998,2,2.0,0,False,False,True,False,False,False,False
+Sofia,Bulgaria,Art Hotel Simona,42.6977028,23.3217359,4,3,3,1,3,4,3,3,2,1,1,1,12.654545454545454,1,3.0,0,False,False,True,False,False,False,False
+San Marino,San Marino,San Giuseppe,43.9458623,12.458306,4,2,3,1,2,3,2,3,4,0,0,0,15.091666666666667,2,4.0,0,False,False,True,False,False,False,False
+Berlin,Germany,Generator Berlin Prenzlauer Berg,52.510885,13.3989367,5,3,2,1,5,4,3,5,2,1,1,1,11.049999999999999,2,3.0,1,False,False,True,False,False,False,False
+Helsinki,Finland,Radisson Blu Plaza Hotel Helsinki,60.1674881,24.9427473,4,3,4,2,3,4,4,4,3,1,1,1,9.26,2,4.0,0,False,False,True,False,False,False,False
+Warsaw,Poland,Colibra,52.2337172,21.071432235636493,4,2,3,1,4,4,3,4,2,1,1,1,10.299999999999999,2,3.0,0,False,False,True,False,False,False,False
+Verona,Italy,Montresor Hotel Palace,45.4424977,10.985737689444765,5,2,3,1,3,4,3,4,3,1,1,0,14.35,2,4.0,0,False,False,True,False,False,False,False
+Annecy,France,Annecy Hostel,45.8992348,6.1288847,4,4,5,3,3,4,3,3,4,1,1,0,11.924999999999999,2,3.0,0,False,False,True,False,False,False,False
+Colombo,Sri Lanka,Zylan Luxury Villa,6.9388614,79.8542005,4,3,3,3,3,4,3,4,2,1,1,1,28.058333333333334,1,3.0,0,False,True,False,False,False,False,False
+Dakar,Senegal,Lodge Des Almadies,14.693425,-17.447938,4,3,3,4,3,4,3,3,2,1,1,1,25.041666666666668,2,3.0,0,True,False,False,False,False,False,False
+Wadi Rum,Jordan,Rum Wonders Camp,29.5084443,35.3362154,3,5,5,1,1,3,3,1,5,0,1,1,25.391666666666666,2,1.0,0,False,False,False,True,False,False,False
+Munich,Germany,City Pension Erding,48.1371079,11.5753822,5,3,3,1,4,4,3,5,2,1,1,0,10.916666666666666,2,2.0,0,False,False,True,False,False,False,False
+Freiburg,Germany,Jugendherberge Freiburg,47.9960901,7.8494005,4,3,5,1,3,3,3,3,4,1,1,0,10.791666666666666,2,3.0,1,False,False,True,False,False,False,False
+Singapore,Singapore,Carlton City Hotel Singapore,1.2899175,103.8519072,4,3,3,3,4,5,4,5,2,1,1,1,28.416666666666668,3,5.0,0,False,True,False,False,False,False,False
+Piran,Slovenia,Terme Krka Strunjan - Villas,45.5284919,13.5684485,4,3,4,4,3,4,3,3,4,0,1,0,15.075000000000001,2,3.0,0,False,False,True,False,False,False,False
+Valletta,Malta,Luciano Valletta Boutique,35.8989979,14.5136607,5,2,3,3,3,4,3,3,2,0,1,0,19.741666666666667,2,3.0,1,False,False,True,False,False,False,False
+Thessaloniki,Greece,Pension Delfini,40.6403167,22.9352716,4,3,3,3,4,5,3,4,2,1,1,1,16.866666666666667,2,2.0,0,False,False,True,False,False,False,False
+Valencia,Spain,Senator Parque Central Hotel,39.4697065,-0.3763353,4,3,4,4,4,5,3,4,3,1,1,1,18.558333333333334,2,4.0,0,False,False,True,False,False,False,False
+Hoi An,Vietnam,Lotus Hoi An Boutique Hotel & Spa,15.8795863,108.3319406,5,3,3,3,2,5,3,2,4,0,1,0,26.833333333333332,1,3.0,0,False,True,False,False,False,False,False
+Budapest,Hungary,Corinthia Hotel Budapest,47.48138955,19.14609412691246,5,3,3,1,5,4,5,4,2,1,1,1,12.383333333333333,2,5.0,0,False,False,True,False,False,False,False
+Yogyakarta,Indonesia,Grand Aston Yogyakarta,-7.8011998,110.3646608,5,3,4,2,3,4,3,3,3,1,1,1,27.849999999999998,1,5.0,0,False,True,False,False,False,False,False
+Monaco,Monaco,Hôtel Hermitage,43.7323492,7.4276832,4,2,3,3,5,4,3,5,2,0,0,0,15.858333333333333,3,5.0,0,False,False,True,False,False,False,False
+Rome,Italy,Hotel Corona,41.8933203,12.4829321,5,3,3,2,4,5,3,5,2,1,1,1,16.633333333333333,2,3.0,0,False,False,True,False,False,False,False
+Stockholm,Sweden,Clarion Hotel Stockholm,59.3251172,18.0710935,4,3,4,2,4,4,3,5,3,1,1,1,9.790000000000001,3,4.0,0,False,False,True,False,False,False,False
+Taipei,Taiwan,Fullon Hotel Tamsui Fishermen's Wharf,25.0375198,121.5636796,4,3,3,2,4,5,3,4,2,1,1,1,24.03333333333333,2,4.0,0,False,True,False,False,False,False,False
+Tokyo,Japan,Imperial Hotel Tokyo,35.6768601,139.7638947,5,2,2,1,5,5,3,5,1,1,1,1,16.666666666666668,3,5.0,0,False,True,False,False,False,False,False
+Noumea,New Caledonia,Le Meridien Noumea,-22.2745264,166.442419,3,3,4,4,3,4,3,3,3,1,1,1,23.641666666666666,3,5.0,0,False,False,False,False,False,True,False
+Palermo,Italy,Villa Palamara 1868,38.1112268,13.3524434,4,2,3,3,3,5,3,4,2,1,1,1,19.241666666666667,2,3.0,0,False,False,True,False,False,False,False
+Sicily,Italy,Residenza delle Palme,37.587794,14.155048,5,3,4,4,3,5,3,3,3,0,1,1,14.450000000000001,2,3.0,0,False,False,True,False,False,False,False
+Amman,Jordan,Crowne Plaza Amman,31.9515694,35.9239625,4,3,3,1,3,4,3,4,2,1,1,1,18.658333333333335,2,5.0,0,False,False,False,True,False,False,False
+Nairobi,Kenya,Villa Rosa Kempinski,-1.30261485,36.82884201813725,4,4,5,1,3,3,3,4,2,1,1,1,19.933333333333334,2,5.0,0,True,False,False,False,False,False,False
+Panama City,Panama,The Westin Panama,8.9714493,-79.5341802,4,3,4,3,4,4,3,4,2,1,1,1,27.075,2,4.0,0,False,False,False,False,True,False,False
+Nagoya,Japan,APA Villa Hotel Nagoya Marunouchi Ekimae,35.1851045,136.8998438,4,2,3,1,3,4,3,4,2,1,1,0,16.474999999999998,3,3.0,0,False,True,False,False,False,False,False
+Fukuoka,Japan,Dukes Hakata Hotel,33.6251241,130.6180016,4,3,3,3,4,5,3,4,2,1,1,1,16.6,2,3.0,0,False,True,False,False,False,False,False
+Mexico City,Mexico,Hotel Amigo Zocalo,19.3207722,-99.1514677512441,5,3,3,1,5,5,3,5,2,1,1,1,17.033333333333335,2,3.0,0,False,False,False,False,True,False,False
+Doha,Qatar,Souq Waqif Boutique Hotels - Tivoli,25.2856329,51.5264162,4,3,2,3,3,4,4,5,2,1,1,1,28.96666666666667,3,5.0,0,False,False,False,True,False,False,False
+Luang Prabang,Laos,Victoria Xiengthong Palace,19.8887438,102.135898,5,3,4,1,2,4,4,2,5,1,1,0,26.8,1,4.0,0,False,True,False,False,False,False,False
+Oaxaca,Mexico,Hotel Boutique Parador San Miguel Oaxaca,17.0,-96.5,5,3,4,2,3,5,3,3,3,1,1,1,20.599999999999998,2,3.0,0,False,False,False,False,True,False,False
+Kaunas,Lithuania,Best Western Santakos Hotel,54.8982139,23.9044817,4,2,3,1,3,3,3,3,3,1,1,0,10.45,1,4.0,0,False,False,True,False,False,False,False
+Kuching,Malaysia,Citadines Uplands Kuching,1.5597561,110.345397,4,3,4,2,3,4,3,3,4,1,1,0,27.016666666666666,1,4.0,0,False,True,False,False,False,False,False
+Port Louis,Mauritius,St Georges Hotel,-20.1624522,57.5028044,4,3,4,5,3,4,3,3,2,0,1,1,21.808333333333334,2,3.0,0,True,False,False,False,False,False,False
+Salalah,Oman,Waves Suites Salalah,17.0174945,54.1010923,3,3,5,4,2,3,3,2,4,1,1,1,26.941666666666666,2,3.0,0,False,False,False,True,False,False,False
+Pretoria,South Africa,Protea Hatfield Apartments,-25.7459277,28.1879101,4,3,4,1,3,4,3,4,2,1,1,0,19.191666666666666,2,3.0,0,True,False,False,False,False,False,False
+Monterrey,Mexico,Novotel Monterrey Valle,25.6802019,-100.315258,4,3,4,1,4,4,3,4,2,1,1,0,22.616666666666664,2,4.0,0,False,False,False,False,True,False,False
+Oslo,Norway,Thon Hotel Astoria,59.9133301,10.7389701,4,3,4,2,3,4,4,4,3,1,1,1,10.38888888888889,3,3.0,0,False,False,True,False,False,False,False
+Rabat,Morocco,La Tour Hassan Palace,33.9851778,-6.8461433,4,2,3,3,3,4,3,4,3,1,1,1,17.591666666666665,1,5.0,0,True,False,False,False,False,False,False
+Arequipa,Peru,White Tower Villa,-16.3988667,-71.5369607,4,3,4,1,3,4,3,3,3,1,1,1,15.908333333333333,1,3.0,0,False,False,False,False,False,False,True
+Krakow,Poland,Campanile Cracovie,50.0619474,19.9368564,5,2,3,1,4,4,3,4,2,1,1,1,10.818181818181818,2,3.0,0,False,False,True,False,False,False,False
+Chiang Rai,Thailand,Ibis Styles Chiang Khong Riverfront,19.7589517,99.6734592,4,3,4,1,2,4,3,2,4,1,1,0,25.266666666666666,1,3.0,0,False,True,False,False,False,False,False
+Christchurch,New Zealand,Peppers Clearwater Resort,-43.530955,172.6364343,3,4,4,3,3,3,3,3,3,1,1,1,11.975,2,4.0,0,False,False,False,False,False,True,False
+San Juan,Puerto Rico,Royal Sonesta San Juan,18.38423905,-66.05343997364733,4,3,3,5,4,4,3,4,2,1,1,1,27.400000000000002,2,4.0,0,False,False,False,False,True,False,False
+Manila,Philippines,Greenhills Elan Hotel Modern,14.5904492,120.9803621,4,3,2,2,4,4,3,4,1,1,1,1,28.683333333333334,1,3.0,0,False,True,False,False,False,False,False
+Bern,Switzerland,Berggasthof Gurnigelbad,46.9484742,7.4521749,4,3,4,1,3,4,4,4,3,1,1,1,10.233333333333333,3,3.0,1,False,False,True,False,False,False,False
+Catania,Italy,Hotel Pomara,37.5023612,15.0873718,4,3,4,3,3,5,3,3,2,1,1,1,18.224999999999998,2,3.0,0,False,False,True,False,False,False,False
+Davao,Philippines,My Hotel,7.0648306,125.6080623,3,4,5,3,3,4,3,3,4,1,1,1,27.991666666666664,1,2.0,0,False,True,False,False,False,False,False
+Porto,Portugal,Porta Azul,41.1494512,-8.6107884,4,3,3,3,4,5,3,4,3,1,1,1,15.241666666666667,2,3.0,0,False,False,True,False,False,False,False
+Constanta,Romania,Comandor,44.1767161,28.6507598,3,3,3,4,3,4,3,3,2,1,1,0,13.716666666666667,1,4.0,0,False,False,True,False,False,False,False
+Puerto Vallarta,Mexico,Occidental Nuevo Vallarta All inclusive,20.6407176,-105.220306,3,4,4,5,4,4,4,3,3,1,1,1,23.46666666666667,2,4.0,0,False,False,False,False,True,False,False
+Cape Town,South Africa,Romney Park Luxury Apartments,-33.9288301,18.4172197,4,4,5,4,4,4,3,4,3,1,1,1,17.075,2,4.0,0,True,False,False,False,False,False,False
+Madrid,Spain,NH Collection Madrid Abascal,40.4167047,-3.7035825,5,3,2,1,5,5,3,5,2,1,1,1,16.216666666666665,2,4.0,0,False,False,True,False,False,False,False
+Nantes,France,Campanile Nantes Oust - Saint Herblain,47.2186371,-1.5541362,4,2,3,2,3,4,3,4,3,1,1,1,13.091666666666667,2,3.0,0,False,False,True,False,False,False,False
+Victoria,Seychelles,The Quadrant Luxury Apartments,-4.6232085,55.452359,3,4,5,5,3,4,4,2,4,0,1,1,27.650000000000002,3,3.0,1,True,False,False,False,False,False,False
+Ljubljana,Slovenia,Hotel Mrak,46.0500268,14.5069289,4,3,4,1,3,4,3,4,3,1,1,1,12.116666666666667,2,3.0,0,False,False,True,False,False,False,False
+Chengdu,China,Lia Chengdu Hotel,30.6598628,104.0633717,5,3,4,1,3,5,3,4,2,1,1,1,18.516666666666666,2,4.0,0,False,True,False,False,False,False,False
+Stone Town,Tanzania,Kisiwa House,-6.16265285,39.18965515249984,5,3,3,4,3,4,3,3,3,0,1,0,27.224999999999998,1,5.0,0,True,False,False,False,False,False,False
+Johannesburg,South Africa,Protea Hatfield Apartments,-26.205,28.049722,4,3,3,1,4,4,3,5,2,1,1,1,16.825,2,3.0,0,True,False,False,False,False,False,False
+Busan,South Korea,Samwonjang Motel,35.1799528,129.0752365,4,3,4,4,4,5,3,4,2,1,1,1,15.458333333333334,2,2.0,0,False,True,False,False,False,False,False
+Seville,Spain,Alcazar,37.3886303,-5.9953403,5,3,2,1,4,5,3,4,2,0,1,1,19.2,2,3.0,0,False,False,True,False,False,False,False
+Bangkok,Thailand,Prom Ratchada Residence and Spa,13.7524938,100.4935089,5,3,2,2,5,5,4,5,1,1,0,1,29.258333333333336,1,3.0,0,False,True,False,False,False,False,False
+Belfast,United Kingdom,The Merchant Hotel,54.596391,-5.9301829,4,3,3,2,3,4,3,4,2,1,1,1,10.125,2,5.0,0,False,False,True,False,False,False,False
+Odessa,Ukraine,Odessa,46.4843023,30.7322878,4,3,3,4,4,4,3,4,2,1,1,1,12.35,1,4.0,0,False,False,True,False,False,False,False
+Krabi,Thailand,Somkiet Buri Resort,8.0634637,98.9162345,3,4,5,5,3,4,4,2,4,1,1,1,26.916666666666668,1,3.0,0,False,True,False,False,False,False,False
+Muscat,Oman,Garden Hotel Muscat,23.5882019,58.3829448,4,3,4,4,2,4,3,3,4,1,1,1,28.900000000000002,2,3.0,1,False,False,False,True,False,False,False
+Galle,Sri Lanka,Deco on 44,6.0328139,80.214955,4,3,4,4,2,4,3,3,4,0,1,0,28.375,1,3.0,0,False,True,False,False,False,False,False
+Gdansk,Poland,Hotel Haffner,54.42880315,18.79832701217957,4,2,3,3,3,4,3,4,2,1,1,0,9.491666666666665,2,5.0,0,False,False,True,False,False,False,False
+Tunis,Tunisia,The Residence Tunis,36.8002068,10.1857757,4,3,3,3,3,4,3,3,2,1,1,0,20.05,1,5.0,0,True,False,False,False,False,False,False
+Rotorua,New Zealand,Alpin Motel & Conference Centre,-38.1381493,176.252922,4,4,5,2,3,3,5,3,3,1,1,0,12.183333333333332,2,3.0,0,False,False,False,False,False,True,False
+El Chaltén,Argentina,Posada Y Cabanas El Barranco,-49.3319564,-72.8860438,2,5,5,1,2,3,3,1,4,0,1,1,3.185714285714286,1,3.0,0,False,False,False,False,False,False,True
+Chefchaouen,Morocco,Dar el Moualim,35.1700832,-5.2766582971063976,4,3,4,1,2,4,3,2,4,0,1,0,19.183333333333334,1,2.0,0,True,False,False,False,False,False,False
+Ronda,Spain,Sevilla,36.7421339,-5.1665916,4,3,4,1,2,4,3,2,4,0,1,0,18.608333333333334,2,4.0,0,False,False,True,False,False,False,False
+London,United Kingdom,Sofitel London St James,51.4893335,-0.1440550845276872,5,2,3,1,5,5,3,5,2,1,1,1,11.316666666666668,3,5.0,0,False,False,True,False,False,False,False
+Namibia,Namibia,Aloegrove Safari Lodge,-23.2335499,17.3231107,3,5,5,2,2,3,3,2,5,0,0,1,21.008333333333333,2,2.0,0,True,False,False,False,False,False,False
+Tulum,Mexico,Grand Slam Fishing Lodge,20.429647,-87.6529306,3,4,4,5,3,4,5,2,4,0,1,1,27.15833333333333,2,4.0,0,False,False,False,False,True,False,False
+Yangshuo,China,Vienna Hotel (Guilin Yangshuo Branch),24.8630286,110.4871831,3,4,5,2,2,3,3,2,4,0,1,1,20.116666666666667,1,4.0,0,False,True,False,False,False,False,False
+Kuala Lumpur,Malaysia,Melia Kuala Lumpur,3.1526589,101.7022205,4,3,3,2,4,5,3,5,2,1,1,1,28.091666666666665,2,4.0,0,False,True,False,False,False,False,False
+Cornwall,United Kingdom,St Michael s Hotel & Spa,50.4433489,-4.62465658489158,3,4,5,5,2,3,3,2,4,0,1,1,12.0,2,4.0,0,False,False,True,False,False,False,False
+Siem Reap,Cambodia,Angkor Sayana Hotel & Spa,13.3617562,103.8590321,5,3,4,1,3,4,3,3,3,0,1,1,28.075,1,3.0,0,False,True,False,False,False,False,False
+Valdivia,Chile,Dreams Pedro de Valdivia,-39.8141262,-73.2459859,3,4,4,3,3,4,3,3,4,1,1,1,11.275,2,4.0,0,False,False,False,False,False,False,True
+Salta,Argentina,La Candela,-25.1076701,-64.3494964,4,4,5,1,3,4,3,3,4,1,1,1,16.708333333333332,2,3.0,0,False,False,False,False,False,False,True
+Split,Croatia,Jupiter Luxury Hotel,43.5116383,16.4399659,4,3,4,4,4,4,3,3,3,1,1,1,17.766666666666666,2,4.0,0,False,False,True,False,False,False,False
+Florence,Italy,UNAHOTELS Vittoria Firenze,43.7697955,11.2556404,5,2,3,1,3,5,3,4,2,1,1,1,16.316666666666666,2,4.0,0,False,False,True,False,False,False,False
+Bordeaux,France,Quick Palace,44.841225,-0.5800364,4,2,3,2,3,5,3,4,3,1,1,1,14.424999999999999,2,2.0,0,False,False,True,False,False,False,False
+Strasbourg,France,Hôtel La Diligence,48.584614,7.7507127,5,2,3,1,3,4,3,4,3,1,1,1,12.1,2,4.0,0,False,False,True,False,False,False,False
+Palau,Palau,Palau Carolines Resort,5.3783537,132.9102573,3,5,5,5,2,3,3,2,4,0,0,1,26.925,3,3.0,0,False,False,False,False,False,True,False
+St. George's,Grenada,Laluna Hotel,12.0535331,-61.751805,3,3,4,5,3,4,4,2,4,0,1,1,27.791666666666668,2,4.0,0,False,False,False,False,True,False,False
+Debrecen,Hungary,Stop Panzio,47.531399,21.6259782,3,2,3,1,3,3,3,3,3,1,1,0,11.941666666666668,1,2.0,0,False,False,True,False,False,False,False
+Taormina,Italy,Hotel  Inn,37.8512218,15.2830191,4,3,4,4,3,5,3,3,4,0,1,1,19.391666666666666,2,3.0,0,False,False,True,False,False,False,False
+Takayama,Japan,Miyama Ouan,36.1396246,137.2510322,5,2,4,1,2,4,3,2,4,0,1,0,13.218181818181819,2,4.0,0,False,True,False,False,False,False,False
+Caracas,Venezuela,The Vip Caracas,10.5060934,-66.9146008,4,3,4,3,3,4,2,3,2,1,1,1,23.3,1,3.0,0,False,False,False,False,False,False,True
+Da Lat,Vietnam,Empress Hotel Dalat,11.9373899,108.4286786,3,4,5,1,2,4,4,3,4,0,1,0,20.266666666666666,1,2.0,0,False,True,False,False,False,False,False
+Sapa,Vietnam,Holiday Sapa,22.3359246,103.8426749,4,4,5,1,2,3,3,2,4,0,1,1,15.875,1,3.0,0,False,True,False,False,False,False,False
+Guadalajara,Mexico,Pequeño Hotel Ejecutivo,20.6720375,-103.338396,5,3,3,1,4,5,3,4,2,1,1,1,20.433333333333334,2,4.0,0,False,False,False,False,True,False,False
+Wellington,New Zealand,Aaa Mana Motel,-41.2887953,174.7772114,4,3,4,3,4,4,3,4,2,1,1,1,14.225,2,3.0,0,False,False,False,False,False,True,False
+San Pedro de Atacama,Chile,Hotel Kimal,-22.910832,-68.2001376,3,5,5,1,2,3,3,2,5,1,1,1,14.5,2,3.0,0,False,False,False,False,False,False,True
+Siena,Italy,Hotel San Michele,43.16720595,11.467561040475552,5,2,3,1,2,4,3,3,4,1,1,0,14.683333333333332,2,3.0,0,False,False,True,False,False,False,False
+Ghent,Belgium,Europahotel,51.0538286,3.7250121,5,2,3,1,4,4,3,4,2,0,1,0,11.933333333333332,2,3.0,0,False,False,True,False,False,False,False
+Sao Paulo,Brazil,Estanplaza Nacoes Unidas,-23.5506507,-46.6333824,5,3,2,2,5,5,3,5,1,1,1,1,20.3,2,3.0,0,False,False,False,False,False,False,True
+Monteverde,Costa Rica,Hotel Fonda Vela,10.29115145,-84.81364393886889,3,5,5,1,2,3,3,1,4,0,1,1,20.575,2,3.0,0,False,False,False,False,True,False,False
+Birmingham,United Kingdom,Holiday Inn Express Birmingham Snow Hill,52.4796992,-1.9026911,4,2,3,1,3,4,3,4,2,1,1,1,10.9,2,3.0,0,False,False,True,False,False,False,False
+Charlottetown,Canada,Dutch Inn,46.234953,-63.132935,4,3,4,3,2,3,3,2,4,1,1,0,11.8375,2,3.0,0,False,False,False,False,True,False,False
+Suzhou,China,Zhangjiagang Zhonglian GDH International Hotel,31.311123,120.6212881,5,2,4,1,3,4,3,3,3,1,1,1,16.983333333333334,2,5.0,0,False,True,False,False,False,False,False
+Sardinia,Italy,La Coluccia,40.0912813,9.0305773,3,4,5,5,3,4,4,3,4,0,1,1,17.891666666666666,2,5.0,0,False,False,True,False,False,False,False
+Port Vila,Vanuatu,Tamanu on the Beach,-17.7414972,168.3150163,3,4,5,4,2,3,4,2,4,0,1,1,24.833333333333332,2,4.0,0,False,False,False,False,False,True,False
+Sibiu,Romania,Mercure Medias Binderbubi Hotel And Spa,45.7973912,24.1519202,4,3,4,1,3,3,3,3,4,1,1,0,10.866666666666667,1,4.0,0,False,False,True,False,False,False,False
+Luxor,Egypt,Eatabe Luxor Hotel,25.702096,32.647186,5,3,3,1,2,4,2,3,3,1,1,1,26.383333333333336,1,4.0,0,True,False,False,False,False,False,False
+Siwa Oasis,Egypt,Taziry Ecolodge,29.215497900000003,25.468972583438237,4,3,5,1,1,3,4,1,5,0,1,0,22.65833333333333,1,3.0,0,True,False,False,False,False,False,False
+Mombasa,Kenya,Neptune Village Beach Resort & Spa All Inclusive,-4.05052,39.667169,4,4,4,5,3,4,3,3,3,1,1,1,26.958333333333332,2,4.0,0,True,False,False,False,False,False,False
+Cuzco,Peru,Belmond Palacio Nazarenas,-13.51695415,-71.97927120704406,5,4,5,1,3,4,3,3,3,1,1,1,12.883333333333333,1,5.0,0,False,False,False,False,False,False,True
+Nara,Japan,Nara Ugaya Guesthouse,34.2963089,135.8816819,5,2,4,1,2,4,3,3,4,0,1,0,17.0,2,1.0,0,False,True,False,False,False,False,False
+Buenos Aires,Argentina,Facon Grande,-34.6083696,-58.4440583,5,3,2,2,5,5,3,5,2,1,0,1,18.566666666666666,2,3.0,0,False,False,False,False,False,False,True
+Vienna,Austria,MAXX by Steigenberger Hotel Vienna,48.2083537,16.3725042,5,2,3,1,4,5,4,5,2,1,1,1,12.708333333333334,2,4.0,0,False,False,True,False,False,False,False
+Baku,Azerbaijan,Hilton Baku,40.3755885,49.8328009,4,3,3,2,4,4,3,4,2,1,1,1,15.991666666666667,2,5.0,0,False,True,False,False,False,False,False
+Minsk,Belarus,Happy Hostel,53.9024716,27.5618225,3,2,3,1,3,3,2,3,3,1,1,0,11.544444444444444,1,1.0,0,False,False,True,False,False,False,False
+Santa Cruz,Bolivia,Hotel K Misional,-17.333333,-61.5,3,4,4,2,3,3,3,3,3,1,1,1,27.325,1,4.0,0,False,False,False,False,False,False,True
+Salvador da Bahia,Brazil,Hotel Pousada Rancho Fundo,-13.2432762,-43.3742847,5,3,4,4,4,5,3,3,2,0,1,1,27.15833333333333,2,3.0,0,False,False,False,False,False,False,True
+Bath,United Kingdom,Abbey Hotel Bw Signature Collection By Best Western,51.3813864,-2.3596963,5,2,3,1,3,4,5,3,3,0,1,0,11.283333333333333,2,4.0,0,False,False,True,False,False,False,False
+Hallstatt,Austria,Gasthof Bergfried,47.5621698,13.6486697,4,3,5,2,2,3,3,2,4,0,0,0,10.290909090909091,2,3.0,1,False,False,True,False,False,False,False
+Nicosia,Cyprus,Castelli Hotel,35.1746503,33.3638783,4,3,3,2,3,4,3,4,2,1,1,1,20.316666666666666,2,3.0,0,False,False,True,False,False,False,False
+Carcassonne,France,Hotel Astoria,43.2130358,2.3491069,5,2,3,1,2,4,3,3,4,1,1,0,14.908333333333333,2,2.0,0,False,False,True,False,False,False,False
+Lagos,Portugal,Via Donana Apartments,37.1027964,-8.6728689,3,4,4,5,4,4,3,3,3,0,1,1,18.241666666666667,2,3.0,0,False,False,True,False,False,False,False
+Alexandria,Egypt,Romance Alexandria Cornich,31.1991806,29.8951716,4,2,3,3,3,4,2,4,2,1,1,1,21.849999999999998,1,4.0,0,True,False,False,False,False,False,False
+Tallinn,Estonia,Metropol Hotel,59.4372155,24.7453688,4,2,3,2,3,4,3,4,3,1,1,1,10.033333333333333,2,3.0,0,False,False,True,False,False,False,False
+Paris,France,Novotel Marne la Vallée Noisy le Grand,48.8588897,2.3200410217200766,5,2,3,1,5,5,4,5,2,1,1,1,13.266666666666666,3,4.0,0,False,False,True,False,False,False,False
+Puglia,Italy,Park Hotel Elizabeth,40.9842539,16.6210027,4,3,4,4,3,5,4,3,4,0,1,1,16.925,2,4.0,0,False,False,True,False,False,False,False
+Queenstown,New Zealand,Blanket Bay,-45.0321923,168.661,3,5,5,2,4,4,4,3,3,0,1,1,10.174999999999999,3,5.0,0,False,False,False,False,False,True,False
+Biarritz,France,Grand Tonic Hotel Biarritz,43.4832523,-1.5592776,3,4,4,5,3,4,4,3,3,0,1,1,15.049999999999999,2,4.0,0,False,False,True,False,False,False,False
+Sintra,Portugal,Quinta do Rio Touro,38.79846,-9.3881,5,3,5,2,2,4,3,3,4,1,1,0,16.083333333333332,2,3.0,1,False,False,True,False,False,False,False
+Hvar,Croatia,Guesthouse Tea,43.17389195,16.55652349457852,3,3,4,5,5,4,3,3,2,0,1,1,18.025000000000002,2,3.0,0,False,False,True,False,False,False,False
+Rostock,Germany,Strandresort Markgrafenheide,54.0886707,12.1400211,4,3,3,4,3,3,3,3,3,0,1,0,9.758333333333333,2,3.0,0,False,False,True,False,False,False,False
+Zakynthos,Greece,Bozonos Luxury Villa,37.78913845,20.790089567090195,3,3,4,5,4,4,3,2,3,1,1,1,19.433333333333334,2,5.0,0,False,False,True,False,False,False,False
+Bandung,Indonesia,ibis Bandung Trans Studio,-6.9215529,107.6110212,4,3,4,2,3,4,3,3,3,1,1,0,22.55,1,3.0,0,False,True,False,False,False,False,False
+Naples,Italy,Holiday Inn Naples,40.8358846,14.2487679,5,3,3,3,4,5,3,4,2,1,1,1,17.45,2,4.0,0,False,False,True,False,False,False,False
+Sapporo,Japan,Dormy Inn Sapporo Annex,43.061936,141.3542924,4,3,4,2,3,4,3,4,3,1,1,1,13.955555555555556,2,3.0,0,False,True,False,False,False,False,False
+Riga,Latvia,Rixwell Centra Hotel,56.9493977,24.1051846,4,3,3,2,4,4,3,4,3,1,1,1,11.02,2,4.0,0,False,False,True,False,False,False,False
+Essaouira,Morocco,Le Medina Essaouira Hotel Thalassa sea & spa MGallery collection,31.5118281,-9.7620903,4,3,4,4,3,4,3,3,4,0,1,0,19.925,1,5.0,0,True,False,False,False,False,False,False
+Pokhara,Nepal,Waterfront Resort,28.209538,83.991402,3,5,5,1,2,3,4,2,4,1,1,1,20.075,1,3.0,0,False,True,False,False,False,False,False
+Eindhoven,Netherlands,Boutique Hotel Glow,51.4392648,5.478633,3,2,3,1,3,3,3,4,2,1,1,0,11.433333333333332,2,3.0,0,False,False,True,False,False,False,False
+Lisbon,Portugal,VIP Executive Entrecampos Hotel & Conference,38.7077507,-9.1365919,5,3,3,3,4,5,3,4,2,1,1,1,17.55,2,4.0,0,False,False,True,False,False,False,False
+Apia,Samoa,Sa Moana Resort,-13.8345235,-171.7630955,4,3,4,4,2,3,3,2,4,1,1,1,27.05,2,3.0,0,False,False,False,False,False,True,False
+Durban,South Africa,The Benjamin,-29.861825,31.009909,3,4,4,5,3,4,3,3,2,1,1,1,20.791666666666668,2,3.0,0,True,False,False,False,False,False,False
+Bled,Slovenia,Mulej Tourist Farm,46.3684202,14.1100595,3,4,5,2,2,3,3,2,4,0,1,0,7.822222222222223,2,4.0,0,False,False,True,False,False,False,False
+Bilbao,Spain,NH Collection Villa de Bilbao,43.2630018,-2.9350039,5,3,3,2,4,4,3,4,2,1,1,1,15.483333333333334,2,4.0,0,False,False,True,False,False,False,False
+Asturias,Spain,Hotel Sercotel Ciudad de Oviedo,43.3133868,-5.94192,4,4,5,4,3,4,3,2,4,0,1,1,13.65,2,4.0,0,False,False,True,False,False,False,False
+Zermatt,Switzerland,Hotel Weisshorn,46.0212076,7.749254,3,5,5,1,2,4,4,2,4,1,1,1,8.399999999999999,3,3.0,1,False,False,True,False,False,False,False
+Chiang Mai,Thailand,Chiangmai Inthanon Golf and Natural Resort,18.7882778,98.9858802,5,4,4,1,3,5,4,3,4,1,1,1,27.008333333333336,1,5.0,0,False,True,False,False,False,False,False
+Kairouan,Tunisia,Hotel La Kasbah Kairouan,35.6710101,10.10062,5,2,2,1,2,3,2,3,3,0,1,0,21.599999999999998,1,5.0,0,True,False,False,False,False,False,False
+Glasgow,United Kingdom,Lorne Hotel Glasgow,55.861155,-4.2501687,4,2,3,1,4,4,3,4,2,1,1,1,9.608333333333333,2,3.0,0,False,False,True,False,False,False,False
+Ushuaia,Argentina,Los Pinos Ushuaia Apart Hotel,-54.807306,-68.3084133,3,5,5,2,2,3,3,2,4,1,1,1,6.216666666666668,2,3.0,0,False,False,False,False,False,False,True
+Manama,Bahrain,Riviera Palace,26.2235041,50.5822436,4,3,2,3,4,4,3,4,2,0,1,0,28.208333333333332,2,4.0,0,False,False,False,True,False,False,False
+La Paz,Bolivia,Ecolodge Copacabana,-16.4955455,-68.1336229,4,4,4,1,3,3,3,3,3,1,1,1,8.075000000000001,1,2.0,0,False,False,False,False,False,False,True
+Montevideo,Uruguay,Hotel Alvear,-34.9058916,-56.1913095,4,3,3,3,3,4,3,4,3,1,1,1,17.066666666666666,2,3.0,0,False,False,False,False,False,False,True
+Mendoza,Argentina,Vecchia Terra Apart Hotel,-34.78709305,-68.43818677312292,3,4,4,1,3,4,3,3,4,1,1,1,15.908333333333333,2,3.0,0,False,False,False,False,False,False,True
+Innsbruck,Austria,Haus Bergfried,47.2654296,11.3927685,4,5,5,1,3,4,3,3,3,1,1,1,8.39090909090909,2,3.0,1,False,False,True,False,False,False,False
+Brussels,Belgium,NH Brussels EU Berlaymont,50.8465573,4.351697,4,2,3,1,3,4,3,4,2,1,1,1,11.475000000000001,2,4.0,0,False,False,True,False,False,False,False
+Tartu,Estonia,Barclay Hotel,58.3801207,26.72245,4,2,3,1,3,3,3,3,3,1,1,0,10.2,1,3.0,0,False,False,True,False,False,False,False
+Harbin,China,Jinjiang Inn Harbin Changjiang Road,45.7593633,126.6276177,4,3,3,1,3,3,2,4,2,1,1,1,16.442857142857143,2,2.0,0,False,True,False,False,False,False,False
+Prague,Czech Republic,Andant Apartments,50.0874654,14.4212535,5,2,3,1,4,4,3,5,2,1,1,1,10.691666666666668,2,2.0,0,False,False,True,False,False,False,False
+Beijing,China,Grand View Garden,40.190632,116.412144,5,3,3,1,4,5,3,5,2,1,1,1,16.61,2,4.0,0,False,True,False,False,False,False,False
+Lhasa,China,Huayu Paradise International Hotel,29.6542054,91.1173015,5,4,4,1,1,3,4,2,5,1,0,1,9.983333333333333,3,4.0,0,False,True,False,False,False,False,False
+Aswan,Egypt,Sofitel Legend Old Cataract Aswan Hotel,24.091071,32.897306,5,3,4,2,2,4,3,2,4,1,1,1,27.575,1,5.0,0,True,False,False,False,False,False,False
+Rijeka,Croatia,Hotel Bonavia Plava Laguna,45.3267976,14.442208,4,3,4,3,3,4,3,3,3,1,1,1,15.816666666666668,2,4.0,0,False,False,True,False,False,False,False
+Cuenca,Ecuador,Posada Todos Santos,-2.8974072,-79.0041726,5,3,4,1,3,4,3,3,4,1,1,1,15.041666666666666,1,3.0,1,False,False,False,False,False,False,True
+Giza,Egypt,Grand Pyramids Hotel,29.9870753,31.2118063,5,3,3,1,2,4,2,3,2,0,1,0,23.46666666666667,2,4.0,0,True,False,False,False,False,False,False
+Venice,Italy,Hotel Continental,45.4371908,12.3345898,5,2,3,1,3,5,3,4,2,1,1,1,14.558333333333332,3,4.0,0,False,False,True,False,False,False,False
+Rennes,France,B and B Hotel Rennes Sud Chantepie,48.1113387,-1.6800198,4,2,3,2,3,4,3,3,3,1,1,0,12.508333333333333,2,2.0,0,False,False,True,False,False,False,False
+Papeete,French Polynesia,Tahiti Pearl Beach Resort,-17.5373835,-149.5659964,3,4,5,5,3,4,4,3,4,1,1,1,26.666666666666668,3,4.0,0,False,False,False,False,False,True,False
+Lyon,France,Kyriad Prestige Lyon Est Saint Priest Eurexpo,45.7578137,4.8320114,5,2,3,1,4,5,3,4,2,1,1,1,13.683333333333332,2,4.0,0,False,False,True,False,False,False,False
+Bora Bora,French Polynesia,Pension Alice Et Raphael Bora Bora,-16.504346650000002,-151.73668863927236,2,4,5,5,2,3,5,1,5,1,0,1,27.391666666666666,3,2.0,0,False,False,False,False,False,True,False
+Osaka,Japan,Imperial Hotel Osaka,34.6937569,135.5014539,4,2,3,2,4,5,3,5,2,1,1,1,17.599999999999998,3,4.0,0,False,True,False,False,False,False,False
+Hamburg,Germany,Ameron Hotel Speicherstadt,53.550341,10.000654,4,3,3,2,4,4,3,5,2,1,1,1,10.416666666666666,2,3.0,1,False,False,True,False,False,False,False
+Vilnius,Lithuania,Holiday Inn Vilnius,54.6870458,25.2829111,4,2,3,2,3,3,3,3,3,1,1,0,11.255555555555555,1,4.0,0,False,False,True,False,False,False,False
+San Cristobal,Venezuela,Lidotel Hotel Boutique San Cristobal,7.7756663,-72.2214154,3,3,4,1,3,3,3,3,4,1,1,0,26.7,1,4.0,0,False,False,False,False,False,False,True
+Lübeck,Germany,Park Inn by Radisson Lübeck,53.866444,10.684738,4,2,3,2,3,4,3,3,3,0,1,0,10.058333333333334,2,4.0,0,False,False,True,False,False,False,False
+Antigua,Guatemala,La Reunion Golf Resort and Residences,14.5567814,-90.7337346,5,3,4,1,3,4,3,3,4,0,1,0,19.908333333333335,1,5.0,0,False,False,False,False,True,False,False
+Akureyri,Iceland,Gista,65.68390355,-18.11217559813441,3,4,5,2,2,3,3,3,4,1,1,0,5.911111111111111,3,3.0,0,False,False,True,False,False,False,False
+Tanna Island,Vanuatu,Tanna Lodge,-19.48577845,169.33450144830016,4,4,5,4,1,3,3,1,5,0,1,1,25.583333333333332,2,4.0,0,False,False,False,False,False,True,False
+Ho Chi Minh City,Vietnam,Sen Viet Hotel,10.7763897,106.7011391,4,3,2,2,4,5,3,5,2,1,1,1,28.45,1,3.0,0,False,True,False,False,False,False,False
+York,United Kingdom,Hilton York,53.96565785,-1.0743052444639218,5,2,3,1,3,4,3,3,3,1,1,0,10.283333333333333,2,4.0,0,False,False,True,False,False,False,False
+Matera,Italy,Hotel Cave del Sole,40.4476419,16.47357384028852,5,2,3,1,2,4,3,3,4,0,1,0,17.125,2,4.0,0,False,False,True,False,False,False,False
+Hiroshima,Japan,Sunroute Hiroshima Hotel,34.3917241,132.4517589,5,2,3,2,3,4,3,3,3,1,1,1,17.108333333333334,2,3.0,0,False,True,False,False,False,False,False
+Vientiane,Laos,Sengtawan Riverside Hotel,17.9640988,102.6133707,4,3,3,1,2,4,3,2,4,1,1,0,27.308333333333334,1,3.0,0,False,True,False,False,False,False,False
+Edinburgh,United Kingdom,Britannia Edinburgh,55.9533456,-3.1883749,5,3,3,2,4,4,3,4,2,1,1,1,9.458333333333334,2,3.0,0,False,False,True,False,False,False,False
+Lusaka,Zambia,Protea Hotel Lusaka,-15.4163395,28.2818414,3,3,4,1,2,3,2,3,3,1,1,1,23.983333333333334,1,3.0,0,True,False,False,False,False,False,False
+Palawan,Philippines,Puerto Del Sol Resort & Dive Center,11.0798978,120.93734215474105,3,4,5,5,2,3,3,2,5,0,1,1,27.78333333333333,1,3.0,0,False,True,False,False,False,False,False
+Bucharest,Romania,Hotel Cismigiu,44.4361414,26.1027202,4,2,3,1,4,4,3,4,2,1,1,1,13.075000000000001,1,4.0,0,False,False,True,False,False,False,False
+Seychelles,Seychelles,Sea View Lodge,-4.6574977,55.4540146,2,3,5,5,2,4,4,2,5,0,0,1,27.650000000000002,3,3.0,0,True,False,False,False,False,False,False
+Zurich,Switzerland,Stars & Stripes - Motel Steighof,47.3744489,8.5410422,4,3,4,1,3,4,4,5,2,1,1,1,10.666666666666666,3,3.0,1,False,False,True,False,False,False,False
+Dubai,United Arab Emirates,Pearl Marina Hotel Apartment,25.07428235,55.18853865430702,4,4,2,4,5,4,5,5,2,1,1,1,29.400000000000002,3,3.0,0,False,False,False,True,False,False,False
+Hanoi,Vietnam,Hilton Garden Inn Hanoi,21.0283334,105.854041,5,3,3,1,3,5,3,4,2,1,1,1,24.816666666666666,1,4.0,0,False,True,False,False,False,False,False
+Cardiff,United Kingdom,Holiday Inn Cardiff City,51.4816546,-3.1791934,4,2,3,2,4,3,3,4,2,1,1,1,11.299999999999999,2,3.0,0,False,False,True,False,False,False,False
+Keswick,United Kingdom,Cumbria House,54.6009812,-3.1375822,3,4,5,2,2,3,3,2,4,0,1,0,10.125,2,4.0,0,False,False,True,False,False,False,False
+Bologna,Italy,Hotel Il Guercino,44.4938203,11.3426327,5,2,3,1,3,5,3,4,2,1,1,1,15.025,2,4.0,0,False,False,True,False,False,False,False
+Isle of Skye,United Kingdom,Duisdale House Hotel,57.36300795,-6.302173669619252,3,4,5,3,1,3,3,1,5,0,1,1,9.833333333333334,2,4.0,0,False,False,True,False,False,False,False
+Macau,China,Yinhua Hotel,22.1757605,113.5514142,4,3,2,2,5,4,3,5,2,0,1,1,23.641666666666666,2,3.0,0,False,True,False,False,False,False,False
+Salento,Colombia,Casa Alto del Coronel,4.6373012,-75.569799,4,4,5,1,2,4,3,2,4,0,1,0,22.59166666666667,1,3.0,1,False,False,False,False,False,False,True
+Quito,Ecuador,La Casa Sol Classic,-0.2201641,-78.5123274,5,4,4,2,3,4,3,3,3,1,1,1,13.975,1,3.0,0,False,False,False,False,False,False,True
+Suva,Fiji,Studio 6 Apartments,-18.1415884,178.4421662,3,3,4,3,3,3,3,3,2,0,1,1,25.34166666666667,2,3.0,0,False,False,False,False,False,True,False
+Toulouse,France,Castellane,43.6044622,1.4442469,4,3,3,2,4,4,3,4,2,1,1,1,14.691666666666668,2,2.0,0,False,False,True,False,False,False,False
+Frankfurt,Germany,NH Collection Frankfurt City,50.1106444,8.6820917,4,2,3,1,4,4,3,5,2,1,1,1,12.216666666666667,2,4.0,0,False,False,True,False,False,False,False
+Colmar,France,Ibis Styles Colmar Centre,48.0777517,7.3579641,4,2,3,1,2,4,3,2,4,1,1,0,12.275,2,3.0,0,False,False,True,False,False,False,False
+Bratislava,Slovakia,Radisson Blu Carlton,48.1516988,17.1093063,4,3,3,1,3,3,3,3,3,1,1,0,12.008333333333333,2,4.0,0,False,False,True,False,False,False,False
+Hong Kong,Hong Kong,Mini Hotel Causeway Bay,22.2793278,114.1628131,5,3,3,2,5,5,3,5,2,1,1,1,24.483333333333334,3,3.0,0,False,True,False,False,False,False,False
+Plovdiv,Bulgaria,Park Hotel Plovdiv,42.1418541,24.7499297,4,3,3,1,3,4,3,3,3,1,1,0,14.133333333333333,1,4.0,0,False,False,True,False,False,False,False
+Harare,Zimbabwe,Cresta Jameson,-17.8567035,31.0601584,3,3,4,1,2,3,2,3,3,1,1,1,19.491666666666667,1,3.0,0,True,False,False,False,False,False,False
+Punta del Este,Uruguay,Jamaica,-34.9632342,-54.9439981,3,3,3,5,5,4,3,4,2,1,1,1,16.900000000000002,2,3.0,0,False,False,False,False,False,False,True
+Vladivostok,Russia,Hotel Versailles,43.1150678,131.8855768,4,3,4,2,3,3,2,3,3,1,1,1,12.2875,2,3.0,0,False,True,False,False,False,False,False
+Murmansk,Russia,Park Inn by Radisson Poliarnie Zori,68.970665,33.07497,3,3,4,1,2,2,2,3,4,1,1,1,8.883333333333333,2,4.0,0,False,True,False,False,False,False,False
+Moscow,Russia,Business Tourist,55.625578,37.6063916,5,3,2,1,4,4,3,5,2,1,1,1,12.0,2,3.0,0,False,True,False,False,False,False,False
+Abu Dhabi,United Arab Emirates,The Ritz Carlton Abu Dhabi Grand Canal,24.4538352,54.3774014,4,3,3,4,3,4,4,5,2,1,1,1,29.25,3,5.0,0,False,False,False,True,False,False,False
+Casablanca,Morocco,Royal Mansour Casablanca,33.5945144,-7.6200284,4,3,2,3,4,4,3,4,2,1,1,1,19.341666666666665,1,5.0,0,True,False,False,False,False,False,False
+Meknes,Morocco,Palace Meknes,33.8984131,-5.5321582,4,2,3,1,2,4,3,3,3,1,1,0,18.05,1,2.0,0,True,False,False,False,False,False,False
+Rarotonga,Cook Islands,Aroko Bungalows,-21.2368312,-159.7774744,3,4,5,5,2,3,4,2,5,0,1,1,24.758333333333336,2,3.0,0,False,False,False,False,False,True,False
+Moorea,French Polynesia,Hotel Hibiscus,-17.533306,-149.8386006,3,4,5,5,2,4,5,2,4,1,1,1,26.53333333333333,3,2.0,0,False,False,False,False,False,True,False
+Salzburg,Austria,Garni Haus Sonnleitn,47.7981346,13.0464806,5,3,4,1,3,4,3,3,3,1,1,1,10.549999999999999,2,3.0,1,False,False,True,False,False,False,False
+Turin,Italy,Villa Dilambda,45.0677551,7.6824892,5,2,3,1,3,4,3,4,2,1,1,1,13.133333333333333,2,3.0,1,False,False,True,False,False,False,False
+Lugano,Switzerland,Villa Principe Leopoldo,46.0050102,8.9520281,3,3,5,2,3,4,4,3,4,1,1,1,13.299999999999999,3,5.0,0,False,False,True,False,False,False,False
+Fortaleza,Brazil,Hotel E Pousada Cumbuco Guesthouse,-3.7304512,-38.5217989,3,4,3,5,4,4,3,3,2,1,1,1,27.675,2,3.0,1,False,False,False,False,False,False,True
+Antofagasta,Chile,ibis Antofagasta,-23.6463741,-70.3980033,3,3,4,3,2,3,2,3,3,1,1,0,16.849999999999998,2,3.0,0,False,False,False,False,False,False,True
+Bariloche,Argentina,Bahia Paraiso Luxury Suites Boutique Hotel,-41.1334781,-71.3101474,3,5,5,2,3,4,3,3,4,0,1,1,8.875,2,3.0,0,False,False,False,False,False,False,True
+Kota Kinabalu,Malaysia,The Klagan Hotel,5.9780066,116.0728988,3,4,5,4,3,4,3,3,3,1,1,1,27.833333333333332,2,3.0,0,False,True,False,False,False,False,False
+Antalya,Turkey,Royal Atlantis Beach,36.8865728,30.7030242,4,4,4,5,4,4,4,3,3,1,1,1,19.966666666666665,2,4.0,0,False,True,False,False,False,False,False
+Sidi Bou Said,Tunisia,Dar Fatma,36.8710935,10.3490516,4,2,3,4,3,4,3,2,4,0,0,0,20.066666666666666,1,3.0,0,True,False,False,False,False,False,False
+Tahiti,French Polynesia,Relais Maroto,-17.6873439,-149.4451681,3,4,5,5,2,4,5,2,5,0,0,1,26.53333333333333,3,2.0,0,False,False,False,False,False,True,False
+Montego Bay,Jamaica,Royalton White Sands All Inclusive,18.4724603,-77.9217357,3,4,4,5,4,4,3,3,3,1,1,1,27.53333333333333,2,4.0,0,False,False,False,False,True,False,False
+Acapulco,Mexico,Holiday Inn Acapulco La Isla,16.8680495,-99.8940182,3,4,3,4,4,4,3,3,2,1,1,1,28.25,2,3.0,0,False,False,False,False,True,False,False
+Kuwait City,Kuwait,Hilton Kuwait Resort,29.3796532,47.9734174,3,2,2,3,3,4,3,4,2,0,1,1,27.666666666666668,3,5.0,0,False,False,False,True,False,False,False
+Lautoka,Fiji,First Landing Beach Resort & Villas,-17.6043956,177.4530138,3,4,4,4,2,3,4,2,4,0,1,0,25.8,2,3.0,0,False,False,False,False,False,True,False
+Nadi,Fiji,Hans Travel Inn,-17.7992725,177.4178549,3,4,5,5,3,3,4,2,4,0,1,1,25.8,2,3.0,0,False,False,False,False,False,True,False
+Lausanne,Switzerland,Victoria,46.5218269,6.6327025,4,3,4,1,3,4,4,4,3,1,1,1,10.058333333333334,3,4.0,0,False,False,True,False,False,False,False
+Vilamoura,Portugal,Marina Buzios by Garvetur,37.0759505,-8.1165401,3,3,4,5,4,4,4,3,3,0,1,0,18.466666666666665,2,3.0,1,False,False,True,False,False,False,False
+Cologne,Germany,Gallery Loft Cologne,50.938361,6.959974,4,2,3,1,4,4,3,4,2,1,1,1,12.258333333333333,2,4.0,0,False,False,True,False,False,False,False
+Pisa,Italy,Leonardo,43.4714722,10.6797912,4,2,3,2,3,4,3,3,2,1,1,0,15.266666666666667,2,3.0,0,False,False,True,False,False,False,False
+Kandy,Sri Lanka,Amanda Hills,7.2931208,80.6350358,5,3,4,1,2,4,3,3,3,0,1,0,27.55,1,2.0,0,False,True,False,False,False,False,False
+Lima,Peru,Meliá Lima,-12.0621065,-77.0365256,5,3,3,2,4,5,3,4,2,1,1,1,19.866666666666667,2,5.0,0,False,False,False,False,False,False,True
+Santa Marta,Colombia,Palma Blanca del Mar Hotel,11.2320944,-74.1950916,4,4,5,4,3,4,3,3,4,1,1,1,29.358333333333334,1,3.0,0,False,False,False,False,False,False,True
+Cali,Colombia,Boutique San Antonio,3.4519988,-76.5325259,4,3,3,2,5,4,3,3,2,1,1,1,23.875,1,3.0,0,False,False,False,False,False,False,True
+Cancun,Mexico,Riu Palace Las Americas All Inclusive Adults Only,21.1527467,-86.8425761,3,4,3,5,5,4,4,3,2,1,1,1,26.558333333333334,2,4.0,0,False,False,False,False,True,False,False
+Granada,Spain,Hotel Victoria Playa,37.1734995,-3.5995337,5,3,3,2,4,5,3,4,2,1,1,1,16.583333333333332,2,4.0,0,False,False,True,False,False,False,False
+Linz,Austria,ARCOTEL Nike Linz,48.3059078,14.286198,4,2,3,1,3,3,3,4,2,1,1,0,11.083333333333334,2,4.0,0,False,False,True,False,False,False,False
+Leipzig,Germany,pentahotel Leipzig,51.3406321,12.3747329,4,2,3,1,4,4,3,4,2,1,1,1,10.983333333333334,2,3.0,1,False,False,True,False,False,False,False
+Hue,Vietnam,Valentine Hotel,16.4639321,107.5863388,5,3,3,2,2,4,3,3,4,1,1,1,26.0,1,3.0,0,False,True,False,False,False,False,False
+Braga,Portugal,Al Braga,41.5510583,-8.4280045,4,2,3,2,3,4,3,3,3,1,1,0,15.0,2,1.0,0,False,False,True,False,False,False,False
+Manaus,Brazil,Express Vieiralves,-3.1316333,-59.9825041,4,4,5,2,3,4,3,3,4,1,1,1,27.625,2,3.0,0,False,False,False,False,False,False,True
+San Carlos de Bariloche,Argentina,Selina Bariloche,-41.1334781,-71.3101474,3,5,5,2,3,4,3,3,4,0,1,1,8.875,2,3.0,0,False,False,False,False,False,False,True
+Machu Picchu,Peru,Terrazas del Inca Bed & Breakfast,-13.164422,-72.5450851,5,5,5,1,1,3,2,1,4,0,0,1,12.883333333333333,3,3.0,0,False,False,False,False,False,False,True
+Antwerp,Belgium,Hotel 3 Paardekens,51.2211097,4.3997081,4,2,2,1,4,4,3,4,2,1,1,1,11.75,2,3.0,0,False,False,True,False,False,False,False
+Nuremberg,Germany,Sheraton Carlton Nuernberg,49.453872,11.077298,4,2,3,1,3,4,3,4,2,0,1,0,10.583333333333334,2,5.0,0,False,False,True,False,False,False,False
+Funchal,Portugal,Jardins d'Ajuda Suite,32.6496497,-16.9086783,4,3,5,3,3,4,4,3,4,1,1,1,20.125,2,4.0,0,False,False,True,False,False,False,False
+Nuwara Eliya,Sri Lanka,Anilana Craigbank,7.012402,80.7571612,3,3,5,1,2,3,4,2,4,0,1,0,16.216666666666665,1,3.0,0,False,True,False,False,False,False,False
+Naypyidaw,Myanmar,The Thingaha Nay Pyi Taw,19.7753289,96.1032552,2,2,3,1,1,2,2,2,4,0,1,0,26.575,1,4.0,0,False,True,False,False,False,False,False
+Rosario,Argentina,Livin' Residence Rosario,-32.9593609,-60.6617024,4,3,3,2,4,4,3,4,2,1,1,1,18.258333333333333,2,3.0,0,False,False,False,False,False,False,True
+Nazca,Peru,Casa Hacienda Nasca Oasis,-14.8277203,-74.9370624,4,3,3,1,2,3,2,2,4,1,0,0,20.133333333333333,1,4.0,0,False,False,False,False,False,False,True
+Los Cabos,Mexico,Cumbre Del Tezal,21.166121,-100.936442,3,4,4,5,4,4,4,3,3,0,1,1,19.541666666666668,2,3.0,0,False,False,False,False,True,False,False
+Lille,France,Sweetôme Aparthotel,50.6365654,3.0635282,4,2,2,1,3,4,3,4,2,1,1,0,11.766666666666666,2,2.0,0,False,False,True,False,False,False,False
+Arica,Chile,Azapa Inn,-18.4785288,-70.3211394,3,4,4,4,3,3,3,2,4,1,1,0,19.316666666666666,1,3.0,0,False,False,False,False,False,False,True
+Taupo,New Zealand,Huka Lodge,-38.6866197,176.0694773,3,5,5,2,3,3,4,2,4,1,1,1,12.433333333333332,2,5.0,0,False,False,False,False,False,True,False
+Dunedin,New Zealand,Quality Cargills,-45.8740984,170.5035755,4,3,4,3,3,3,3,3,4,1,1,0,10.491666666666667,2,3.0,0,False,False,False,False,False,True,False
+Aarhus,Denmark,First Hotel Atlantic,56.1496278,10.2134046,4,2,3,3,3,4,3,4,3,1,1,0,9.866666666666667,2,3.0,0,False,False,True,False,False,False,False
+Savusavu,Fiji,Namale the Fiji Islands Resort and Spa,-16.7802184,179.3328955,3,4,5,5,2,3,4,2,5,1,1,1,26.675,2,5.0,0,False,False,False,False,False,True,False
+Bristol,United Kingdom,The Bristol Hotel,51.4538022,-2.5972985,4,3,3,2,4,4,3,4,2,1,1,1,11.35,2,4.0,0,False,False,True,False,False,False,False
+Rovaniemi,Finland,Napapiirin Saarituvat,66.5025657,25.73122,3,4,5,1,2,3,3,2,4,1,1,1,9.5,2,3.0,1,False,False,True,False,False,False,False
+Nelson,New Zealand,The Lodge at Paratiho Farm,-41.2710849,173.2836756,3,4,5,3,2,3,3,3,4,1,1,1,13.816666666666668,2,3.0,0,False,False,False,False,False,True,False
+Maun,Botswana,Kamanga Safari Hotel,-19.9860951,23.4224352,3,5,5,1,2,3,3,2,4,1,1,1,24.141666666666666,2,2.0,0,True,False,False,False,False,False,False
+Gothenburg,Sweden,Sure Hotel by Best Western Center,57.7072326,11.9670171,4,3,4,3,3,4,3,4,3,0,1,1,9.174999999999999,2,3.0,0,False,False,True,False,False,False,False
+Manchester,United Kingdom,Jurys Inn Manchester City Centre,53.4794892,-2.2451148,4,2,2,1,4,4,3,4,2,1,1,1,10.433333333333334,2,4.0,0,False,False,True,False,False,False,False
+Copenhagen,Denmark,Hotel Alexandra,55.6867243,12.5700724,5,2,3,2,4,4,3,5,2,1,1,1,10.225,2,4.0,0,False,False,True,False,False,False,False
+Sucre,Bolivia,Las Torres Hostal,-19.0477251,-65.2594306,4,3,3,1,2,3,2,2,4,1,1,1,15.566666666666668,1,2.0,0,False,False,False,False,False,False,True
