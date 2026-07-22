@@ -147,16 +147,16 @@ def inject_css():
         .tw-float{ animation: floaty 5s ease-in-out infinite; display:inline-block; }
         .tw-float-slow{ animation: floaty 7s ease-in-out infinite; display:inline-block; }
 
-        .tw-illustration-row{ display:flex; justify-content:center; gap:1.8rem; font-size:1.9rem; margin: 1.2rem 0 2.4rem 0; }
+        .tw-illustration-row{ display:flex; justify-content:center; gap:2rem; font-size:3.4rem; margin: 1.2rem 0 2.4rem 0; }
         .tw-section-title{ font-weight:700; font-size:1.6rem; color:var(--text-dark); margin: 2.2rem 0 1rem 0;}
         .tw-muted{ color:var(--text-muted); }
 
         .tw-icon-circle{
-            width:42px; height:42px; border-radius:13px;
+            width:68px; height:68px; border-radius:18px;
             background: linear-gradient(135deg, var(--sky), var(--blue));
             display:flex; align-items:center; justify-content:center;
-            font-size:1.1rem; margin-bottom:.7rem; color:white;
-            box-shadow: 0 8px 18px rgba(14,165,233,.28);
+            font-size:1.9rem; margin-bottom:.8rem; color:white;
+            box-shadow: 0 10px 24px rgba(14,165,233,.3);
         }
 
         .tw-result-card{
@@ -349,9 +349,14 @@ def render_insights(df: pd.DataFrame):
             color_discrete_sequence=accent_scale,
         )
         fig1.update_layout(
+            template="plotly_white",
             title="Destinations by Region", paper_bgcolor=plot_bg, plot_bgcolor=plot_bg,
-            font_color="#0F172A", margin=dict(t=50, b=10, l=10, r=10), height=340,
+            font=dict(color="#0F172A", size=13),
+            title_font=dict(color="#0F172A", size=15),
+            legend=dict(font=dict(color="#0F172A")),
+            margin=dict(t=50, b=10, l=10, r=10), height=340,
         )
+        fig1.update_traces(textfont_color="#0F172A")
         st.plotly_chart(fig1, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -365,9 +370,15 @@ def render_insights(df: pd.DataFrame):
             labels={"x": "", "y": "Destinations"},
         )
         fig2.update_layout(
+            template="plotly_white",
             title="Destinations by Budget Level", paper_bgcolor=plot_bg, plot_bgcolor=plot_bg,
-            font_color="#0F172A", showlegend=False, margin=dict(t=50, b=10, l=10, r=10), height=340,
+            font=dict(color="#0F172A", size=13),
+            title_font=dict(color="#0F172A", size=15),
+            xaxis=dict(color="#0F172A", tickfont=dict(color="#0F172A")),
+            yaxis=dict(color="#0F172A", tickfont=dict(color="#0F172A")),
+            showlegend=False, margin=dict(t=50, b=10, l=10, r=10), height=340,
         )
+        fig2.update_traces(textfont_color="#0F172A")
         st.plotly_chart(fig2, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -381,8 +392,13 @@ def render_insights(df: pd.DataFrame):
         labels={"x": "Avg. Temperature (°C)", "y": ""},
     )
     fig3.update_layout(
+        template="plotly_white",
         title="Average Yearly Temperature by Region", paper_bgcolor=plot_bg, plot_bgcolor=plot_bg,
-        font_color="#0F172A", coloraxis_showscale=False, margin=dict(t=50, b=10, l=10, r=10), height=380,
+        font=dict(color="#0F172A", size=13),
+        title_font=dict(color="#0F172A", size=15),
+        xaxis=dict(color="#0F172A", tickfont=dict(color="#0F172A")),
+        yaxis=dict(color="#0F172A", tickfont=dict(color="#0F172A")),
+        coloraxis_showscale=False, margin=dict(t=50, b=10, l=10, r=10), height=380,
     )
     st.plotly_chart(fig3, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
