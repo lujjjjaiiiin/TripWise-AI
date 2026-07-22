@@ -327,16 +327,7 @@ Streamlet
 !pip install streamlit
 
 # Commented out IPython magic to ensure Python compatibility.
-# %%writefile requirements.txt
-# 
-# streamlit
-# pandas
-# numpy
-# scikit-learn
-# matplotlib
-# seaborn
-# xgboost
-# plotly
+
 
 # Commented out IPython magic to ensure Python compatibility.
 # %%writefile app.py
