@@ -68,27 +68,68 @@ def inject_css():
             --shadow: 0 20px 60px rgba(37,99,235,0.12);
         }
 
-        html, body, [class*="css"]  { font-family: 'Inter', sans-serif; font-size: 16px; }
+        html, body, [class*="css"]  { font-family: 'Inter', sans-serif; font-size: 17.5px; line-height:1.65; }
         h1,h2,h3, .tw-display { font-family: 'Outfit', sans-serif; }
 
         #MainMenu, footer, header {visibility:hidden;}
-        .block-container{ padding-top:1rem; padding-bottom:2rem; max-width: 1200px;}
+        .block-container{ padding-top:1.4rem; padding-bottom:3rem; max-width: 1200px;}
         .stApp{ background: linear-gradient(180deg, #DCEFFC 0%, #C9E6FA 55%, #BFE0F8 100%); }
         body{ background: linear-gradient(180deg, #DCEFFC 0%, #C9E6FA 55%, #BFE0F8 100%); }
 
-        /* ---------------- READABILITY FIXES ---------------- */
+        /* ---------------- READABILITY / TYPOGRAPHY ---------------- */
         .stApp, .main, .block-container { direction: ltr; }
         label, .stMarkdown p, .stMarkdown li, .stMarkdown span,
         .stSelectbox label, .stRadio label, .stCheckbox label, .stSlider label {
             color: var(--text-dark) !important;
-            font-weight: 600 !important;
-            font-size: 0.98rem !important;
+            font-weight: 650 !important;
+            font-size: 1.08rem !important;
+            letter-spacing: .01em;
+            margin-bottom: .35rem !important;
         }
-        [data-testid="stSlider"] { direction: ltr !important; }
-        [data-testid="stSlider"] * { direction: ltr !important; unicode-bidi: plaintext !important; }
-        [data-testid="stTickBarMin"], [data-testid="stTickBarMax"],
-        [data-testid="stThumbValue"] {
-            color: var(--blue) !important; font-weight:700 !important;
+        .tw-section-title{ font-weight:800; font-size:1.9rem; color:var(--text-dark); margin: 2.6rem 0 1.2rem 0; letter-spacing:-.01em;}
+        .tw-muted{ color:var(--text-muted); font-size:1.05rem; line-height:1.6; }
+
+        /* Consistent vertical rhythm between Streamlit widgets */
+        div[data-testid="stVerticalBlock"] > div{ margin-bottom:.35rem; }
+        div[data-testid="column"]{ padding: 0 .6rem; }
+
+        /* ---------------- SLIDERS (fixed direction + bigger + clearer) ---------------- */
+        [data-testid="stSlider"]{
+            direction: ltr !important;
+            padding-top:.3rem; padding-bottom:.6rem;
+        }
+        [data-testid="stSlider"] *{
+            direction: ltr !important;
+            unicode-bidi: plaintext !important;
+        }
+        [data-testid="stSlider"] [data-baseweb="slider"]{ margin-top:.5rem; }
+        [data-testid="stTickBarMin"], [data-testid="stTickBarMax"]{
+            color: var(--blue) !important; font-weight:700 !important; font-size:.95rem !important;
+        }
+        [data-testid="stThumbValue"]{
+            color: white !important; font-weight:700 !important; font-size:.9rem !important;
+            background: var(--blue) !important; padding:.15rem .5rem !important; border-radius:8px !important;
+        }
+        [data-baseweb="slider"] [role="slider"]{
+            box-shadow: 0 0 0 4px rgba(37,99,235,.18) !important;
+        }
+
+        /* ---------------- FORM CONTROLS (bigger + more spacing) ---------------- */
+        .stSelectbox, .stRadio, .stCheckbox, .stTextInput, .stNumberInput { margin-bottom: 1.1rem; }
+        div[data-baseweb="select"] > div{
+            border-radius:14px !important; min-height:3rem !important; font-size:1.05rem !important;
+            border-color: rgba(30,58,138,0.25) !important;
+        }
+        .stTextInput input, .stNumberInput input{
+            border-radius:14px !important; min-height:3rem !important; font-size:1.05rem !important;
+        }
+        div[role="radiogroup"] label{ font-size:1rem !important; margin-right:1.2rem !important; }
+        .stCheckbox label p{ font-size:1.05rem !important; }
+        form[data-testid="stForm"]{
+            background: rgba(255,255,255,0.25);
+            border-radius: 26px;
+            padding: 2rem 1.8rem;
+            border: 1px solid rgba(30,58,138,0.1);
         }
 
         section[data-testid="stSidebar"]{
@@ -106,39 +147,52 @@ def inject_css():
         .stButton>button{
             background: linear-gradient(90deg, var(--sky), var(--blue));
             color:white; border:none; border-radius:999px;
-            padding:0.7rem 1.8rem; font-weight:600; font-size:1rem;
+            padding:0.95rem 2.2rem; font-weight:700; font-size:1.1rem;
             box-shadow: 0 10px 30px rgba(37,99,235,.35);
             transition: all .25s ease;
         }
-        .stButton>button:hover{ transform: translateY(-2px) scale(1.02); box-shadow:0 14px 36px rgba(37,99,235,.45); }
+        .stButton>button:hover{ transform: translateY(-3px) scale(1.03); box-shadow:0 16px 40px rgba(37,99,235,.5); }
+        .stButton>button:active{ transform: translateY(-1px) scale(1.0); }
+
+        .tw-back-btn button{
+            background: rgba(15,23,42,0.08) !important;
+            color: var(--text-dark) !important;
+            font-size: 0.95rem !important;
+            padding: 0.55rem 1.3rem !important;
+            box-shadow: none !important;
+        }
+        .tw-back-btn button:hover{
+            background: rgba(15,23,42,0.15) !important;
+            transform: translateX(-3px) !important;
+        }
 
         .tw-glass{
-            background: rgba(219,234,254,0.55);
+            background: rgba(219,234,254,0.6);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(30,58,138,0.15);
             border-radius: 24px;
-            padding: 1.8rem;
+            padding: 2.2rem;
             box-shadow: var(--shadow);
             transition: transform .3s ease, box-shadow .3s ease;
         }
         .tw-glass:hover{ transform: translateY(-6px); box-shadow: 0 26px 70px rgba(37,99,235,.18); }
 
-        .tw-hero{ text-align:center; padding: 3.2rem 1rem 1rem 1rem; }
+        .tw-hero{ text-align:center; padding: 3.4rem 1rem 1.2rem 1rem; }
         .tw-hero h1{
-            font-size: 3.1rem; font-weight:800; color:var(--text-dark);
-            line-height:1.15; margin-bottom:1rem;
+            font-size: 3.4rem; font-weight:800; color:var(--text-dark);
+            line-height:1.18; margin-bottom:1.2rem;
             animation: fadeUp .9s ease both;
         }
         .tw-hero p{
-            font-size:1.15rem; color:var(--text-muted); max-width:680px;
-            margin: 0 auto 2rem auto; line-height:1.6;
+            font-size:1.3rem; color:var(--text-muted); max-width:700px;
+            margin: 0 auto 2.2rem auto; line-height:1.7;
             animation: fadeUp .9s ease .15s both;
         }
         .tw-badge{
-            display:inline-block; padding:.4rem 1rem; border-radius:999px;
-            background: rgba(14,165,233,.12); color:var(--blue); font-weight:600;
-            font-size:.85rem; margin-bottom:1.2rem; letter-spacing:.02em;
+            display:inline-block; padding:.5rem 1.2rem; border-radius:999px;
+            background: rgba(14,165,233,.14); color:var(--blue); font-weight:700;
+            font-size:.95rem; margin-bottom:1.4rem; letter-spacing:.02em;
             animation: fadeUp .9s ease both;
         }
 
@@ -148,8 +202,6 @@ def inject_css():
         .tw-float-slow{ animation: floaty 7s ease-in-out infinite; display:inline-block; }
 
         .tw-illustration-row{ display:flex; justify-content:center; gap:2rem; font-size:3.4rem; margin: 1.2rem 0 2.4rem 0; }
-        .tw-section-title{ font-weight:700; font-size:1.6rem; color:var(--text-dark); margin: 2.2rem 0 1rem 0;}
-        .tw-muted{ color:var(--text-muted); }
 
         .tw-icon-circle{
             width:68px; height:68px; border-radius:18px;
@@ -161,13 +213,13 @@ def inject_css():
 
         .tw-result-card{
             background: linear-gradient(135deg, #EEF4FC 0%, #E1EBFA 100%);
-            border-radius:20px; padding:1.4rem 1.6rem;
-            box-shadow: var(--shadow); margin-bottom:1rem;
+            border-radius:20px; padding:1.6rem 1.8rem;
+            box-shadow: var(--shadow); margin-bottom:1.1rem;
             border-left: 6px solid var(--blue);
         }
         .tw-score-pill{
-            display:inline-block; padding:.25rem .7rem; border-radius:999px;
-            background: rgba(30,58,138,.12); color:var(--blue); font-weight:700; font-size:.8rem;
+            display:inline-block; padding:.35rem .9rem; border-radius:999px;
+            background: rgba(30,58,138,.14); color:var(--blue); font-weight:800; font-size:.9rem;
         }
         </style>
         """,
@@ -263,13 +315,36 @@ NAV_ITEMS = [
 ]
 
 
+def go_to(page: str):
+    """Navigate to a page, pushing the current one onto history for Back support."""
+    if st.session_state.page != page:
+        st.session_state.history.append(st.session_state.page)
+    st.session_state.page = page
+    st.rerun()
+
+
+def go_back():
+    if st.session_state.history:
+        st.session_state.page = st.session_state.history.pop()
+    else:
+        st.session_state.page = "Home"
+    st.rerun()
+
+
+def render_back_button():
+    if st.session_state.page != "Home":
+        st.markdown('<div class="tw-back-btn">', unsafe_allow_html=True)
+        if st.button("← Back", key="back_btn"):
+            go_back()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+
 def render_sidebar():
     with st.sidebar:
         st.markdown('<span class="tw-logo">✈️ TripWise AI</span>', unsafe_allow_html=True)
         for label, icon in NAV_ITEMS:
             if st.button(f"{icon}  {label}", key=f"nav_{label}", use_container_width=True):
-                st.session_state.page = label
-                st.rerun()
+                go_to(label)
 
 
 # ----------------------------------------------------------------------------
@@ -292,8 +367,7 @@ def page_home(df: pd.DataFrame):
     col = st.columns([1, 1, 1])[1]
     with col:
         if st.button("Start Planning →", use_container_width=True):
-            st.session_state.page = "Destination Explorer"
-            st.rerun()
+            go_to("Destination Explorer")
 
     st.markdown(
         """
@@ -321,8 +395,8 @@ def page_home(df: pd.DataFrame):
                 f"""
                 <div class="tw-glass">
                     <div class="tw-icon-circle">{icon}</div>
-                    <div style="font-weight:700; font-size:1.05rem; margin-bottom:.4rem;">{title}</div>
-                    <div class="tw-muted" style="font-size:.92rem; line-height:1.5;">{desc}</div>
+                    <div style="font-weight:800; font-size:1.25rem; margin-bottom:.6rem; color:#0F172A;">{title}</div>
+                    <div class="tw-muted" style="font-size:1.02rem; line-height:1.6;">{desc}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -492,11 +566,11 @@ def page_destination_explorer(df: pd.DataFrame):
             st.markdown(
                 f"""
                 <div class="tw-result-card">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="font-weight:700; font-size:1.15rem;">📍 {row['city']}, {row['country']}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem;">
+                        <div style="font-weight:800; font-size:1.3rem; color:#0F172A;">📍 {row['city']}, {row['country']}</div>
                         <span class="tw-score-pill">{match_pct}% match</span>
                     </div>
-                    <div class="tw-muted" style="margin-top:.4rem; font-size:.92rem;">{hotel_name}</div>
+                    <div class="tw-muted" style="margin-top:.5rem; font-size:1rem;">{hotel_name}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -510,10 +584,10 @@ def page_placeholder(title, icon, description):
     st.markdown(f'<div class="tw-section-title">{icon} {title}</div>', unsafe_allow_html=True)
     st.markdown(
         f"""
-        <div class="tw-glass" style="text-align:center; padding:3.2rem 2rem;">
-            <div style="font-size:2.6rem; margin-bottom:1rem;">{icon}</div>
-            <div style="font-weight:700; font-size:1.3rem; margin-bottom:.6rem;">{title} is coming soon</div>
-            <div class="tw-muted">{description}</div>
+        <div class="tw-glass" style="text-align:center; padding:3.6rem 2rem;">
+            <div style="font-size:3rem; margin-bottom:1.1rem;">{icon}</div>
+            <div style="font-weight:800; font-size:1.6rem; margin-bottom:.7rem; color:#0F172A;">{title} is coming soon</div>
+            <div class="tw-muted" style="font-size:1.08rem;">{description}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -540,6 +614,8 @@ def main():
         st.session_state.splash_done = False
     if "page" not in st.session_state:
         st.session_state.page = "Home"
+    if "history" not in st.session_state:
+        st.session_state.history = []
 
     if not st.session_state.splash_done:
         placeholder = st.empty()
@@ -552,6 +628,7 @@ def main():
         return
 
     render_sidebar()
+    render_back_button()
 
     if st.session_state.page == "Home":
         df = load_data()
