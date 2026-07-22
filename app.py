@@ -1,6 +1,12 @@
+"""
+TripWise AI — Premium Streamlit Travel Assistant
+Splash screen (SVG heart-path flight animation) -> Main App (Home / nav pages)
+Destination Explorer page runs the real Cosine Similarity recommendation engine.
+"""
 
 import time
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics.pairwise import cosine_similarity
@@ -58,16 +64,32 @@ def inject_css():
             --white:#FFFFFF;
             --light-gray:#F3F6FA;
             --text-dark:#0F172A;
-            --text-muted:#64748B;
+            --text-muted:#475569;
             --shadow: 0 20px 60px rgba(37,99,235,0.12);
         }
 
-        html, body, [class*="css"]  { font-family: 'Inter', sans-serif; }
+        html, body, [class*="css"]  { font-family: 'Inter', sans-serif; font-size: 16px; }
         h1,h2,h3, .tw-display { font-family: 'Outfit', sans-serif; }
 
         #MainMenu, footer, header {visibility:hidden;}
         .block-container{ padding-top:1rem; padding-bottom:2rem; max-width: 1200px;}
-        body{ background: linear-gradient(180deg, #F8FBFF 0%, #EFF5FC 100%); }
+        .stApp{ background: linear-gradient(180deg, #DCEFFC 0%, #C9E6FA 55%, #BFE0F8 100%); }
+        body{ background: linear-gradient(180deg, #DCEFFC 0%, #C9E6FA 55%, #BFE0F8 100%); }
+
+        /* ---------------- READABILITY FIXES ---------------- */
+        .stApp, .main, .block-container { direction: ltr; }
+        label, .stMarkdown p, .stMarkdown li, .stMarkdown span,
+        .stSelectbox label, .stRadio label, .stCheckbox label, .stSlider label {
+            color: var(--text-dark) !important;
+            font-weight: 600 !important;
+            font-size: 0.98rem !important;
+        }
+        [data-testid="stSlider"] { direction: ltr !important; }
+        [data-testid="stSlider"] * { direction: ltr !important; unicode-bidi: plaintext !important; }
+        [data-testid="stTickBarMin"], [data-testid="stTickBarMax"],
+        [data-testid="stThumbValue"] {
+            color: var(--blue) !important; font-weight:700 !important;
+        }
 
         section[data-testid="stSidebar"]{
             background: linear-gradient(180deg, #0B1220 0%, #111B33 100%);
@@ -252,7 +274,7 @@ def render_sidebar():
 # ----------------------------------------------------------------------------
 # PAGE: HOME
 # ----------------------------------------------------------------------------
-def page_home():
+def page_home(df: pd.DataFrame):
     st.markdown(
         """
         <div class="tw-hero">
@@ -304,6 +326,65 @@ def page_home():
                 """,
                 unsafe_allow_html=True,
             )
+
+    render_insights(df)
+
+
+def render_insights(df: pd.DataFrame):
+    st.markdown('<div class="tw-section-title">📊 Key Insights</div>', unsafe_allow_html=True)
+
+    plot_bg = "rgba(0,0,0,0)"
+    accent_scale = ["#0EA5E9", "#2563EB", "#38BDF8", "#60A5FA", "#93C5FD", "#0284C7", "#1D4ED8"]
+
+    i1, i2 = st.columns(2)
+
+    with i1:
+        st.markdown('<div class="tw-glass">', unsafe_allow_html=True)
+        region_counts = (
+            df[REGION_COLS].sum().rename(lambda c: c.replace("region_", "").replace("_", " ").title())
+        )
+        fig1 = px.pie(
+            names=region_counts.index, values=region_counts.values, hole=0.55,
+            color_discrete_sequence=accent_scale,
+        )
+        fig1.update_layout(
+            title="Destinations by Region", paper_bgcolor=plot_bg, plot_bgcolor=plot_bg,
+            font_color="#0F172A", margin=dict(t=50, b=10, l=10, r=10), height=340,
+        )
+        st.plotly_chart(fig1, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with i2:
+        st.markdown('<div class="tw-glass">', unsafe_allow_html=True)
+        budget_labels = {1: "Budget", 2: "Mid-range", 3: "Luxury"}
+        budget_counts = df["budget_level_encoded"].map(budget_labels).value_counts()
+        fig2 = px.bar(
+            x=budget_counts.index, y=budget_counts.values,
+            color=budget_counts.index, color_discrete_sequence=accent_scale,
+            labels={"x": "", "y": "Destinations"},
+        )
+        fig2.update_layout(
+            title="Destinations by Budget Level", paper_bgcolor=plot_bg, plot_bgcolor=plot_bg,
+            font_color="#0F172A", showlegend=False, margin=dict(t=50, b=10, l=10, r=10), height=340,
+        )
+        st.plotly_chart(fig2, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="tw-glass" style="margin-top:1.2rem;">', unsafe_allow_html=True)
+    region_temp = df.assign(
+        region=df[REGION_COLS].idxmax(axis=1).str.replace("region_", "").str.replace("_", " ").str.title()
+    ).groupby("region")["temp_avg_yearly"].mean().sort_values()
+    fig3 = px.bar(
+        x=region_temp.values, y=region_temp.index, orientation="h",
+        color=region_temp.values, color_continuous_scale=["#93C5FD", "#0EA5E9", "#2563EB"],
+        labels={"x": "Avg. Temperature (°C)", "y": ""},
+    )
+    fig3.update_layout(
+        title="Average Yearly Temperature by Region", paper_bgcolor=plot_bg, plot_bgcolor=plot_bg,
+        font_color="#0F172A", coloraxis_showscale=False, margin=dict(t=50, b=10, l=10, r=10), height=380,
+    )
+    st.plotly_chart(fig3, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ----------------------------------------------------------------------------
@@ -456,7 +537,8 @@ def main():
     render_sidebar()
 
     if st.session_state.page == "Home":
-        page_home()
+        df = load_data()
+        page_home(df)
     elif st.session_state.page == "Destination Explorer":
         df = load_data()
         page_destination_explorer(df)
