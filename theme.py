@@ -50,7 +50,9 @@ CSS = """
 #MainMenu, footer, [data-testid="stStatusWidget"], [data-testid="stDecoration"],
 [data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"],
 [data-testid="stToolbar"]{ display:none !important; }
-[data-testid="stHeader"]{ background:transparent !important; height:0 !important; }
+/* Streamlit's header sits at the top of the viewport with its own stacking
+   context and swallows clicks aimed at the fixed navbar underneath it. */
+[data-testid="stHeader"]{ display:none !important; }
 
 .stApp{
   background:
@@ -104,7 +106,7 @@ html, body, [class*="css"], .stApp{
    NAVBAR
    ===================================================================== */
 .tw-nav{
-  position:fixed; top:0; left:0; right:0; height:var(--nav-h); z-index:9990;
+  position:fixed; top:0; left:0; right:0; height:var(--nav-h); z-index:2147483000;
   display:flex; align-items:center; justify-content:space-between;
   padding:0 clamp(18px,4vw,44px);
   background:rgba(255,255,255,.78);
@@ -120,7 +122,7 @@ html, body, [class*="css"], .stApp{
 }
 .tw-nav__links{ display:flex; align-items:center; gap:.35rem; }
 .tw-nav__links a{
-  position:relative; text-decoration:none; color:var(--slate);
+  position:relative; pointer-events:auto; text-decoration:none; color:var(--slate);
   font-size:.9rem; font-weight:500; padding:.5rem .85rem; border-radius:99px;
   transition:color .25s var(--ease), background .25s var(--ease);
 }
