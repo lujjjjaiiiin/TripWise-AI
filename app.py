@@ -62,7 +62,7 @@ SPLASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
 html,body{height:100%;overflow:hidden}
 body{
   display:grid;place-items:center;
-  background:radial-gradient(130% 100% at 50% -10%, #223350 0%, #101a2c 55%, #070b14 100%);
+  background:linear-gradient(180deg,#f1f4f7 0%,#e3e9ef 42%,#ced6df 100%);
   animation:out .8s ease 4.5s forwards;
 }
 @keyframes out{to{opacity:0}}
@@ -71,7 +71,7 @@ body{
   animation:scenein 1.2s cubic-bezier(.2,.7,.3,1) both}
 @keyframes scenein{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:none}}
 svg{width:100%;height:100%;display:block;
-  filter:drop-shadow(0 42px 90px rgba(0,0,0,.6))}
+  filter:drop-shadow(0 30px 64px rgba(66,80,96,.22))}
 
 /* shades: hold closed, then glide up out of the opening */
 .shade{transform:translateY(0);animation:up 2.2s cubic-bezier(.72,0,.18,1) forwards}
@@ -85,11 +85,15 @@ svg{width:100%;height:100%;display:block;
 
 .mark{position:absolute;left:0;right:0;bottom:6%;text-align:center;opacity:0;
   animation:mk 1s cubic-bezier(.2,.7,.3,1) 2.8s both}
-.mark .t{font-family:'Outfit',sans-serif;font-weight:800;color:#fff;
-  font-size:clamp(1.35rem,3.2vw,2.15rem);letter-spacing:.01em;
-  text-shadow:0 10px 34px rgba(0,0,0,.5)}
-.mark .s{font-family:'Inter',sans-serif;margin-top:.4rem;color:rgba(255,255,255,.72);
-  font-size:clamp(.6rem,1.3vw,.78rem);letter-spacing:.34em;text-transform:uppercase}
+.mark .t{font-family:'Outfit',sans-serif;font-weight:800;
+  font-size:clamp(1.5rem,3.6vw,2.45rem);letter-spacing:-.005em;
+  background:linear-gradient(96deg,#0EA5E9,#2563EB);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  color:#2563EB;
+  filter:drop-shadow(0 0 22px rgba(14,165,233,.45)) drop-shadow(0 2px 3px rgba(255,255,255,.95))}
+.mark .s{font-family:'Inter',sans-serif;margin-top:.5rem;color:#5A6B7E;font-weight:500;
+  font-size:clamp(.62rem,1.35vw,.8rem);letter-spacing:.34em;text-transform:uppercase;
+  text-shadow:0 1px 2px rgba(255,255,255,.9)}
 @keyframes mk{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
 @media (prefers-reduced-motion:reduce){
@@ -101,6 +105,17 @@ svg{width:100%;height:100%;display:block;
 <div class="scene">
 <svg viewBox="0 0 1200 620" xmlns="http://www.w3.org/2000/svg">
 <defs>
+  <linearGradient id="cabin" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f1f4f7"/><stop offset=".42" stop-color="#e3e9ef"/>
+    <stop offset="1" stop-color="#ced6df"/>
+  </linearGradient>
+  <radialGradient id="vign" cx="50%" cy="42%" r="72%">
+    <stop offset="55%" stop-color="#000" stop-opacity="0"/>
+    <stop offset="100%" stop-color="#48535f" stop-opacity=".16"/>
+  </radialGradient>
+  <filter id="winShadow" x="-25%" y="-25%" width="150%" height="150%">
+    <feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#54626f" flood-opacity=".33"/>
+  </filter>
   <linearGradient id="bezel" x1=".25" y1="0" x2=".75" y2="1">
     <stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#f4f6f8"/>
     <stop offset="1" stop-color="#dbe1e7"/>
@@ -137,9 +152,15 @@ svg{width:100%;height:100%;display:block;
   <linearGradient id="mDeepg" x1="0" y1="0" x2="0" y2="1"><stop offset="40%" stop-color="#fff" stop-opacity="0"/><stop offset="66%" stop-color="#fff" stop-opacity="1"/><stop offset="100%" stop-color="#fff" stop-opacity="1"/></linearGradient><mask id="mDeep" maskUnits="userSpaceOnUse" x="-40" y="0" width="300" height="326"><rect x="-40" y="0" width="300" height="326" fill="url(#mDeepg)"/></mask><linearGradient id="mDeckg" x1="0" y1="0" x2="0" y2="1"><stop offset="44%" stop-color="#fff" stop-opacity="0"/><stop offset="70%" stop-color="#fff" stop-opacity="1"/><stop offset="100%" stop-color="#fff" stop-opacity="1"/></linearGradient><mask id="mDeck" maskUnits="userSpaceOnUse" x="-40" y="0" width="300" height="326"><rect x="-40" y="0" width="300" height="326" fill="url(#mDeckg)"/></mask><linearGradient id="mLowg" x1="0" y1="0" x2="0" y2="1"><stop offset="58%" stop-color="#fff" stop-opacity="0"/><stop offset="84%" stop-color="#fff" stop-opacity="1"/><stop offset="100%" stop-color="#fff" stop-opacity="1"/></linearGradient><mask id="mLow" maskUnits="userSpaceOnUse" x="-40" y="0" width="300" height="326"><rect x="-40" y="0" width="300" height="326" fill="url(#mLowg)"/></mask><linearGradient id="mHighg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff" stop-opacity="1"/><stop offset="30%" stop-color="#fff" stop-opacity="0"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="mHigh" maskUnits="userSpaceOnUse" x="-40" y="0" width="300" height="326"><rect x="-40" y="0" width="300" height="326" fill="url(#mHighg)"/></mask>
   <filter id="cA_0" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.009" numOctaves="5" seed="11" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -1.9 0 0 0 1.18"/></filter><filter id="cB_0" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.017" numOctaves="6" seed="5" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.5 0 0 0 1.45"/></filter><filter id="cC_0" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.034" numOctaves="5" seed="29" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -3.0 0 0 0 1.72"/></filter><filter id="cD_0" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="4" seed="41" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.6 0 0 0 1.3"/></filter><filter id="cA_1" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.009" numOctaves="5" seed="71" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -1.9 0 0 0 1.18"/></filter><filter id="cB_1" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.017" numOctaves="6" seed="65" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.5 0 0 0 1.45"/></filter><filter id="cC_1" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.034" numOctaves="5" seed="89" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -3.0 0 0 0 1.72"/></filter><filter id="cD_1" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="4" seed="101" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.6 0 0 0 1.3"/></filter><filter id="cA_2" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.009" numOctaves="5" seed="131" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -1.9 0 0 0 1.18"/></filter><filter id="cB_2" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.017" numOctaves="6" seed="125" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.5 0 0 0 1.45"/></filter><filter id="cC_2" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.034" numOctaves="5" seed="149" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -3.0 0 0 0 1.72"/></filter><filter id="cD_2" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="4" seed="161" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.6 0 0 0 1.3"/></filter>
 </defs>
+  <rect width="1200" height="620" fill="url(#cabin)"/>
+  <rect x="0" y="34" width="1200" height="2" fill="#c3cbd4" opacity=".55"/>
+  <rect x="0" y="37" width="1200" height="1" fill="#ffffff" opacity=".9"/>
+  <rect x="0" y="561" width="1200" height="2" fill="#c3cbd4" opacity=".5"/>
+  <rect x="0" y="564" width="1200" height="1" fill="#ffffff" opacity=".85"/>
 
   <g transform="translate(72,78)">
-    <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="url(#bezel)"/>
+    <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="url(#bezel)"
+          filter="url(#winShadow)"/>
     <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="none"
           stroke="#aab3bd" stroke-width="1.1" opacity=".5"/>
     <rect x="24" y="24" width="252" height="382" rx="76" ry="60" fill="url(#well)"/>
@@ -176,7 +197,8 @@ svg{width:100%;height:100%;display:block;
              C200 34 100 34 58 52 Z" fill="url(#lipHi)"/>
   </g>
   <g transform="translate(450,78)">
-    <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="url(#bezel)"/>
+    <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="url(#bezel)"
+          filter="url(#winShadow)"/>
     <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="none"
           stroke="#aab3bd" stroke-width="1.1" opacity=".5"/>
     <rect x="24" y="24" width="252" height="382" rx="76" ry="60" fill="url(#well)"/>
@@ -213,7 +235,8 @@ svg{width:100%;height:100%;display:block;
              C200 34 100 34 58 52 Z" fill="url(#lipHi)"/>
   </g>
   <g transform="translate(828,78)">
-    <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="url(#bezel)"/>
+    <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="url(#bezel)"
+          filter="url(#winShadow)"/>
     <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="none"
           stroke="#aab3bd" stroke-width="1.1" opacity=".5"/>
     <rect x="24" y="24" width="252" height="382" rx="76" ry="60" fill="url(#well)"/>
@@ -249,6 +272,7 @@ svg{width:100%;height:100%;display:block;
     <path d="M58 52 C100 20 200 20 242 52
              C200 34 100 34 58 52 Z" fill="url(#lipHi)"/>
   </g>
+  <rect width="1200" height="620" fill="url(#vign)" pointer-events="none"/>
 </svg>
 </div>
 <div class="mark">
@@ -322,7 +346,11 @@ def inject_css():
             letter-spacing: .01em;
             margin-bottom: .35rem !important;
         }
-        .tw-section-title{ font-weight:800; font-size:1.9rem; color:var(--text-dark); margin: 2.6rem 0 1.2rem 0; letter-spacing:-.01em;}
+        .tw-section-title{
+            font-weight:800; font-size:2rem; color:var(--text-dark);
+            margin: 2.6rem 0 1.2rem 0; letter-spacing:-.015em;
+            text-shadow: 0 1px 0 rgba(255,255,255,.85);
+        }
         .tw-muted{ color:var(--text-muted); font-size:1.05rem; line-height:1.6; }
 
         /* Consistent vertical rhythm between Streamlit widgets */
@@ -416,9 +444,17 @@ def inject_css():
 
         .tw-hero{ text-align:center; padding: 3.4rem 1rem 1.2rem 1rem; }
         .tw-hero h1{
-            font-size: 3.4rem; font-weight:800; color:var(--text-dark);
-            line-height:1.18; margin-bottom:1.2rem;
+            font-size: 3.6rem; font-weight:800; color:var(--text-dark);
+            line-height:1.16; margin-bottom:1.2rem; letter-spacing:-.02em;
+            text-shadow: 0 1px 0 rgba(255,255,255,.9), 0 10px 34px rgba(37,99,235,.14);
             animation: fadeUp .9s ease both;
+        }
+        /* the product name itself carries the brand gradient and a soft glow */
+        .tw-hero h1 .tw-glow{
+            background: linear-gradient(96deg, var(--sky), var(--blue));
+            -webkit-background-clip:text; background-clip:text;
+            -webkit-text-fill-color:transparent; color:var(--blue);
+            filter: drop-shadow(0 0 20px rgba(14,165,233,.4));
         }
         .tw-hero p{
             font-size:1.3rem; color:var(--text-muted); max-width:700px;
@@ -437,14 +473,26 @@ def inject_css():
         .tw-float{ animation: floaty 5s ease-in-out infinite; display:inline-block; }
         .tw-float-slow{ animation: floaty 7s ease-in-out infinite; display:inline-block; }
 
-        .tw-illustration-row{ display:flex; justify-content:center; gap:2.2rem; font-size:4.4rem; margin: 1.4rem 0 2.6rem 0; }
+        /* Floating travel icons. clamp() lets them grow on desktop without
+           overflowing narrow screens; flex-wrap is the safety net below that. */
+        .tw-illustration-row{
+            display:flex; justify-content:center; align-items:center; flex-wrap:wrap;
+            gap: clamp(1.2rem, 3.5vw, 3rem);
+            font-size: clamp(3.2rem, 8vw, 7rem);
+            line-height:1; margin: 2rem 0 3rem 0;
+        }
+        .tw-illustration-row span{
+            filter: drop-shadow(0 14px 26px rgba(37,99,235,.28));
+        }
 
         .tw-icon-circle{
-            width:84px; height:84px; border-radius:22px;
+            width: clamp(88px, 9vw, 116px); height: clamp(88px, 9vw, 116px);
+            border-radius:28px;
             background: linear-gradient(135deg, var(--sky), var(--blue));
             display:flex; align-items:center; justify-content:center;
-            font-size:2.4rem; margin-bottom:.9rem; color:white;
-            box-shadow: 0 12px 28px rgba(14,165,233,.32);
+            font-size: clamp(2.6rem, 4vw, 3.4rem); line-height:1;
+            margin-bottom:1.1rem; color:white;
+            box-shadow: 0 16px 34px rgba(14,165,233,.34);
         }
 
         .tw-result-card{
@@ -544,7 +592,7 @@ def page_home(df: pd.DataFrame):
         """
         <div class="tw-hero">
             <span class="tw-badge">✨ AI-Powered Travel Planning</span>
-            <h1>✈️ Plan Smarter with<br/>TripWise AI</h1>
+            <h1>✈️ Plan Smarter with<br/><span class="tw-glow">TripWise AI</span></h1>
             <p>Your intelligent travel companion that creates personalized itineraries,
             predicts travel costs, recommends destinations, and helps you explore the
             world effortlessly.</p>
@@ -680,6 +728,19 @@ def _clean(value):
     return text
 
 
+def _airport_of(row):
+    """Best available airport identity for a row, as (name, code).
+
+    The notebook fills cities that found no airport match with "Unknown", so a
+    row may carry an "Unknown" name, a has_airport flag of 0, or no airport
+    columns at all if the CSV was exported without them. Any of those means
+    there is nothing to show, and each is reported the same way.
+    """
+    name = _clean(row.get("name"))
+    code = _clean(row.get("iata")) or _clean(row.get("icao"))
+    return (name, code) if (name or code) else (None, None)
+
+
 def page_destination_explorer(df: pd.DataFrame):
     st.markdown('<div class="tw-section-title">📍 Destination Explorer</div>', unsafe_allow_html=True)
     st.markdown('<p class="tw-muted">Tell us what you love, and we\'ll match you with the best destinations.</p>', unsafe_allow_html=True)
@@ -758,6 +819,15 @@ def page_destination_explorer(df: pd.DataFrame):
             .head(8)
         )
 
+        missing = [c for c in ("name", "iata") if c not in df.columns]
+        if missing:
+            st.warning(
+                "No nearest airport can be shown: tripwise_data.csv has no "
+                + " or ".join(f"`{c}`" for c in missing)
+                + " column. Re-export final_df from the notebook with the "
+                "airport columns included."
+            )
+
         st.markdown('<div class="tw-section-title">Top matches for you</div>', unsafe_allow_html=True)
         st.markdown(
             '<p class="tw-muted" style="margin-top:-.6rem;">'
@@ -769,9 +839,8 @@ def page_destination_explorer(df: pd.DataFrame):
             match_pct = round(row["similarity_score"] * 100, 1)
 
             hotel_name = _clean(row.get("HotelName"))
-            airport_name = _clean(row.get("name"))       # airport name from the airports merge
-            airport_iata = _clean(row.get("iata"))
-            has_air = int(row.get("has_airport", 0)) == 1 and airport_name is not None
+            airport_name, airport_iata = _airport_of(row)
+            has_air = airport_name is not None or airport_iata is not None
 
             # Line 1 — make it explicit this is a hotel pick for this city.
             if hotel_name:
@@ -788,9 +857,10 @@ def page_destination_explorer(df: pd.DataFrame):
             # Line 2 — nearest airport, name + IATA code, or a clear fallback.
             if has_air:
                 code = f' <span class="tw-score-pill" style="font-size:.78rem;">{airport_iata}</span>' if airport_iata else ""
+                label = airport_name or "Airport"
                 airport_html = (
                     f'<div class="tw-detail"><span class="tw-detail-ic">🛫</span>'
-                    f'<span><b>Nearest airport</b> — {airport_name}{code}</span></div>'
+                    f'<span><b>Nearest airport</b> — {label}{code}</span></div>'
                 )
             else:
                 airport_html = (
