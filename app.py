@@ -1306,7 +1306,7 @@ html, body, [class*="css"], .stApp{
    NAVBAR
    ===================================================================== */
 .tw-nav{
-  position:fixed; top:0; left:0; right:0; height:var(--nav-h); z-index:2147483000;
+  position:fixed; top:0; left:0; right:0; height:var(--nav-h); z-index:50;
   display:flex; align-items:center; justify-content:space-between;
   padding:0 clamp(18px,4vw,44px);
   background:rgba(255,255,255,.78);
@@ -1377,6 +1377,7 @@ html, body, [class*="css"], .stApp{
   content:""; position:absolute; inset:0 0 auto; height:1px;
   border-radius:var(--r-lg) var(--r-lg) 0 0;
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.96),transparent);
+  pointer-events:none;
 }
 .tw-card:hover{ transform:translateY(-6px); box-shadow:var(--sh-3); }
 
@@ -1423,6 +1424,7 @@ html, body, [class*="css"], .stApp{
 .tw-dest__scrim{
   position:absolute; inset:auto 0 0 0; height:64%;
   background:linear-gradient(180deg,transparent,rgba(6,12,24,.66));
+  pointer-events:none;
 }
 .tw-dest__place{ position:absolute; left:18px; bottom:14px; right:96px; }
 .tw-dest__place h3{
@@ -2301,12 +2303,15 @@ def build_splash() -> str:
 <style>
 .tw-splash{{
   /* purely decorative, so it must never intercept a click even mid-animation */
-  pointer-events:none;
+  pointer-events:none !important;
   position:fixed; inset:0; z-index:99998; display:grid; place-items:center;
   background:linear-gradient(180deg,#f1f4f7 0%,#e3e9ef 42%,#ced6df 100%);
-  animation:twSplashOut .9s ease 4.4s forwards;
+  animation:twSplashOut .6s ease 2.2s forwards;
 }}
-@keyframes twSplashOut{{ to{{ opacity:0; visibility:hidden; pointer-events:none; }} }}
+.tw-splash *{{ pointer-events:none !important; }}
+@keyframes twSplashOut{{
+  to{{ opacity:0; visibility:hidden; pointer-events:none; display:none; }}
+}}
 .tw-splash .tw-scene{{
   width:min(96vw,1240px); aspect-ratio:{SPL_W}/{SPL_H};
   animation:twSceneIn 1.2s cubic-bezier(.2,.7,.3,1) both;
@@ -2417,6 +2422,13 @@ def build_splash() -> str:
 <div class="s">Plan smarter &middot; Travel further</div>
 </div>
 </div>
+<script>
+setTimeout(function(){{
+  var s = document.querySelector('.tw-splash');
+  if (s && s.parentNode) s.parentNode.removeChild(s);
+}}, 3200);
+</script>
+
 """)
 
 
