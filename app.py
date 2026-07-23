@@ -23,7 +23,6 @@ from html import escape
 import numpy as np
 import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as components
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import StandardScaler
 
@@ -1502,7 +1501,7 @@ def window_svg(i: int, x: int) -> str:
         # a per-window filter so each window shows a different piece of sky
         wid = f"{cid}_{i}"
         clouds.append(
-            f'<g class="drift" style="animation-duration:{dur + i * 2}s;'
+            f'<g class="tw-drift" style="animation-duration:{dur + i * 2}s;'
             f"animation-delay:-{n * 3 + i}s;--dx:{dist}px\">"
             f'<rect x="{GX - 40}" y="{GY}" width="{GW + 80}" height="{GH}" '
             f'filter="url(#{wid})" mask="url(#{mask})" opacity="{op}" '
@@ -1531,7 +1530,7 @@ def window_svg(i: int, x: int) -> str:
                fill="url(#sun)" opacity=".55"/>
 
       <!-- shade: starts closed, glides up out of the opening -->
-      <g class="shade" style="animation-delay:{delay}s">
+      <g class="tw-shade" style="animation-delay:{delay}s">
         <rect x="{GX - 4}" y="{GY - 2}" width="{GW + 8}" height="{GH + 4}" fill="url(#shade)"/>
         <rect x="{GX - 4}" y="{GY + GH - 40}" width="{GW + 8}" height="42" fill="url(#lipG)"/>
         <rect x="{GX + GW / 2 - 30}" y="{GY + GH - 26}" width="60" height="9" rx="4.5"
@@ -1567,119 +1566,135 @@ def build_splash() -> str:
                 f"</filter>"
             )
 
-    return f"""<!doctype html><html><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    return _flatten(f"""
 <style>
-*{{margin:0;padding:0;box-sizing:border-box}}
-html,body{{height:100%;overflow:hidden}}
-body{{
-  display:grid;place-items:center;
+.tw-splash{{
+  position:fixed; inset:0; z-index:99999; display:grid; place-items:center;
   background:linear-gradient(180deg,#f1f4f7 0%,#e3e9ef 42%,#ced6df 100%);
-  animation:out .8s ease 4.5s forwards;
+  animation:twSplashOut .9s ease 4.4s forwards;
 }}
-@keyframes out{{to{{opacity:0}}}}
-
-.scene{{width:min(96vw,1240px);aspect-ratio:{SPL_W}/{SPL_H};
-  animation:scenein 1.2s cubic-bezier(.2,.7,.3,1) both}}
-@keyframes scenein{{from{{opacity:0;transform:scale(1.05)}}to{{opacity:1;transform:none}}}}
-svg{{width:100%;height:100%;display:block;
-  filter:drop-shadow(0 30px 64px rgba(66,80,96,.22))}}
-
-/* shades: hold closed, then glide up out of the opening */
-.shade{{transform:translateY(0);animation:up 2.2s cubic-bezier(.72,0,.18,1) forwards}}
-@keyframes up{{to{{transform:translateY(-{GH + 60}px)}}}}
-
-/* clouds drift sideways at different speeds for parallax */
-.drift{{animation-name:dr;animation-timing-function:ease-in-out;
-  animation-iteration-count:infinite;animation-direction:alternate}}
-@keyframes dr{{from{{transform:translateX(calc(var(--dx) * -1))}}
-              to{{transform:translateX(var(--dx))}}}}
-
-.mark{{position:absolute;left:0;right:0;bottom:6%;text-align:center;opacity:0;
-  animation:mk 1s cubic-bezier(.2,.7,.3,1) 2.8s both}}
-.mark .t{{font-family:'Outfit',sans-serif;font-weight:800;
-  font-size:clamp(1.5rem,3.6vw,2.45rem);letter-spacing:-.005em;
+@keyframes twSplashOut{{ to{{ opacity:0; visibility:hidden; pointer-events:none; }} }}
+.tw-splash .tw-scene{{
+  width:min(96vw,1240px); aspect-ratio:{SPL_W}/{SPL_H};
+  animation:twSceneIn 1.2s cubic-bezier(.2,.7,.3,1) both;
+}}
+@keyframes twSceneIn{{ from{{ opacity:0; transform:scale(1.05); }} to{{ opacity:1; transform:none; }} }}
+.tw-splash .tw-scene svg{{
+  width:100%; height:100%; display:block;
+  filter:drop-shadow(0 30px 64px rgba(66,80,96,.22));
+}}
+.tw-splash .tw-shade{{
+  transform:translateY(0);
+  animation:twShadeUp 2.2s cubic-bezier(.72,0,.18,1) forwards;
+}}
+@keyframes twShadeUp{{ to{{ transform:translateY(-{GH + 60}px); }} }}
+.tw-splash .tw-drift{{
+  animation-name:twDrift; animation-timing-function:ease-in-out;
+  animation-iteration-count:infinite; animation-direction:alternate;
+}}
+@keyframes twDrift{{
+  from{{ transform:translateX(calc(var(--dx) * -1)); }}
+  to{{ transform:translateX(var(--dx)); }}
+}}
+.tw-splash .tw-mark{{
+  position:absolute; left:0; right:0; bottom:7%; text-align:center; opacity:0;
+  animation:twMarkIn 1s cubic-bezier(.2,.7,.3,1) 2.8s both;
+}}
+.tw-splash .tw-mark .t{{
+  font-family:'Plus Jakarta Sans','Outfit',sans-serif; font-weight:800;
+  font-size:clamp(1.5rem,3.6vw,2.45rem); letter-spacing:-.02em;
   background:linear-gradient(96deg,#0EA5E9,#2563EB);
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  color:#2563EB;
-  filter:drop-shadow(0 0 22px rgba(14,165,233,.45)) drop-shadow(0 2px 3px rgba(255,255,255,.95))}}
-.mark .s{{font-family:'Inter',sans-serif;margin-top:.5rem;color:#5A6B7E;font-weight:500;
-  font-size:clamp(.62rem,1.35vw,.8rem);letter-spacing:.34em;text-transform:uppercase;
-  text-shadow:0 1px 2px rgba(255,255,255,.9)}}
-@keyframes mk{{from{{opacity:0;transform:translateY(12px)}}to{{opacity:1;transform:none}}}}
-
-@media (prefers-reduced-motion:reduce){{
-  .shade{{animation-duration:.01s}}
-  .drift{{animation:none}}
-  body{{animation:out .5s linear 2s forwards}}
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#2563EB;
+  filter:drop-shadow(0 0 22px rgba(14,165,233,.45));
 }}
-</style></head><body>
-<div class="scene">
+.tw-splash .tw-mark .s{{
+  font-family:'Inter',sans-serif; margin-top:.5rem; color:#5A6B7E; font-weight:500;
+  font-size:clamp(.62rem,1.35vw,.8rem); letter-spacing:.34em; text-transform:uppercase;
+}}
+@keyframes twMarkIn{{ from{{ opacity:0; transform:translateY(12px); }} to{{ opacity:1; transform:none; }} }}
+@media (prefers-reduced-motion:reduce){{
+  .tw-splash .tw-shade{{ animation-duration:.01s; }}
+  .tw-splash .tw-drift{{ animation:none; }}
+  .tw-splash{{ animation:twSplashOut .5s linear 1.8s forwards; }}
+}}
+</style>
+<div class="tw-splash" aria-hidden="true">
+<div class="tw-scene">
 <svg viewBox="0 0 {SPL_W} {SPL_H}" xmlns="http://www.w3.org/2000/svg">
 <defs>
-  <linearGradient id="cabin" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#f1f4f7"/><stop offset=".42" stop-color="#e3e9ef"/>
-    <stop offset="1" stop-color="#ced6df"/>
-  </linearGradient>
-  <radialGradient id="vign" cx="50%" cy="42%" r="72%">
-    <stop offset="55%" stop-color="#000" stop-opacity="0"/>
-    <stop offset="100%" stop-color="#48535f" stop-opacity=".16"/>
-  </radialGradient>
-  <filter id="winShadow" x="-25%" y="-25%" width="150%" height="150%">
-    <feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#54626f" flood-opacity=".33"/>
-  </filter>
-  <linearGradient id="bezel" x1=".25" y1="0" x2=".75" y2="1">
-    <stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#f4f6f8"/>
-    <stop offset="1" stop-color="#dbe1e7"/>
-  </linearGradient>
-  <linearGradient id="well" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#6f7883"/><stop offset=".28" stop-color="#98a1ab"/>
-    <stop offset=".75" stop-color="#c9d0d8"/><stop offset="1" stop-color="#eef1f4"/>
-  </linearGradient>
-  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#1a4a8c"/><stop offset=".34" stop-color="#4886c4"/>
-    <stop offset=".56" stop-color="#9ec8e8"/><stop offset=".72" stop-color="#d9eaf6"/>
-    <stop offset="1" stop-color="#c2d9ec"/>
-  </linearGradient>
-  <radialGradient id="sun">
-    <stop offset="0" stop-color="#fff6dc" stop-opacity=".85"/>
-    <stop offset="55%" stop-color="#ffe9b8" stop-opacity=".22"/>
-    <stop offset="100%" stop-color="#ffe9b8" stop-opacity="0"/>
-  </radialGradient>
-  <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0" stop-color="#d9dee4"/><stop offset=".08" stop-color="#f2f4f7"/>
-    <stop offset=".5" stop-color="#fafbfc"/><stop offset=".92" stop-color="#eceff3"/>
-    <stop offset="1" stop-color="#d3d9e0"/>
-  </linearGradient>
-  <linearGradient id="lipG" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#d3d9e0"/><stop offset="1" stop-color="#b3bbc5"/>
-  </linearGradient>
-  <linearGradient id="gripG" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#98a0aa"/><stop offset="1" stop-color="#727a85"/>
-  </linearGradient>
-  <linearGradient id="lipHi" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#ffffff" stop-opacity=".92"/>
-    <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
-  </linearGradient>
-  {deck_masks()}
-  {''.join(per_window)}
+<linearGradient id="bezel" x1=".25" y1="0" x2=".75" y2="1">
+<stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#f4f6f8"/>
+<stop offset="1" stop-color="#dbe1e7"/>
+</linearGradient>
+<linearGradient id="cabin" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#f1f4f7"/><stop offset=".42" stop-color="#e3e9ef"/>
+<stop offset="1" stop-color="#ced6df"/>
+</linearGradient>
+<radialGradient id="vign" cx="50%" cy="42%" r="72%">
+<stop offset="55%" stop-color="#000" stop-opacity="0"/>
+<stop offset="100%" stop-color="#48535f" stop-opacity=".16"/>
+</radialGradient>
+<filter id="winShadow" x="-25%" y="-25%" width="150%" height="150%">
+<feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#54626f" flood-opacity=".33"/>
+</filter>
+<linearGradient id="well" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#6f7883"/><stop offset=".28" stop-color="#98a1ab"/>
+<stop offset=".75" stop-color="#c9d0d8"/><stop offset="1" stop-color="#eef1f4"/>
+</linearGradient>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#1a4a8c"/><stop offset=".34" stop-color="#4886c4"/>
+<stop offset=".56" stop-color="#9ec8e8"/><stop offset=".72" stop-color="#d9eaf6"/>
+<stop offset="1" stop-color="#c2d9ec"/>
+</linearGradient>
+<radialGradient id="sun">
+<stop offset="0" stop-color="#fff6dc" stop-opacity=".85"/>
+<stop offset="55%" stop-color="#ffe9b8" stop-opacity=".22"/>
+<stop offset="100%" stop-color="#ffe9b8" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#d9dee4"/><stop offset=".08" stop-color="#f2f4f7"/>
+<stop offset=".5" stop-color="#fafbfc"/><stop offset=".92" stop-color="#eceff3"/>
+<stop offset="1" stop-color="#d3d9e0"/>
+</linearGradient>
+<linearGradient id="lipG" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#d3d9e0"/><stop offset="1" stop-color="#b3bbc5"/>
+</linearGradient>
+<linearGradient id="gripG" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#98a0aa"/><stop offset="1" stop-color="#727a85"/>
+</linearGradient>
+<linearGradient id="lipHi" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#ffffff" stop-opacity=".92"/>
+<stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+</linearGradient>
+{deck_masks()}
+{''.join(per_window)}
 </defs>
-  <rect width="{SPL_W}" height="{SPL_H}" fill="url(#cabin)"/>
-  <rect x="0" y="{SPL_H*0.055:.0f}" width="{SPL_W}" height="2" fill="#c3cbd4" opacity=".55"/>
-  <rect x="0" y="{SPL_H*0.055+3:.0f}" width="{SPL_W}" height="1" fill="#ffffff" opacity=".9"/>
-  <rect x="0" y="{SPL_H*0.905:.0f}" width="{SPL_W}" height="2" fill="#c3cbd4" opacity=".5"/>
-  <rect x="0" y="{SPL_H*0.905+3:.0f}" width="{SPL_W}" height="1" fill="#ffffff" opacity=".85"/>
+<rect width="{SPL_W}" height="{SPL_H}" fill="url(#cabin)"/>
+<rect x="0" y="{SPL_H*0.055:.0f}" width="{SPL_W}" height="2" fill="#c3cbd4" opacity=".55"/>
+<rect x="0" y="{SPL_H*0.055+3:.0f}" width="{SPL_W}" height="1" fill="#ffffff" opacity=".9"/>
+<rect x="0" y="{SPL_H*0.905:.0f}" width="{SPL_W}" height="2" fill="#c3cbd4" opacity=".5"/>
+<rect x="0" y="{SPL_H*0.905+3:.0f}" width="{SPL_W}" height="1" fill="#ffffff" opacity=".85"/>
 {windows}
-  <rect width="{SPL_W}" height="{SPL_H}" fill="url(#vign)" pointer-events="none"/>
+<rect width="{SPL_W}" height="{SPL_H}" fill="url(#vign)" pointer-events="none"/>
 </svg>
 </div>
-<div class="mark">
-  <div class="t">TripWise AI</div>
-  <div class="s">Plan smarter &middot; Travel further</div>
+<div class="tw-mark">
+<div class="t">TripWise AI</div>
+<div class="s">Plan smarter &middot; Travel further</div>
 </div>
-</body></html>"""
+</div>
+""")
+
+
+def _flatten(markup: str) -> str:
+    """Strip leading indentation from every line.
+
+    Streamlit renders this through its Markdown parser, which treats any line
+    indented four spaces or more as a code block and would print the markup as
+    text instead of rendering it.
+    """
+    return "\n".join(line.lstrip() for line in markup.splitlines() if line.strip())
 
 # ==========================================================================
 # APPLICATION — TripWise AI — an AI travel platform.
@@ -1690,15 +1705,6 @@ svg{{width:100%;height:100%;display:block;
 
 
 
-SPLASH_CHROME = """
-<style>
-[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stSidebar"]{display:none!important;}
-.block-container{padding:0!important;max-width:100%!important;}
-.stApp{background:#e3e9ef!important;}
-iframe{position:fixed!important;inset:0!important;width:100vw!important;
-       height:100vh!important;border:0!important;z-index:99999!important;}
-</style>
-"""
 
 
 # --------------------------------------------------------------------------- #
@@ -1987,17 +1993,16 @@ def main() -> None:
     params = st.query_params
     view = params.get("view", "home")
 
-    # The splash plays only on a bare first load. Any navigation carries a query
-    # param, so returning to the landing page never replays it.
-    first_visit = len(params) == 0 and not st.session_state.get("seen_splash")
-    if first_visit:
-        st.session_state.seen_splash = True
-        html(SPLASH_CHROME)
-        components.html(build_splash(), height=760, scrolling=False)
-        return
-
     html(THEME_CSS)
     df, is_real, missing = load_catalogue()
+
+    # The splash is painted over the page that renders beneath it in this same
+    # run, then fades itself out — so there is never a blank frame, no blocking
+    # sleep and no second rerun. It plays only on a bare first load; every link
+    # in the app carries a query param, so navigation never replays it.
+    if len(params) == 0 and not st.session_state.get("seen_splash", False):
+        st.session_state["seen_splash"] = True
+        html(build_splash())
 
     if view == "planner":
         page_planner(df, is_real)
