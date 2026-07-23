@@ -139,10 +139,10 @@ CSV_NAME = "tripwise_data.csv"
 # across a hot reload, so an instance built by a previous version of a class can
 # survive into new code that expects fields it does not have. Any change to a
 # cached return type must bump this.
-CACHE_VERSION = "4.1.0"
+CACHE_VERSION = "4.2.0"
 
 # Shown in the app so the running build can be identified from a screenshot.
-BUILD = "4.1.0"
+BUILD = "4.2.0"
 
 # ==========================================================================
 # ERROR HANDLING — Logging and failure containment.
@@ -1227,9 +1227,10 @@ THEME_CSS = """
   --blue:#2563EB;
   --line:rgba(10,18,32,.09);
   --card:rgba(255,255,255,.78);
-  --r-lg:22px; --r-md:14px; --r-sm:10px;
+  --r-xl:30px; --r-lg:24px; --r-md:16px; --r-sm:10px;
   --sh-1:0 1px 2px rgba(10,18,32,.04), 0 6px 20px rgba(10,18,32,.06);
-  --sh-2:0 20px 46px rgba(37,99,235,.13);
+  --sh-2:0 2px 8px rgba(10,18,32,.05), 0 26px 56px rgba(37,99,235,.15);
+  --sh-3:0 34px 76px rgba(37,99,235,.2);
   --ease:cubic-bezier(.22,.75,.28,1);
 }
 
@@ -1242,7 +1243,7 @@ THEME_CSS = """
   background-attachment:fixed;
 }
 #MainMenu, footer{ visibility:hidden; }
-.block-container{ max-width:1120px; padding-top:2.2rem; padding-bottom:5rem; }
+.block-container{ max-width:1160px; padding-top:1.6rem; padding-bottom:6rem; }
 
 html, body, .stApp, [class*="css"]{
   font-family:'Inter',system-ui,-apple-system,sans-serif;
@@ -1253,9 +1254,18 @@ html, body, .stApp, [class*="css"]{
 /* ---- type ------------------------------------------------------------ */
 .tw-display{
   font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;
-  letter-spacing:-.035em; line-height:1.05; color:var(--ink);
-  font-size:clamp(2.1rem,5vw,3.6rem); margin:.6rem 0 1rem;
+  letter-spacing:-.042em; line-height:1.01; color:var(--ink);
+  font-size:clamp(2.6rem,6.4vw,4.9rem); margin:1rem 0 1.3rem;
 }
+.tw-hero{ position:relative; padding:1.4rem 0 .5rem; }
+.tw-hero__inner{ max-width:760px; }
+.tw-hero__plane{
+  position:absolute; right:-1%; top:2%; width:min(42%,430px);
+  pointer-events:none; animation:twFloat 8s ease-in-out infinite;
+}
+.tw-hero__plane svg{ width:100%; height:auto; overflow:visible; }
+@keyframes twFloat{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-14px) } }
+@media (max-width:920px){ .tw-hero__plane{ display:none } }
 .tw-grad{
   background:linear-gradient(96deg,var(--sky),var(--blue));
   -webkit-background-clip:text; background-clip:text;
@@ -1263,23 +1273,29 @@ html, body, .stApp, [class*="css"]{
 }
 .tw-eyebrow{
   font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.68rem;
-  letter-spacing:.22em; text-transform:uppercase; color:var(--blue);
+  letter-spacing:.24em; text-transform:uppercase; color:var(--blue);
+  display:inline-flex; align-items:center; gap:.6rem;
 }
-.tw-lede{ color:var(--slate); font-size:1.04rem; line-height:1.7; max-width:640px; }
+.tw-eyebrow::before{
+  content:""; width:26px; height:1px;
+  background:linear-gradient(90deg,var(--sky),transparent);
+}
+.tw-lede{ color:var(--slate); font-size:clamp(1rem,1.5vw,1.16rem);
+  line-height:1.72; max-width:600px; }
 .tw-h2{
   font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;
-  font-size:clamp(1.5rem,3vw,2.1rem); letter-spacing:-.028em;
-  margin:.4rem 0 .5rem; color:var(--ink);
+  font-size:clamp(1.7rem,3.4vw,2.6rem); letter-spacing:-.032em;
+  margin:.55rem 0 .6rem; color:var(--ink); line-height:1.08;
 }
 .tw-sub{ color:var(--slate); font-size:.98rem; line-height:1.65; margin:0 0 .4rem; }
 .tw-mono{ font-family:'JetBrains Mono',ui-monospace,monospace; }
 
 /* ---- brand row ------------------------------------------------------- */
 .tw-brand{ display:flex; align-items:center; gap:.6rem; margin-bottom:.2rem; }
-.tw-brand svg{ width:28px; height:28px; }
+.tw-brand svg{ width:30px; height:30px; }
 .tw-brand b{
-  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1.15rem;
-  letter-spacing:-.02em;
+  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1.24rem;
+  letter-spacing:-.025em;
 }
 
 /* ---- stats ----------------------------------------------------------- */
@@ -1304,18 +1320,23 @@ html, body, .stApp, [class*="css"]{
   transition:transform .34s var(--ease), box-shadow .34s var(--ease);
   height:100%; overflow:hidden;
 }
-.tw-card:hover{ transform:translateY(-4px); box-shadow:var(--sh-2); }
+.tw-card::before{
+  content:""; position:absolute; inset:0 0 auto; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.98),transparent);
+}
+.tw-card{ position:relative; }
+.tw-card:hover{ transform:translateY(-6px); box-shadow:var(--sh-3); }
 
-.tw-feat{ padding:1.6rem 1.4rem; }
+.tw-feat{ padding:1.9rem 1.6rem; }
 .tw-feat__icon{
-  width:60px; height:60px; border-radius:18px; display:grid; place-items:center;
+  width:72px; height:72px; border-radius:22px; display:grid; place-items:center;
   background:linear-gradient(140deg,var(--sky),var(--blue));
   box-shadow:0 12px 26px rgba(14,165,233,.3); margin-bottom:1rem;
 }
-.tw-feat__icon svg{ width:28px; height:28px; fill:none; stroke:#fff;
+.tw-feat__icon svg{ width:34px; height:34px; fill:none; stroke:#fff;
   stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
 .tw-feat h3{
-  font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:1.06rem;
+  font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:1.14rem;
   margin:0 0 .45rem; letter-spacing:-.015em; color:var(--ink);
 }
 .tw-feat p{ color:var(--slate); font-size:.92rem; line-height:1.65; margin:0; }
@@ -1401,15 +1422,29 @@ html, body, .stApp, [class*="css"]{
 .stButton>button[kind="secondary"]:hover{ border-color:var(--sky); color:var(--blue); }
 
 /* tabs carry the navigation, so they get a little more presence */
+/* the tab strip is the navigation, so it is dressed as a glass pill bar */
 .stTabs [data-baseweb="tab-list"]{
-  gap:.3rem; border-bottom:1px solid var(--line); padding-bottom:.2rem;
+  gap:.3rem; border-bottom:none; padding:.4rem; margin-bottom:1.4rem;
+  background:rgba(255,255,255,.7);
+  backdrop-filter:blur(18px) saturate(1.5);
+  -webkit-backdrop-filter:blur(18px) saturate(1.5);
+  border:1px solid rgba(255,255,255,.9);
+  border-radius:99px; box-shadow:var(--sh-1); width:fit-content;
 }
 .stTabs [data-baseweb="tab"]{
   font-family:'Inter',sans-serif; font-weight:600; font-size:.95rem;
-  color:var(--slate); padding:.6rem 1.1rem; border-radius:12px 12px 0 0;
+  color:var(--slate); padding:.62rem 1.5rem; border-radius:99px;
+  transition:color .24s var(--ease), background .24s var(--ease);
 }
-.stTabs [aria-selected="true"]{ color:var(--blue) !important; }
-.stTabs [data-baseweb="tab-highlight"]{ background:var(--blue); height:2.5px; }
+.stTabs [data-baseweb="tab"]:hover{ color:var(--ink); background:rgba(10,18,32,.05); }
+.stTabs [aria-selected="true"]{
+  color:#fff !important;
+  background:linear-gradient(96deg,var(--sky),var(--blue));
+  box-shadow:0 8px 20px rgba(37,99,235,.3);
+}
+.stTabs [data-baseweb="tab-highlight"], .stTabs [data-baseweb="tab-border"]{
+  display:none;
+}
 
 [data-testid="stSlider"] label, .stSelectbox label, .stRadio label,
 .stCheckbox label, .stNumberInput label, .stMultiSelect label{
@@ -1441,9 +1476,13 @@ div[role="radiogroup"] label{
   background:rgba(255,255,255,.65);
 }
 
+.stTabs [data-baseweb="tab-panel"]{ padding-top:.6rem; }
+
 /* ---- entrance -------------------------------------------------------- */
-.tw-rise{ animation:twRise .6s var(--ease) both; }
-@keyframes twRise{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+.tw-rise{ animation:twRise .7s var(--ease) both; }
+@keyframes twRise{ from{ opacity:0; transform:translateY(18px); } to{ opacity:1; transform:none; } }
+.d1{animation-delay:.05s}.d2{animation-delay:.13s}.d3{animation-delay:.21s}
+.d4{animation-delay:.29s}.d5{animation-delay:.37s}
 
 @media (max-width:640px){
   .tw-facts{ grid-template-columns:repeat(2,1fr); }
@@ -1768,24 +1807,51 @@ stroke-linecap="round" stroke-linejoin="round">
 
 
 def hero(stats: list[tuple[str, str]]) -> str:
+    """The landing headline, with the aircraft drifting alongside it."""
     cells = "".join(
         f'<div class="tw-stat"><b>{_e(v)}</b><span>{_e(label)}</span></div>'
         for v, label in stats
     )
     return f"""
-<div class="tw-rise">
-<span class="tw-eyebrow">Intelligent travel planning</span>
-<h1 class="tw-display">Plan smarter with<br/><span class="tw-grad">TripWise AI</span></h1>
-<p class="tw-lede">Tell us how you like to travel and TripWise ranks real
-destinations against your answers &mdash; with the cost, the climate, the right
-season and the nearest airport worked out before you commit to anything.</p>
-<div class="tw-stats">{cells}</div>
+<div class="tw-hero">
+<div class="tw-hero__plane">
+<svg viewBox="0 0 420 250" fill="none">
+<defs>
+<linearGradient id="planeBody" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#2563EB"/>
+</linearGradient>
+<linearGradient id="planeTrail" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0%" stop-color="#0EA5E9" stop-opacity="0"/>
+<stop offset="100%" stop-color="#2563EB" stop-opacity=".5"/>
+</linearGradient>
+</defs>
+<path d="M12 208 C120 198 208 148 288 70" stroke="url(#planeTrail)"
+stroke-width="3" stroke-dasharray="2 12" stroke-linecap="round"/>
+<circle cx="298" cy="62" r="52" fill="url(#planeBody)" opacity=".09"/>
+<g transform="translate(298,62) rotate(-38)">
+<path d="M46 0 L16 -7 L-6 -34 L-18 -34 L-9 -7 L-30 -7 L-40 -17 L-48 -17
+L-42 -5 L-42 5 L-48 17 L-40 17 L-30 7 L-9 7 L-18 34 L-6 34 L16 7 Z"
+fill="url(#planeBody)"/>
+<path d="M46 0 L16 -7 L-9 -7 L-9 7 L16 7 Z" fill="#ffffff" opacity=".3"/>
+</g>
+<circle cx="12" cy="208" r="6" fill="#2563EB"/>
+<circle cx="12" cy="208" r="11" fill="#2563EB" opacity=".2"/>
+</svg>
+</div>
+<div class="tw-hero__inner">
+<span class="tw-eyebrow tw-rise d1">Intelligent travel planning</span>
+<h1 class="tw-display tw-rise d2">Plan smarter with<br/><span class="tw-grad">TripWise AI</span></h1>
+<p class="tw-lede tw-rise d3">Tell us how you like to travel and TripWise ranks
+real destinations against your answers &mdash; with the cost, the climate, the
+right season and the nearest airport worked out before you commit to anything.</p>
+<div class="tw-stats tw-rise d4">{cells}</div>
+</div>
 </div>"""
 
 
 def heading(eyebrow: str, title: str, sub: str = "") -> str:
     tail = f'<p class="tw-sub">{_e(sub)}</p>' if sub else ""
-    return (f'<div class="tw-rise" style="margin-top:2.2rem">'
+    return (f'<div class="tw-rise" style="margin:3rem 0 1.6rem;max-width:660px">'
             f'<span class="tw-eyebrow">{_e(eyebrow)}</span>'
             f'<div class="tw-h2">{_e(title)}</div>{tail}</div>')
 
