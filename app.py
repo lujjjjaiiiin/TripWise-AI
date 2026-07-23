@@ -3,26 +3,34 @@ TripWise AI — an AI travel platform (single-file build).
 
     streamlit run app.py
 
-This is the packaged form of the modular project: the same code with every
-module inlined, so it deploys anywhere without a package folder alongside it.
-Section banners below mark what was theme.py, art.py, engine.py, data.py,
-ui.py, splash.py and app.py.
+Generated from the modular project by build_single.py: identical code with the
+package inlined, so it deploys without a folder alongside it. Banners mark the
+module each section came from; edit the modules, not this file.
 
-Python does the thinking — loading the catalogue, ranking destinations, deriving
-seasons, costs and insights. Everything visible is custom markup styled by the
-design system; Streamlit's own interface is hidden.
+Python does the thinking — loading and validating the catalogue, resolving
+airports, ranking destinations and deriving costs, seasons and insights.
+Everything visible is custom markup styled by the design system.
 """
 
 from __future__ import annotations
 
+import functools
 import hashlib
+import logging
 import math
 import os
+import re
+import sys
+import unicodedata
+from contextlib import contextmanager
+from dataclasses import dataclass, field
 from html import escape
+from typing import Any, Callable, TypeVar
 
 import numpy as np
 import pandas as pd
 import streamlit as st
+from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import StandardScaler
 
@@ -33,6 +41,1106 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+
+# ==========================================================================
+# CONFIGURATION — Schema and tunables.
+# ==========================================================================
+
+# --------------------------------------------------------------------------- #
+# catalogue schema
+# --------------------------------------------------------------------------- #
+
+TASTES: list[tuple[str, str, str]] = [
+    ("culture", "Culture", "Museums, old towns, landmarks"),
+    ("adventure", "Adventure", "Hiking, diving, adrenaline"),
+    ("nature", "Nature", "Parks, mountains, wildlife"),
+    ("beaches", "Beaches", "Coastline and swimming"),
+    ("nightlife", "Nightlife", "Bars, music, late nights"),
+    ("cuisine", "Food", "Restaurants and street food"),
+    ("wellness", "Wellness", "Spas, retreats, slow days"),
+    ("urban", "City life", "Design, shopping, skylines"),
+    ("seclusion", "Quiet", "Few crowds, room to breathe"),
+]
+TASTE_KEYS: list[str] = [k for k, _, _ in TASTES]
+TASTE_LABEL: dict[str, str] = {k: lbl for k, lbl, _ in TASTES}
+
+REGIONS: list[tuple[str, str]] = [
+    ("region_africa", "Africa"),
+    ("region_asia", "Asia"),
+    ("region_europe", "Europe"),
+    ("region_middle_east", "Middle East"),
+    ("region_north_america", "North America"),
+    ("region_oceania", "Oceania"),
+    ("region_south_america", "South America"),
+]
+REGION_COLS: list[str] = [c for c, _ in REGIONS]
+REGION_LABEL: dict[str, str] = dict(REGIONS)
+
+NUMERIC_EXTRAS: list[str] = [
+    "has_airport", "is_short_trip", "is_one_week", "temp_avg_yearly",
+    "budget_level_encoded", "HotelRating_encoded", "rating_was_unknown",
+]
+
+FEATURE_COLS: list[str] = (
+    ["latitude", "longitude"] + TASTE_KEYS + NUMERIC_EXTRAS + REGION_COLS
+)
+
+# the catalogue is unusable without these
+REQUIRED_COLS: list[str] = [
+    "city", "country", "latitude", "longitude",
+    "temp_avg_yearly", "budget_level_encoded",
+] + TASTE_KEYS
+
+# present -> richer cards, absent -> those rows are simply omitted
+OPTIONAL_COLS: list[str] = [
+    "name", "iata", "icao", "HotelName", "Attractions", "Description",
+    "latitude_airport", "longitude_airport",
+]
+
+# values the notebook writes in place of a missing string
+NULL_TOKENS: frozenset[str] = frozenset(
+    {"", "unknown", "not specified", "nan", "none", "n/a", "na", "-", "null"}
+)
+
+# --------------------------------------------------------------------------- #
+# domain constants
+# --------------------------------------------------------------------------- #
+
+BUDGET_LABEL: dict[int, str] = {1: "Budget", 2: "Mid-range", 3: "Luxury"}
+BUDGET_DAILY: dict[int, int] = {1: 55, 2: 130, 3: 290}
+
+TASTE_MIN, TASTE_MAX = 1, 5
+TEMP_MIN, TEMP_MAX = -20, 50
+STARS_MIN, STARS_MAX = 1.0, 5.0
+NIGHTS_MIN, NIGHTS_MAX = 1, 60
+TRAVELLERS_MIN, TRAVELLERS_MAX = 1, 12
+
+DEFAULT_TOP_N = 6
+
+# --------------------------------------------------------------------------- #
+# model tunables
+# --------------------------------------------------------------------------- #
+
+RANDOM_STATE = 42
+
+# k scales with catalogue size but stays in a range that produces readable groups
+KMEANS_MIN_K, KMEANS_MAX_K = 3, 8
+KMEANS_ROWS_PER_CLUSTER = 14
+
+# at most this many results may come from one destination profile, so a
+# shortlist cannot collapse into six variations of the same place
+MAX_PER_CLUSTER = 2
+
+# how far a fallback airport may be before it stops being useful
+AIRPORT_MAX_KM = 450.0
+
+CSV_NAME = "tripwise_data.csv"
+
+# ==========================================================================
+# ERROR HANDLING — Logging and failure containment.
+# ==========================================================================
+
+_CONFIGURED = False
+
+
+def get_logger(name: str = "tripwise") -> logging.Logger:
+    """Module logger, configured once for the process."""
+    global _CONFIGURED
+    logger = logging.getLogger(name)
+    if not _CONFIGURED:
+        handler = logging.StreamHandler(sys.stderr)
+        handler.setFormatter(logging.Formatter(
+            "%(asctime)s %(levelname)-7s %(name)s | %(message)s",
+            datefmt="%H:%M:%S",
+        ))
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+        logger.propagate = False
+        _CONFIGURED = True
+    return logger
+
+
+log = get_logger()
+
+T = TypeVar("T")
+
+
+def safe(default: T, label: str = "") -> Callable:
+    """Decorator: log and return `default` instead of raising.
+
+    Used on the per-row derivations that feed the cards, where one malformed
+    value should cost a single detail rather than the whole result set.
+    """
+    def outer(fn: Callable[..., T]) -> Callable[..., T]:
+        @functools.wraps(fn)
+        def inner(*args: Any, **kwargs: Any) -> T:
+            try:
+                return fn(*args, **kwargs)
+            except Exception:
+                log.warning("%s failed, using fallback", label or fn.__name__, exc_info=True)
+                return default
+        return inner
+    return outer
+
+
+@contextmanager
+def guard(label: str):
+    """Context manager for a whole page section.
+
+    Yields a one-element list; it stays empty on success and holds the exception
+    on failure, letting the caller render an apology in place of the section.
+    """
+    box: list[Exception] = []
+    try:
+        yield box
+    except Exception as exc:                      # noqa: BLE001 - deliberate boundary
+        log.error("%s failed", label, exc_info=True)
+        box.append(exc)
+
+
+def to_float(value: Any, default: float = 0.0) -> float:
+    """Coerce anything to a float without raising."""
+    try:
+        if value is None:
+            return default
+        out = float(value)
+        return default if out != out else out     # reject NaN
+    except (TypeError, ValueError):
+        return default
+
+
+def to_int(value: Any, default: int = 0, lo: int | None = None, hi: int | None = None) -> int:
+    """Coerce to int, optionally clamped to a range."""
+    out = int(round(to_float(value, default)))
+    if lo is not None:
+        out = max(lo, out)
+    if hi is not None:
+        out = min(hi, out)
+    return out
+
+# ==========================================================================
+# AIRPORT RESOLUTION — Airport resolution.
+# ==========================================================================
+
+EARTH_RADIUS_KM = 6371.0088
+
+
+def clean(value) -> str | None:
+    """Trim a cell, treating the notebook's placeholder fills as missing."""
+    if value is None:
+        return None
+    try:
+        if pd.isna(value):
+            return None
+    except (TypeError, ValueError):
+        pass
+    text = str(value).strip()
+    return None if text.lower() in NULL_TOKENS else text
+
+
+def normalise(text: str | None) -> str:
+    """Fold a place name to a comparable key.
+
+    Strips accents, case and punctuation, so ``Al-'Ula``, ``AlUla`` and
+    ``al ula`` all collapse to ``alula``.
+    """
+    if not text:
+        return ""
+    decomposed = unicodedata.normalize("NFKD", str(text))
+    ascii_only = "".join(c for c in decomposed if not unicodedata.combining(c))
+    return re.sub(r"[^a-z0-9]+", "", ascii_only.lower())
+
+
+@dataclass(frozen=True)
+class Airport:
+    """One resolved airport, and how it was arrived at."""
+    name: str | None
+    code: str | None
+    distance_km: float | None
+    how: str = "direct"                      # direct | name | distance
+
+    @property
+    def exact(self) -> bool:
+        return self.how in ("direct", "name")
+
+    @property
+    def label(self) -> str:
+        """Display string, honest about how far away the airport is."""
+        if self.name and self.code:
+            base = f"{self.name} ({self.code})"
+        else:
+            base = self.name or self.code or "Unnamed airport"
+        if self.exact or not self.distance_km:
+            return base
+        if self.distance_km <= AIRPORT_MAX_KM:
+            return f"{base} — about {self.distance_km:,.0f} km away"
+        return f"{base} — {self.distance_km:,.0f} km away, closest in the catalogue"
+
+    def __bool__(self) -> bool:
+        return bool(self.name or self.code)
+
+
+NO_AIRPORT = Airport(None, None, None, "none")
+
+
+def _haversine(lat: float, lon: float, lats: np.ndarray, lons: np.ndarray) -> np.ndarray:
+    """Great-circle distance in km from one point to many, vectorised."""
+    p1, p2 = np.radians(lat), np.radians(lats)
+    dphi = p2 - p1
+    dlambda = np.radians(lons - lon)
+    a = np.sin(dphi / 2) ** 2 + np.cos(p1) * np.cos(p2) * np.sin(dlambda / 2) ** 2
+    return 2 * EARTH_RADIUS_KM * np.arcsin(np.sqrt(np.clip(a, 0, 1)))
+
+
+class AirportIndex:
+    """Every airport the catalogue knows, searchable by name or position.
+
+    Built once per catalogue and cached, because it scans the whole frame.
+    """
+
+    def __init__(self, df: pd.DataFrame):
+        self._lats = np.empty(0)
+        self._lons = np.empty(0)
+        self._names: list[str | None] = []
+        self._codes: list[str | None] = []
+        self._by_city: dict[str, int] = {}
+        self._build(df)
+
+    def _build(self, df: pd.DataFrame) -> None:
+        if "name" not in df.columns and "iata" not in df.columns:
+            log.warning("catalogue carries no airport columns; airports unavailable")
+            return
+
+        # airport coordinates land in *_airport when the merge collides with the
+        # destination's own lat/lon; otherwise the destination position is a
+        # fair proxy for a city's own airport
+        lat_col = "latitude_airport" if "latitude_airport" in df.columns else "latitude"
+        lon_col = "longitude_airport" if "longitude_airport" in df.columns else "longitude"
+
+        seen: set[tuple[str | None, str | None]] = set()
+        lats: list[float] = []
+        lons: list[float] = []
+
+        for row in df.itertuples(index=False):
+            name = clean(getattr(row, "name", None))
+            code = clean(getattr(row, "iata", None)) or clean(getattr(row, "icao", None))
+            if not (name or code):
+                continue
+
+            lat = to_float(getattr(row, lat_col, None), float("nan"))
+            lon = to_float(getattr(row, lon_col, None), float("nan"))
+            if lat != lat or lon != lon or not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
+                continue
+
+            key = (name, code)
+            if key in seen:
+                continue
+            seen.add(key)
+
+            position = len(self._names)
+            self._names.append(name)
+            self._codes.append(code)
+            lats.append(lat)
+            lons.append(lon)
+
+            # remember which city this airport served, for the name retry
+            for token in (normalise(getattr(row, "city", None)), normalise(name)):
+                if token and token not in self._by_city:
+                    self._by_city[token] = position
+
+        self._lats = np.asarray(lats, dtype=float)
+        self._lons = np.asarray(lons, dtype=float)
+        log.info("airport index built: %d airports, %d name keys",
+                 len(self._names), len(self._by_city))
+
+    def __len__(self) -> int:
+        return len(self._names)
+
+    def _at(self, i: int, distance: float | None, how: str) -> Airport:
+        return Airport(self._names[i], self._codes[i], distance, how)
+
+    @safe(NO_AIRPORT, "airport name lookup")
+    def by_name(self, city: str | None) -> Airport:
+        """Recover a match the exact string join missed."""
+        i = self._by_city.get(normalise(city))
+        return self._at(i, 0.0, "name") if i is not None else NO_AIRPORT
+
+    @safe(NO_AIRPORT, "nearest airport lookup")
+    def nearest(self, lat: float, lon: float) -> Airport:
+        """Closest indexed airport to a coordinate.
+
+        Always answers when the index holds anything; the distance carries the
+        caveat rather than a silent refusal.
+        """
+        if not len(self) or lat != lat or lon != lon:
+            return NO_AIRPORT
+        distances = _haversine(lat, lon, self._lats, self._lons)
+        i = int(np.argmin(distances))
+        km = float(distances[i])
+        if km > AIRPORT_MAX_KM:
+            log.debug("nearest airport is %.0f km away — sparse airport coverage", km)
+        return self._at(i, km, "distance")
+
+    @safe(NO_AIRPORT, "airport resolution")
+    def resolve(self, row) -> Airport:
+        """The airport for one destination, via the three-step ladder."""
+        name = clean(row.get("name"))
+        code = clean(row.get("iata")) or clean(row.get("icao"))
+        if name or code:
+            return Airport(name, code, 0.0, "direct")
+
+        found = self.by_name(row.get("city"))
+        if found:
+            return found
+
+        return self.nearest(
+            to_float(row.get("latitude"), float("nan")),
+            to_float(row.get("longitude"), float("nan")),
+        )
+
+
+def coverage(df: pd.DataFrame, index: AirportIndex) -> tuple[int, int]:
+    """(rows resolved by direct join, rows total) — for the data-health notice."""
+    if not len(df):
+        return 0, 0
+    direct = sum(
+        1 for _, r in df.iterrows()
+        if clean(r.get("name")) or clean(r.get("iata")) or clean(r.get("icao"))
+    )
+    return direct, len(df)
+
+# ==========================================================================
+# CATALOGUE — Catalogue loading and validation.
+# ==========================================================================
+
+# city, country, region, iata, airport name, lat, lon,
+# cul adv nat bea nig cui wel urb sec, budget, temp, stars
+_DEMO: list[tuple] = [
+    ("Paris", "France", "region_europe", "CDG", "Charles de Gaulle", 48.86, 2.35, 5,2,2,1,4,5,3,5,1, 3, 12.3, 4.2),
+    ("Barcelona", "Spain", "region_europe", "BCN", "Barcelona El Prat", 41.39, 2.17, 4,3,2,4,5,5,3,4,1, 2, 17.1, 4.0),
+    ("Reykjavik", "Iceland", "region_europe", "KEF", "Keflavik International", 64.15, -21.94, 3,5,5,1,3,3,4,2,5, 3, 5.2, 4.0),
+    ("Santorini", "Greece", "region_europe", "JTR", "Santorini National", 36.39, 25.46, 3,2,3,5,3,4,5,2,4, 3, 18.4, 4.4),
+    ("Vienna", "Austria", "region_europe", "VIE", "Vienna International", 48.21, 16.37, 5,2,3,1,3,4,4,4,2, 3, 11.0, 4.3),
+    ("Lisbon", "Portugal", "region_europe", "LIS", "Humberto Delgado", 38.72, -9.14, 4,3,3,4,4,4,3,4,2, 2, 17.5, 4.1),
+    ("Tokyo", "Japan", "region_asia", "HND", "Haneda", 35.68, 139.69, 5,2,2,1,5,5,3,5,1, 3, 16.0, 4.3),
+    ("Bali", "Indonesia", "region_asia", "DPS", "Ngurah Rai International", -8.41, 115.19, 4,4,5,5,4,4,5,2,4, 1, 26.6, 4.1),
+    ("Bangkok", "Thailand", "region_asia", "BKK", "Suvarnabhumi", 13.76, 100.50, 4,3,2,2,5,5,4,5,1, 1, 28.4, 4.0),
+    ("Maldives", "Maldives", "region_asia", "MLE", "Velana International", 4.18, 73.51, 1,3,4,5,1,3,5,1,5, 3, 28.1, 4.6),
+    ("Kyoto", "Japan", "region_asia", "KIX", "Kansai International", 35.01, 135.77, 5,2,4,1,2,5,4,2,3, 3, 15.9, 4.3),
+    ("Kathmandu", "Nepal", "region_asia", "KTM", "Tribhuvan International", 27.72, 85.32, 5,5,5,1,2,3,3,2,4, 1, 18.5, 3.5),
+    ("Dubai", "UAE", "region_middle_east", "DXB", "Dubai International", 25.20, 55.27, 2,4,1,4,4,4,4,5,1, 3, 28.0, 4.5),
+    ("AlUla", "Saudi Arabia", "region_middle_east", "ULH", "Prince Abdul Majeed", 26.61, 37.92, 5,5,5,1,1,3,4,1,5, 3, 26.0, 4.4),
+    ("Istanbul", "Turkey", "region_middle_east", "IST", "Istanbul Airport", 41.01, 28.98, 5,2,2,2,4,5,3,5,1, 2, 15.0, 4.1),
+    ("Muscat", "Oman", "region_middle_east", "MCT", "Muscat International", 23.59, 58.41, 4,4,4,4,1,4,4,2,4, 2, 28.3, 4.2),
+    ("Marrakesh", "Morocco", "region_africa", "RAK", "Marrakesh Menara", 31.63, -7.99, 5,4,3,1,3,5,4,3,2, 2, 20.3, 4.0),
+    ("Cape Town", "South Africa", "region_africa", "CPT", "Cape Town International", -33.92, 18.42, 4,5,5,5,4,5,3,4,3, 2, 17.0, 4.2),
+    ("Zanzibar", "Tanzania", "region_africa", "ZNZ", "Abeid Amani Karume", -6.16, 39.20, 3,4,4,5,2,3,4,1,4, 2, 26.4, 4.0),
+    ("Cairo", "Egypt", "region_africa", "CAI", "Cairo International", 30.04, 31.24, 5,3,1,1,3,4,2,4,1, 1, 22.1, 3.7),
+    ("New York", "United States", "region_north_america", "JFK", "John F. Kennedy", 40.71, -74.01, 5,2,2,2,5,5,3,5,1, 3, 12.9, 4.1),
+    ("Banff", "Canada", "region_north_america", "YYC", "Calgary International", 51.18, -115.57, 2,5,5,1,2,3,4,1,5, 3, 3.0, 4.3),
+    ("Mexico City", "Mexico", "region_north_america", "MEX", "Benito Juarez", 19.43, -99.13, 5,3,3,1,5,5,3,5,1, 2, 17.0, 4.0),
+    ("Vancouver", "Canada", "region_north_america", "YVR", "Vancouver International", 49.28, -123.12, 3,5,5,3,3,4,4,4,3, 3, 11.0, 4.2),
+    ("Rio de Janeiro", "Brazil", "region_south_america", "GIG", "Galeao", -22.91, -43.17, 3,4,4,5,5,4,3,4,2, 2, 23.8, 4.0),
+    ("Cusco", "Peru", "region_south_america", "CUZ", "Alejandro Velasco Astete", -13.53, -71.97, 5,5,5,1,3,4,3,2,4, 1, 12.3, 3.9),
+    ("Patagonia", "Chile", "region_south_america", "PNT", "Teniente Julio Gallardo", -51.73, -72.51, 2,5,5,1,1,3,3,1,5, 3, 6.5, 4.0),
+    ("Cartagena", "Colombia", "region_south_america", "CTG", "Rafael Nunez", 10.39, -75.51, 4,3,3,5,4,4,4,3,3, 2, 27.8, 4.1),
+    ("Sydney", "Australia", "region_oceania", "SYD", "Kingsford Smith", -33.87, 151.21, 3,4,4,5,4,5,4,5,2, 3, 18.3, 4.2),
+    ("Queenstown", "New Zealand", "region_oceania", "ZQN", "Queenstown Airport", -45.03, 168.66, 2,5,5,2,3,4,4,2,4, 3, 10.6, 4.3),
+    ("Fiji", "Fiji", "region_oceania", "NAN", "Nadi International", -17.71, 177.44, 2,4,5,5,2,3,5,1,5, 3, 25.4, 4.3),
+]
+
+
+@dataclass
+class CatalogueReport:
+    """What happened during load — surfaced in the UI, not swallowed."""
+    is_real: bool = True
+    source: str = ""
+    rows_in: int = 0
+    rows_out: int = 0
+    missing_required: list[str] = field(default_factory=list)
+    missing_optional: list[str] = field(default_factory=list)
+    coerced: list[str] = field(default_factory=list)
+    dropped_rows: int = 0
+    error: str = ""
+
+    @property
+    def healthy(self) -> bool:
+        return self.is_real and not self.missing_required and not self.error
+
+
+def _demo_frame() -> pd.DataFrame:
+    rows = []
+    for (city, country, region, iata, airport, lat, lon,
+         cul, adv, nat, bea, nig, cui, wel, urb, sec, budget, temp, stars) in _DEMO:
+        row = {
+            "city": city, "country": country, "iata": iata, "name": airport,
+            "latitude": lat, "longitude": lon,
+            "culture": cul, "adventure": adv, "nature": nat, "beaches": bea,
+            "nightlife": nig, "cuisine": cui, "wellness": wel, "urban": urb,
+            "seclusion": sec,
+            "budget_level_encoded": budget, "temp_avg_yearly": temp,
+            "HotelRating_encoded": stars, "rating_was_unknown": 0,
+            "has_airport": 1, "is_short_trip": 1, "is_one_week": 1,
+            "HotelName": f"The {city} House",
+        }
+        row.update({c: (1 if c == region else 0) for c in REGION_COLS})
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def _coerce(df: pd.DataFrame, report: CatalogueReport) -> pd.DataFrame:
+    """Force every modelling column to a sane number, recording what changed."""
+    df = df.copy()
+
+    for col in TASTE_KEYS:
+        before = df[col].copy()
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+        df[col] = df[col].fillna(3).clip(TASTE_MIN, TASTE_MAX)
+        if not before.equals(df[col]):
+            report.coerced.append(col)
+
+    for col, lo, hi, fill in (
+        ("latitude", -90, 90, 0.0),
+        ("longitude", -180, 180, 0.0),
+        ("temp_avg_yearly", TEMP_MIN, TEMP_MAX, 20.0),
+        ("budget_level_encoded", 1, 3, 2),
+        ("HotelRating_encoded", 1, 5, 3),
+    ):
+        if col not in df.columns:
+            df[col] = fill
+            continue
+        before = df[col].copy()
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(fill).clip(lo, hi)
+        if not before.equals(df[col]):
+            report.coerced.append(col)
+
+    for col in NUMERIC_EXTRAS + REGION_COLS:
+        if col not in df.columns:
+            df[col] = 0
+        else:
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+
+    for col in OPTIONAL_COLS:
+        if col not in df.columns:
+            report.missing_optional.append(col)
+
+    # a row with no name or no position cannot be shown or mapped
+    before = len(df)
+    df = df[df["city"].notna() & (df["city"].astype(str).str.strip() != "")]
+    df = df.dropna(subset=["latitude", "longitude"])
+    report.dropped_rows = before - len(df)
+
+    if "country" not in df.columns:
+        df["country"] = ""
+    df["country"] = df["country"].fillna("")
+
+    # one row per destination; the notebook emits one row per hotel
+    subset = [c for c in ("city", "country") if c in df.columns]
+    if subset:
+        df = df.drop_duplicates(subset=subset, keep="first")
+
+    return df.reset_index(drop=True)
+
+
+def load_catalogue_file(path: str | None = None) -> tuple[pd.DataFrame, CatalogueReport]:
+    """Load, validate and clean the catalogue.
+
+    Falls back to a built-in demo catalogue rather than failing, so the app is
+    always usable and the report says which one is in play.
+    """
+    report = CatalogueReport()
+
+    candidates = [path] if path else []
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    candidates += [os.path.join(here, CSV_NAME), CSV_NAME]
+
+    found = next((p for p in candidates if p and os.path.exists(p)), None)
+    if not found:
+        log.warning("%s not found; using the demo catalogue", CSV_NAME)
+        df = _coerce(_demo_frame(), report)
+        report.is_real, report.source = False, "built-in demo catalogue"
+        report.rows_in = report.rows_out = len(df)
+        return df, report
+
+    try:
+        raw = pd.read_csv(found)
+    except Exception as exc:                        # noqa: BLE001 - user file
+        log.error("could not read %s", found, exc_info=True)
+        df = _coerce(_demo_frame(), report)
+        report.is_real, report.source = False, "built-in demo catalogue"
+        report.error = f"{CSV_NAME} could not be read ({exc.__class__.__name__})."
+        report.rows_in = report.rows_out = len(df)
+        return df, report
+
+    report.rows_in = len(raw)
+    missing = [c for c in REQUIRED_COLS if c not in raw.columns]
+    if missing:
+        log.error("%s is missing required columns: %s", CSV_NAME, missing)
+        df = _coerce(_demo_frame(), report)
+        report.is_real, report.source = False, "built-in demo catalogue"
+        report.missing_required = missing
+        report.rows_out = len(df)
+        return df, report
+
+    df = _coerce(raw, report)
+    report.source, report.rows_out = os.path.basename(found), len(df)
+    log.info("catalogue loaded: %d rows from %s (%d dropped)",
+             report.rows_out, report.source, report.dropped_rows)
+    return df, report
+
+
+def feature_frame(df: pd.DataFrame) -> tuple[np.ndarray, list[str]]:
+    """The numeric matrix the models train on, and the columns it came from."""
+    cols = [c for c in FEATURE_COLS if c in df.columns]
+    return df[cols].to_numpy(dtype=float), cols
+
+
+def catalogue_stats(df: pd.DataFrame) -> list[tuple[str, str]]:
+    cities = df["city"].nunique() if "city" in df else len(df)
+    countries = df["country"].nunique() if "country" in df else 0
+    regions = sum(1 for c in REGION_COLS if c in df.columns and df[c].sum() > 0)
+    return [
+        (f"{cities:,}", "Destinations ranked"),
+        (f"{countries:,}", "Countries covered"),
+        (f"{regions}", "World regions"),
+        ("9", "Travel dimensions"),
+    ]
+
+# ==========================================================================
+# MODELS — The fitted model bundle.
+# ==========================================================================
+
+def choose_k(n_rows: int) -> int:
+    """Enough clusters to be discriminating, few enough to stay readable."""
+    if n_rows < KMEANS_MIN_K * 2:
+        return max(1, min(KMEANS_MIN_K, n_rows))
+    k = n_rows // KMEANS_ROWS_PER_CLUSTER
+    return int(np.clip(k, KMEANS_MIN_K, KMEANS_MAX_K))
+
+
+def _name_cluster(profile: dict[str, float], mean: dict[str, float]) -> str:
+    """Label a cluster by the tastes it over-indexes on versus the catalogue."""
+    lifts = sorted(
+        ((k, profile[k] - mean.get(k, 3.0)) for k in TASTE_KEYS),
+        key=lambda kv: -kv[1],
+    )
+    top = [TASTE_LABEL[k] for k, lift in lifts[:2] if lift > 0.35]
+    if not top:
+        return "All-rounder"
+    return " & ".join(top)
+
+
+@dataclass
+class ModelBundle:
+    """Everything fitted against one catalogue."""
+    columns: list[str]
+    scaler: StandardScaler
+    matrix: np.ndarray                     # scaled catalogue, rows aligned to df
+    kmeans: KMeans | None
+    labels: np.ndarray                     # cluster id per row
+    cluster_names: dict[int, str]
+    norms: np.ndarray                      # row norms, precomputed for scoring
+
+    @property
+    def n_clusters(self) -> int:
+        return len(self.cluster_names)
+
+    def transform(self, values: dict) -> np.ndarray:
+        """Put one preference dict into the same space as the catalogue."""
+        row = pd.DataFrame([{c: values.get(c, 0) for c in self.columns}])[self.columns]
+        return self.scaler.transform(row.to_numpy(dtype=float))
+
+    def cluster_of(self, index: int) -> int:
+        return int(self.labels[index]) if index < len(self.labels) else -1
+
+    def cluster_name(self, index: int) -> str:
+        return self.cluster_names.get(self.cluster_of(index), "All-rounder")
+
+
+def fit_models(df: pd.DataFrame) -> ModelBundle:
+    """Fit the scaler and the clustering against a catalogue."""
+    raw, columns = feature_frame(df)
+    if raw.size == 0:
+        raise ValueError("catalogue has no usable feature columns")
+
+    scaler = StandardScaler()
+    matrix = scaler.fit_transform(raw)
+
+    norms = np.linalg.norm(matrix, axis=1)
+    norms[norms == 0] = 1e-9
+
+    k = choose_k(len(df))
+    kmeans: KMeans | None = None
+    labels = np.zeros(len(df), dtype=int)
+    names: dict[int, str] = {0: "All-rounder"}
+
+    if k > 1:
+        kmeans = KMeans(n_clusters=k, random_state=RANDOM_STATE, n_init=10)
+        labels = kmeans.fit_predict(matrix)
+
+        # name each cluster from its members' real (unscaled) taste averages
+        catalogue_mean = {c: float(df[c].mean()) for c in TASTE_KEYS if c in df.columns}
+        names = {}
+        for cid in range(k):
+            members = df.loc[labels == cid]
+            if members.empty:
+                names[cid] = "All-rounder"
+                continue
+            profile = {c: float(members[c].mean()) for c in TASTE_KEYS if c in members.columns}
+            names[cid] = _name_cluster(profile, catalogue_mean)
+
+        # disambiguate collisions so two clusters never share a name
+        seen: dict[str, int] = {}
+        for cid, label in list(names.items()):
+            if label in seen:
+                seen[label] += 1
+                names[cid] = f"{label} {seen[label]}"
+            else:
+                seen[label] = 1
+
+    log.info("models fitted: %d features, %d clusters (%s)",
+             len(columns), max(1, k), ", ".join(sorted(set(names.values()))))
+
+    return ModelBundle(
+        columns=columns, scaler=scaler, matrix=matrix, kmeans=kmeans,
+        labels=labels, cluster_names=names, norms=norms,
+    )
+
+# ==========================================================================
+# RECOMMENDER — The recommendation pipeline.
+# ==========================================================================
+
+@dataclass
+class Recommendation:
+    """The ranked result plus how it was arrived at."""
+    frame: pd.DataFrame
+    profiles: list[str] = field(default_factory=list)
+    considered: int = 0
+    diversified: bool = False
+
+    @property
+    def empty(self) -> bool:
+        return self.frame.empty
+
+
+def build_preference_vector(df: pd.DataFrame, answers: dict) -> dict:
+    """Translate validated answers into the model's feature space.
+
+    Coordinates are set to the catalogue centroid rather than zero: zero is a
+    real place in the Atlantic, and after scaling it would drag every result
+    towards whatever is nearest to it.
+    """
+    prefs = {c: 0.0 for c in FEATURE_COLS}
+
+    for key in TASTE_KEYS:
+        prefs[key] = to_float(answers.get(key, 3), 3.0)
+
+    prefs["latitude"] = float(df["latitude"].mean()) if "latitude" in df else 0.0
+    prefs["longitude"] = float(df["longitude"].mean()) if "longitude" in df else 0.0
+    prefs["temp_avg_yearly"] = to_float(answers.get("temp", 22), 22.0)
+    prefs["budget_level_encoded"] = to_float(answers.get("budget", 2), 2.0)
+    prefs["HotelRating_encoded"] = to_float(answers.get("stars", 4), 4.0)
+    prefs["rating_was_unknown"] = 0.0
+    prefs["has_airport"] = 1.0 if answers.get("needs_airport", True) else 0.0
+    prefs["is_short_trip"] = 1.0 if answers.get("trip_length") == "short" else 0.0
+    prefs["is_one_week"] = 1.0 if answers.get("trip_length") == "week" else 0.0
+
+    region = answers.get("region")
+    if region in REGION_COLS:
+        prefs[region] = 1.0
+
+    return prefs
+
+
+def _cosine(bundle: ModelBundle, user_scaled: np.ndarray, rows: np.ndarray) -> np.ndarray:
+    """Cosine similarity of one vector against selected catalogue rows.
+
+    Uses the row norms precomputed at fit time rather than recomputing the whole
+    matrix per request.
+    """
+    user = user_scaled.ravel()
+    user_norm = float(np.linalg.norm(user)) or 1e-9
+    dots = bundle.matrix[rows] @ user
+    return dots / (bundle.norms[rows] * user_norm)
+
+
+def _diversify(order: np.ndarray, clusters: np.ndarray, top_n: int,
+               cap: int = MAX_PER_CLUSTER) -> tuple[list[int], bool]:
+    """Walk the ranking, capping how many results share a profile.
+
+    If the cap cannot fill the shortlist — a small or homogeneous catalogue —
+    the remaining places are filled from the ranking in order, so the caller
+    always gets `top_n` results where they exist.
+    """
+    picked: list[int] = []
+    used: dict[int, int] = {}
+    for idx in order:
+        cid = int(clusters[idx])
+        if used.get(cid, 0) >= cap:
+            continue
+        picked.append(int(idx))
+        used[cid] = used.get(cid, 0) + 1
+        if len(picked) == top_n:
+            return picked, True
+
+    applied = len(picked) > 0
+    for idx in order:
+        if len(picked) == top_n:
+            break
+        if int(idx) not in picked:
+            picked.append(int(idx))
+    return picked, applied and len(used) > 1
+
+
+def recommend(df: pd.DataFrame, bundle: ModelBundle, prefs: dict,
+              top_n: int = DEFAULT_TOP_N, pool_index: np.ndarray | None = None) -> Recommendation:
+    """Rank destinations for one traveller.
+
+    `pool_index` restricts scoring to a subset of the catalogue (a region
+    filter, say) while still using the model fitted on everything, so the
+    scaling stays stable no matter how the pool is narrowed.
+    """
+    if df.empty:
+        return Recommendation(frame=df.head(0))
+
+    rows = np.arange(len(df)) if pool_index is None else np.asarray(pool_index, dtype=int)
+    rows = rows[(rows >= 0) & (rows < len(bundle.matrix))]
+    if rows.size == 0:
+        log.warning("recommendation pool is empty after bounds checking")
+        return Recommendation(frame=df.head(0))
+
+    scores = _cosine(bundle, bundle.transform(prefs), rows)
+    order_local = np.argsort(-scores)
+    order_global = rows[order_local]
+
+    clusters = bundle.labels
+    picked, diversified = _diversify(order_global, clusters, min(top_n, rows.size))
+
+    out = df.iloc[picked].copy()
+    lookup = {int(g): float(s) for g, s in zip(order_global, scores[order_local])}
+    out["similarity"] = [lookup.get(int(i), 0.0) for i in picked]
+    out["match"] = ((out["similarity"] + 1) / 2 * 100).round(1)
+    out["profile"] = [bundle.cluster_name(int(i)) for i in picked]
+    out = out.reset_index(drop=True)
+
+    return Recommendation(
+        frame=out,
+        profiles=sorted(set(out["profile"])),
+        considered=int(rows.size),
+        diversified=diversified,
+    )
+
+# ==========================================================================
+# TRAVEL INTELLIGENCE — Travel intelligence derived from a matched destination.
+# ==========================================================================
+
+def region_of(row) -> str | None:
+    for col, label in REGIONS:
+        if to_float(row.get(col, 0)) == 1:
+            return label
+    return None
+
+
+def tastes_of(row) -> dict:
+    return {k: to_float(row.get(k, 3), 3.0) for k in TASTE_KEYS}
+
+
+@safe(130, "daily cost")
+def daily_cost(row) -> int:
+    """Per-person daily spend, from budget tier and accommodation standard."""
+    tier = to_int(row.get("budget_level_encoded", 2), 2, 1, 3)
+    stars = to_float(row.get("HotelRating_encoded", 3), 3.0)
+    return int(round(BUDGET_DAILY[tier] * (0.85 + 0.075 * stars), -1))
+
+
+def trip_cost(row, nights: int, travellers: int) -> int:
+    return daily_cost(row) * max(1, nights) * max(1, travellers)
+
+
+@safe("Climate data unavailable", "climate_summary")
+def climate_summary(row) -> str:
+    t = to_float(row.get("temp_avg_yearly", 20), 20.0)
+    if t >= 28:
+        return f"Hot year-round, averaging {t:.0f}°C"
+    if t >= 22:
+        return f"Warm and settled, around {t:.0f}°C"
+    if t >= 15:
+        return f"Mild, averaging {t:.0f}°C"
+    if t >= 8:
+        return f"Cool, around {t:.0f}°C — pack layers"
+    return f"Cold, averaging {t:.0f}°C"
+
+
+@safe("Year-round", "best_season")
+def best_season(row) -> str:
+    """Infer a sensible window from latitude and average temperature."""
+    lat = to_float(row.get("latitude", 0), 0.0)
+    t = to_float(row.get("temp_avg_yearly", 20), 20.0)
+    north = lat >= 0
+    if abs(lat) < 15:                       # tropics: the dry months matter, not heat
+        return "December to March, outside the rains"
+    if t >= 26:                             # hot climates are best off-peak
+        return "November to March" if north else "May to September"
+    if t <= 8:                              # cold climates: either peak summer or snow season
+        return "June to August, or December for snow"
+    return "April to June and September to October" if north else \
+           "October to December and March to May"
+
+
+@safe(["Balanced"], "trip_style")
+def trip_style(row) -> list[str]:
+    tastes = tastes_of(row)
+    ranked = sorted(tastes.items(), key=lambda kv: -kv[1])
+    return [TASTE_LABEL[k] for k, v in ranked[:3] if v >= 3.5] or ["Balanced"]
+
+
+@safe("This destination matched your overall preferences.", "explain")
+def explain(row, prefs: dict) -> str:
+    """Say plainly why this place surfaced, using the traveller's own answers."""
+    tastes = tastes_of(row)
+    strong = []
+    for key in TASTE_KEYS:
+        want = to_float(prefs.get(key, 3), 3.0)
+        has = tastes.get(key, 3)
+        if want >= 4 and has >= 4:
+            strong.append(TASTE_LABEL[key].lower())
+
+    city = clean(row.get("city")) or "This destination"
+    tier = BUDGET_LABEL.get(int(to_float(row.get("budget_level_encoded", 2), 2.0)), "Mid-range")
+
+    if strong:
+        wanted = ", ".join(strong[:2]) if len(strong) <= 2 else \
+            f"{', '.join(strong[:2])} and {strong[2]}"
+        lead = f"You asked for {wanted}, and {city} scores highly on all of it"
+    else:
+        lead = f"{city} sits closest to the overall balance you described"
+
+    temp_gap = abs(to_float(row.get("temp_avg_yearly", 20), 20.0) - to_float(prefs.get("temp_avg_yearly", 22), 22.0))
+    climate = "with a climate close to your target" if temp_gap <= 4 else \
+              "though the climate runs a little off your target"
+    return f"{lead}, {climate}. It fits a {tier.lower()} budget."
+
+
+@safe([], "attractions_of")
+def attractions_of(row, limit: int = 3) -> list[str]:
+    """Pull attractions from the dataset if the export carried them."""
+    raw = clean(row.get("Attractions"))
+    if not raw:
+        return []
+    parts = [p.strip(" .;") for chunk in raw.split("|") for p in chunk.split(",")]
+    seen, out = set(), []
+    for p in parts:
+        if 3 < len(p) < 60 and p.lower() not in seen:
+            seen.add(p.lower())
+            out.append(p if len(p) < 46 else p[:43] + "…")
+        if len(out) >= limit:
+            break
+    return out
+
+
+@safe("Book accommodation before flights.", "travel_tip")
+def travel_tip(row) -> str:
+    """A short, situation-specific pointer built from the row's own numbers."""
+    tastes = tastes_of(row)
+    t = to_float(row.get("temp_avg_yearly", 20), 20.0)
+    tier = int(to_float(row.get("budget_level_encoded", 2), 2.0))
+    code = clean(row.get("iata"))
+
+    if t >= 28:
+        return "Plan outdoor time early morning or after sunset — midday heat is punishing."
+    if t <= 8:
+        return "Daylight is short in winter; book the outdoor activities first."
+    if tastes.get("seclusion", 3) >= 4:
+        return "Getting around is easier with your own transport — arrange it before arrival."
+    if tastes.get("nightlife", 3) >= 4 and tier <= 2:
+        return "Stay central: the saving on taxis usually beats the cheaper outer hotels."
+    if tastes.get("culture", 3) >= 4:
+        return "Buy museum passes online — the queues are the real cost, not the ticket."
+    if code:
+        return f"Flights into {code} are cheapest midweek; avoid Friday and Sunday departures."
+    return "Book accommodation before flights — availability moves faster than airfare."
+
+
+# --------------------------------------------------------------------------- #
+# insights across the whole result set
+# --------------------------------------------------------------------------- #
+
+def travel_insights(results: pd.DataFrame, prefs: dict, answers: dict,
+             profiles: list[str] | None = None) -> list[tuple[str, str]]:
+    """Plain-language readings of the result set, as (heading, body) pairs."""
+    out: list[tuple[str, str]] = []
+    if results.empty:
+        return out
+
+    wanted = [TASTE_LABEL[k].lower() for k in TASTE_KEYS if float(prefs.get(k, 3)) >= 4]
+    tier = BUDGET_LABEL.get(int(answers.get("budget", 2)), "Mid-range").lower()
+    if wanted:
+        phrase = wanted[0] if len(wanted) == 1 else ", ".join(wanted[:-1]) + f" and {wanted[-1]}"
+        out.append((
+            "Your travel profile",
+            f"You lean towards {phrase} at a {tier} budget. That combination is what "
+            f"ranked these destinations, not their general popularity.",
+        ))
+    else:
+        out.append((
+            "Your travel profile",
+            f"You kept most preferences balanced at a {tier} budget, so the ranking "
+            "favours destinations that do many things well rather than specialising.",
+        ))
+
+    temps = results["temp_avg_yearly"].astype(float)
+    target = float(answers.get("temp", 22))
+    close = int((temps - target).abs().le(4).sum())
+    out.append((
+        "Climate fit",
+        f"{close} of your {len(results)} matches sit within 4°C of the {target:.0f}°C "
+        f"you asked for. The spread runs {temps.min():.0f}°C to {temps.max():.0f}°C.",
+    ))
+
+    costs = [daily_cost(r) for _, r in results.iterrows()]
+    nights = int(answers.get("nights", 7))
+    out.append((
+        "What it costs",
+        f"Daily spend across these matches runs ${min(costs)}–${max(costs)} per person. "
+        f"Over {nights} nights that is roughly ${min(costs) * nights:,}–${max(costs) * nights:,} "
+        "each, before flights.",
+    ))
+
+    regions = [region_of(r) for _, r in results.iterrows()]
+    regions = [r for r in regions if r]
+    if regions:
+        top = max(set(regions), key=regions.count)
+        share = regions.count(top)
+        out.append((
+            "Where they cluster",
+            f"{share} of {len(results)} matches are in {top}. Booking two of them into one "
+            "trip is usually cheaper than two separate journeys."
+            if share > 1 else
+            f"Your matches spread across {len(set(regions))} regions, so there is no obvious "
+            "way to combine them — pick on preference, not logistics.",
+        ))
+
+    if profiles and len(profiles) > 1:
+        listed = ", ".join(profiles[:-1]) + f" and {profiles[-1]}"
+        out.append((
+            "Distinct options",
+            f"Your shortlist covers {len(profiles)} different destination profiles — "
+            f"{listed} — so these are genuine alternatives rather than variations "
+            "on one idea.",
+        ))
+    elif profiles:
+        out.append((
+            "A clear direction",
+            f"Every match falls into the same profile ({profiles[0]}), which means "
+            "your preferences point somewhere specific. Choose on cost and season.",
+        ))
+
+    with_air = sum(1 for _, r in results.iterrows()
+                   if clean(r.get("name")) or clean(r.get("iata")))
+    if with_air < len(results):
+        out.append((
+            "Getting there",
+            f"{len(results) - with_air} of these have no major airport recorded in the "
+            "dataset, which usually means a connecting flight plus ground transfer.",
+        ))
+    return out
+
+# ==========================================================================
+# VALIDATION — Validation of everything that arrives from the form.
+# ==========================================================================
+
+@dataclass
+class Validated:
+    """Cleaned answers plus anything that had to be corrected."""
+    answers: dict
+    notices: list[str] = field(default_factory=list)
+    blocking: str = "" 
+
+    @property
+    def ok(self) -> bool:
+        return not self.blocking
+
+
+def _clamp(value, lo, hi, default, label, notices, integer=False):
+    raw = to_int(value, default, lo, hi) if integer else to_float(value, default)
+    if not integer:
+        raw = min(hi, max(lo, raw))
+    original = to_float(value, default)
+    if abs(original - raw) > 1e-9:
+        notices.append(f"{label} was adjusted to {raw:g} (allowed {lo:g}–{hi:g}).")
+    return raw
+
+
+def validate_answers(answers: dict | None) -> Validated:
+    """Coerce the planner's answers into a safe, complete set."""
+    notices: list[str] = []
+    src = answers or {}
+    if not isinstance(src, dict):
+        log.warning("answers arrived as %s, not a dict", type(src).__name__)
+        src = {}
+
+    out: dict = {}
+    for key in TASTE_KEYS:
+        out[key] = _clamp(src.get(key, 3), TASTE_MIN, TASTE_MAX, 3,
+                          key.title(), notices, integer=True)
+
+    out["budget"] = to_int(src.get("budget", 2), 2, 1, 3)
+    out["temp"] = _clamp(src.get("temp", 22), TEMP_MIN, TEMP_MAX, 22,
+                         "Temperature", notices)
+    out["stars"] = _clamp(src.get("stars", 4), STARS_MIN, STARS_MAX, 4.0,
+                          "Accommodation standard", notices)
+    out["nights"] = _clamp(src.get("nights", 7), NIGHTS_MIN, NIGHTS_MAX, 7,
+                           "Nights", notices, integer=True)
+    out["travellers"] = _clamp(src.get("travellers", 2), TRAVELLERS_MIN,
+                               TRAVELLERS_MAX, 2, "Travellers", notices, integer=True)
+
+    length = str(src.get("trip_length", "week")).lower()
+    out["trip_length"] = length if length in {"short", "week"} else "week"
+
+    region = src.get("region")
+    if region and region not in REGION_COLS:
+        notices.append("That region is not in the catalogue, so all regions were searched.")
+        region = None
+    out["region"] = region
+
+    out["needs_airport"] = bool(src.get("needs_airport", True))
+    return Validated(answers=out, notices=notices)
+
+
+def validate_pool(df: pd.DataFrame, answers: dict, minimum: int = 3) -> tuple[pd.DataFrame, list[str]]:
+    """Apply the hard filters, relaxing any that would empty the catalogue.
+
+    A filter that leaves nothing to rank is worse than no filter, so each one is
+    reverted with an explanation rather than returning an empty result.
+    """
+    notices: list[str] = []
+    pool = df
+
+    region = answers.get("region")
+    if region and region in pool.columns:
+        filtered = pool[pool[region] == 1]
+        if len(filtered) >= minimum:
+            pool = filtered
+        else:
+            notices.append(
+                f"Only {len(filtered)} destination(s) in {REGION_LABEL.get(region, 'that region')}, "
+                "so the search was widened to every region."
+            )
+
+    if pool.empty:
+        notices.append("No destinations matched those filters, so all were considered.")
+        return df, notices
+
+    return pool, notices
+
+
+def validate_catalogue(df: pd.DataFrame) -> str:
+    """A blocking message if the catalogue cannot support a recommendation."""
+    if df is None or df.empty:
+        return "The destination catalogue is empty, so nothing can be ranked."
+    if len(df) < 2:
+        return "The catalogue holds a single destination — at least two are needed to rank."
+    return ""
 
 # ==========================================================================
 # DESIGN SYSTEM — The whole visual language in one place.
@@ -82,7 +1190,9 @@ THEME_CSS = """
 #MainMenu, footer, [data-testid="stStatusWidget"], [data-testid="stDecoration"],
 [data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"],
 [data-testid="stToolbar"]{ display:none !important; }
-[data-testid="stHeader"]{ background:transparent !important; height:0 !important; }
+/* Streamlit's header sits at the top of the viewport with its own stacking
+   context and swallows clicks aimed at the fixed navbar underneath it. */
+[data-testid="stHeader"]{ display:none !important; }
 
 .stApp{
   background:
@@ -136,7 +1246,7 @@ html, body, [class*="css"], .stApp{
    NAVBAR
    ===================================================================== */
 .tw-nav{
-  position:fixed; top:0; left:0; right:0; height:var(--nav-h); z-index:9990;
+  position:fixed; top:0; left:0; right:0; height:var(--nav-h); z-index:2147483000;
   display:flex; align-items:center; justify-content:space-between;
   padding:0 clamp(18px,4vw,44px);
   background:rgba(255,255,255,.78);
@@ -152,7 +1262,7 @@ html, body, [class*="css"], .stApp{
 }
 .tw-nav__links{ display:flex; align-items:center; gap:.35rem; }
 .tw-nav__links a{
-  position:relative; text-decoration:none; color:var(--slate);
+  position:relative; pointer-events:auto; text-decoration:none; color:var(--slate);
   font-size:.9rem; font-weight:500; padding:.5rem .85rem; border-radius:99px;
   transition:color .25s var(--ease), background .25s var(--ease);
 }
@@ -466,9 +1576,6 @@ div[role="radiogroup"] label:hover{ border-color:var(--sky); }
 # DESTINATION ARTWORK — Generative destination artwork.
 # ==========================================================================
 
-import hashlib
-import math
-
 # --------------------------------------------------------------------------- #
 # palettes: sky stops, land tones, sun colour
 # --------------------------------------------------------------------------- #
@@ -726,444 +1833,8 @@ def destination_art(city: str, tastes: dict, temp_c: float) -> str:
     )
 
 # ==========================================================================
-# RECOMMENDATION ENGINE — Recommendation engine and the travel intelligence layered on top of it.
-# ==========================================================================
-
-import numpy as np
-import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.preprocessing import StandardScaler
-
-# --------------------------------------------------------------------------- #
-# schema
-# --------------------------------------------------------------------------- #
-
-TASTES = [
-    ("culture", "Culture", "Museums, old towns, landmarks"),
-    ("adventure", "Adventure", "Hiking, diving, adrenaline"),
-    ("nature", "Nature", "Parks, mountains, wildlife"),
-    ("beaches", "Beaches", "Coastline and swimming"),
-    ("nightlife", "Nightlife", "Bars, music, late nights"),
-    ("cuisine", "Food", "Restaurants and street food"),
-    ("wellness", "Wellness", "Spas, retreats, slow days"),
-    ("urban", "City life", "Design, shopping, skylines"),
-    ("seclusion", "Quiet", "Few crowds, room to breathe"),
-]
-TASTE_KEYS = [k for k, _, _ in TASTES]
-TASTE_LABEL = {k: lbl for k, lbl, _ in TASTES}
-
-REGIONS = [
-    ("region_africa", "Africa"),
-    ("region_asia", "Asia"),
-    ("region_europe", "Europe"),
-    ("region_middle_east", "Middle East"),
-    ("region_north_america", "North America"),
-    ("region_oceania", "Oceania"),
-    ("region_south_america", "South America"),
-]
-REGION_COLS = [c for c, _ in REGIONS]
-REGION_LABEL = dict(REGIONS)
-
-FEATURE_COLS = (
-    ["latitude", "longitude"]
-    + TASTE_KEYS
-    + ["has_airport", "is_short_trip", "is_one_week", "temp_avg_yearly",
-       "budget_level_encoded", "HotelRating_encoded", "rating_was_unknown"]
-    + REGION_COLS
-)
-
-BUDGET_LABEL = {1: "Budget", 2: "Mid-range", 3: "Luxury"}
-BUDGET_DAILY = {1: 55, 2: 130, 3: 290}
-
-
-# --------------------------------------------------------------------------- #
-# small helpers
-# --------------------------------------------------------------------------- #
-
-def clean(value) -> str | None:
-    """Trim a cell, treating the notebook's placeholder fills as missing."""
-    if value is None:
-        return None
-    try:
-        if pd.isna(value):
-            return None
-    except (TypeError, ValueError):
-        pass
-    text = str(value).strip()
-    if not text or text.lower() in {"unknown", "not specified", "nan", "none", "n/a", "-"}:
-        return None
-    return text
-
-
-def airport_of(row) -> tuple[str | None, str | None]:
-    """Nearest airport as (name, code).
-
-    The notebook fills unmatched cities with "Unknown" *after* computing
-    has_airport, so a row can hold a perfectly good airport name while the flag
-    reads 0. The flag is therefore ignored and the actual values decide.
-    """
-    name = clean(row.get("name"))
-    code = clean(row.get("iata")) or clean(row.get("icao"))
-    return (name, code) if (name or code) else (None, None)
-
-
-def region_of(row) -> str | None:
-    for col, label in REGIONS:
-        try:
-            if float(row.get(col, 0)) == 1:
-                return label
-        except (TypeError, ValueError):
-            continue
-    return None
-
-
-def tastes_of(row) -> dict:
-    out = {}
-    for key in TASTE_KEYS:
-        try:
-            out[key] = float(row.get(key, 3))
-        except (TypeError, ValueError):
-            out[key] = 3.0
-    return out
-
-
-# --------------------------------------------------------------------------- #
-# ranking
-# --------------------------------------------------------------------------- #
-
-class Recommender:
-    """Holds the fitted scaler so it is computed once, not per request."""
-
-    def __init__(self, df: pd.DataFrame):
-        self.columns = [c for c in FEATURE_COLS if c in df.columns]
-        self.scaler = StandardScaler()
-        self.matrix = self.scaler.fit_transform(df[self.columns])
-        self.df = df
-
-    def rank(self, prefs: dict, top_n: int = 6) -> pd.DataFrame:
-        user = pd.DataFrame([{c: prefs.get(c, 0) for c in self.columns}])[self.columns]
-        scores = cosine_similarity(self.scaler.transform(user), self.matrix)[0]
-
-        out = self.df.copy()
-        out["similarity"] = scores
-        out["match"] = ((scores + 1) / 2 * 100).round(1)
-        out = out.sort_values("similarity", ascending=False)
-        subset = [c for c in ("city", "country") if c in out.columns]
-        if subset:
-            out = out.drop_duplicates(subset=subset)
-        return out.head(top_n).reset_index(drop=True)
-
-
-def build_preferences(df: pd.DataFrame, answers: dict) -> dict:
-    """Translate the form's answers into a point in feature space."""
-    prefs = {c: 0 for c in FEATURE_COLS}
-    prefs.update({
-        "latitude": float(df["latitude"].mean()) if "latitude" in df else 0.0,
-        "longitude": float(df["longitude"].mean()) if "longitude" in df else 0.0,
-        "has_airport": 1 if answers.get("needs_airport", True) else 0,
-        "is_short_trip": 1 if answers.get("trip_length") == "short" else 0,
-        "is_one_week": 1 if answers.get("trip_length") == "week" else 0,
-        "temp_avg_yearly": answers.get("temp", 22),
-        "budget_level_encoded": answers.get("budget", 2),
-        "HotelRating_encoded": answers.get("stars", 4),
-        "rating_was_unknown": 0,
-    })
-    for key in TASTE_KEYS:
-        prefs[key] = answers.get(key, 3)
-    region = answers.get("region")
-    if region and region in REGION_COLS:
-        prefs[region] = 1
-    return prefs
-
-
-# --------------------------------------------------------------------------- #
-# travel intelligence
-# --------------------------------------------------------------------------- #
-
-def daily_cost(row) -> int:
-    try:
-        tier = int(float(row.get("budget_level_encoded", 2)))
-    except (TypeError, ValueError):
-        tier = 2
-    tier = min(3, max(1, tier))
-    try:
-        stars = float(row.get("HotelRating_encoded", 3))
-    except (TypeError, ValueError):
-        stars = 3.0
-    return int(round(BUDGET_DAILY[tier] * (0.85 + 0.075 * stars), -1))
-
-
-def trip_cost(row, nights: int, travellers: int) -> int:
-    return daily_cost(row) * max(1, nights) * max(1, travellers)
-
-
-def climate_summary(row) -> str:
-    t = float(row.get("temp_avg_yearly", 20) or 20)
-    if t >= 28:
-        return f"Hot year-round, averaging {t:.0f}°C"
-    if t >= 22:
-        return f"Warm and settled, around {t:.0f}°C"
-    if t >= 15:
-        return f"Mild, averaging {t:.0f}°C"
-    if t >= 8:
-        return f"Cool, around {t:.0f}°C — pack layers"
-    return f"Cold, averaging {t:.0f}°C"
-
-
-def best_season(row) -> str:
-    """Infer a sensible window from latitude and average temperature."""
-    lat = float(row.get("latitude", 0) or 0)
-    t = float(row.get("temp_avg_yearly", 20) or 20)
-    north = lat >= 0
-    if abs(lat) < 15:                       # tropics: the dry months matter, not heat
-        return "December to March, outside the rains"
-    if t >= 26:                             # hot climates are best off-peak
-        return "November to March" if north else "May to September"
-    if t <= 8:                              # cold climates: either peak summer or snow season
-        return "June to August, or December for snow"
-    return "April to June and September to October" if north else \
-           "October to December and March to May"
-
-
-def trip_style(row) -> list[str]:
-    tastes = tastes_of(row)
-    ranked = sorted(tastes.items(), key=lambda kv: -kv[1])
-    return [TASTE_LABEL[k] for k, v in ranked[:3] if v >= 3.5] or ["Balanced"]
-
-
-def explain(row, prefs: dict) -> str:
-    """Say plainly why this place surfaced, using the traveller's own answers."""
-    tastes = tastes_of(row)
-    strong = []
-    for key in TASTE_KEYS:
-        want = float(prefs.get(key, 3))
-        has = tastes.get(key, 3)
-        if want >= 4 and has >= 4:
-            strong.append(TASTE_LABEL[key].lower())
-
-    city = clean(row.get("city")) or "This destination"
-    tier = BUDGET_LABEL.get(int(float(row.get("budget_level_encoded", 2) or 2)), "Mid-range")
-
-    if strong:
-        wanted = ", ".join(strong[:2]) if len(strong) <= 2 else \
-            f"{', '.join(strong[:2])} and {strong[2]}"
-        lead = f"You asked for {wanted}, and {city} scores highly on all of it"
-    else:
-        lead = f"{city} sits closest to the overall balance you described"
-
-    temp_gap = abs(float(row.get("temp_avg_yearly", 20) or 20) - float(prefs.get("temp_avg_yearly", 22)))
-    climate = "with a climate close to your target" if temp_gap <= 4 else \
-              "though the climate runs a little off your target"
-    return f"{lead}, {climate}. It fits a {tier.lower()} budget."
-
-
-def attractions_of(row, limit: int = 3) -> list[str]:
-    """Pull attractions from the dataset if the export carried them."""
-    raw = clean(row.get("Attractions"))
-    if not raw:
-        return []
-    parts = [p.strip(" .;") for chunk in raw.split("|") for p in chunk.split(",")]
-    seen, out = set(), []
-    for p in parts:
-        if 3 < len(p) < 60 and p.lower() not in seen:
-            seen.add(p.lower())
-            out.append(p if len(p) < 46 else p[:43] + "…")
-        if len(out) >= limit:
-            break
-    return out
-
-
-def travel_tip(row) -> str:
-    """A short, situation-specific pointer built from the row's own numbers."""
-    tastes = tastes_of(row)
-    t = float(row.get("temp_avg_yearly", 20) or 20)
-    tier = int(float(row.get("budget_level_encoded", 2) or 2))
-    _, code = airport_of(row)
-
-    if t >= 28:
-        return "Plan outdoor time early morning or after sunset — midday heat is punishing."
-    if t <= 8:
-        return "Daylight is short in winter; book the outdoor activities first."
-    if tastes.get("seclusion", 3) >= 4:
-        return "Getting around is easier with your own transport — arrange it before arrival."
-    if tastes.get("nightlife", 3) >= 4 and tier <= 2:
-        return "Stay central: the saving on taxis usually beats the cheaper outer hotels."
-    if tastes.get("culture", 3) >= 4:
-        return "Buy museum passes online — the queues are the real cost, not the ticket."
-    if code:
-        return f"Flights into {code} are cheapest midweek; avoid Friday and Sunday departures."
-    return "Book accommodation before flights — availability moves faster than airfare."
-
-
-# --------------------------------------------------------------------------- #
-# insights across the whole result set
-# --------------------------------------------------------------------------- #
-
-def insights(results: pd.DataFrame, prefs: dict, answers: dict) -> list[tuple[str, str]]:
-    """Plain-language readings of the result set, as (heading, body) pairs."""
-    out: list[tuple[str, str]] = []
-    if results.empty:
-        return out
-
-    wanted = [TASTE_LABEL[k].lower() for k in TASTE_KEYS if float(prefs.get(k, 3)) >= 4]
-    tier = BUDGET_LABEL.get(int(answers.get("budget", 2)), "Mid-range").lower()
-    if wanted:
-        phrase = wanted[0] if len(wanted) == 1 else ", ".join(wanted[:-1]) + f" and {wanted[-1]}"
-        out.append((
-            "Your travel profile",
-            f"You lean towards {phrase} at a {tier} budget. That combination is what "
-            f"ranked these destinations, not their general popularity.",
-        ))
-    else:
-        out.append((
-            "Your travel profile",
-            f"You kept most preferences balanced at a {tier} budget, so the ranking "
-            "favours destinations that do many things well rather than specialising.",
-        ))
-
-    temps = results["temp_avg_yearly"].astype(float)
-    target = float(answers.get("temp", 22))
-    close = int((temps - target).abs().le(4).sum())
-    out.append((
-        "Climate fit",
-        f"{close} of your {len(results)} matches sit within 4°C of the {target:.0f}°C "
-        f"you asked for. The spread runs {temps.min():.0f}°C to {temps.max():.0f}°C.",
-    ))
-
-    costs = [daily_cost(r) for _, r in results.iterrows()]
-    nights = int(answers.get("nights", 7))
-    out.append((
-        "What it costs",
-        f"Daily spend across these matches runs ${min(costs)}–${max(costs)} per person. "
-        f"Over {nights} nights that is roughly ${min(costs) * nights:,}–${max(costs) * nights:,} "
-        "each, before flights.",
-    ))
-
-    regions = [region_of(r) for _, r in results.iterrows()]
-    regions = [r for r in regions if r]
-    if regions:
-        top = max(set(regions), key=regions.count)
-        share = regions.count(top)
-        out.append((
-            "Where they cluster",
-            f"{share} of {len(results)} matches are in {top}. Booking two of them into one "
-            "trip is usually cheaper than two separate journeys."
-            if share > 1 else
-            f"Your matches spread across {len(set(regions))} regions, so there is no obvious "
-            "way to combine them — pick on preference, not logistics.",
-        ))
-
-    with_air = sum(1 for _, r in results.iterrows() if any(airport_of(r)))
-    if with_air < len(results):
-        out.append((
-            "Getting there",
-            f"{len(results) - with_air} of these have no major airport recorded in the "
-            "dataset, which usually means a connecting flight plus ground transfer.",
-        ))
-    return out
-
-# ==========================================================================
-# CATALOGUE — Loading and validating the destination catalogue.
-# ==========================================================================
-
-import os
-
-import numpy as np
-import pandas as pd
-
-
-CSV_NAME = "tripwise_data.csv"
-
-REQUIRED = ["city", "country", "latitude", "longitude", "temp_avg_yearly",
-            "budget_level_encoded"] + TASTE_KEYS
-
-# city, country, region col, iata, airport, lat, lon,
-# cul adv nat bea nig cui wel urb sec, budget, temp, stars
-_DEMO = [
-    ("Paris", "France", "region_europe", "CDG", "Charles de Gaulle", 48.86, 2.35, 5,2,2,1,4,5,3,5,1, 3, 12.3, 4.2),
-    ("Barcelona", "Spain", "region_europe", "BCN", "Barcelona El Prat", 41.39, 2.17, 4,3,2,4,5,5,3,4,1, 2, 17.1, 4.0),
-    ("Reykjavik", "Iceland", "region_europe", "KEF", "Keflavik International", 64.15, -21.94, 3,5,5,1,3,3,4,2,5, 3, 5.2, 4.0),
-    ("Santorini", "Greece", "region_europe", "JTR", "Santorini National", 36.39, 25.46, 3,2,3,5,3,4,5,2,4, 3, 18.4, 4.4),
-    ("Tokyo", "Japan", "region_asia", "HND", "Haneda", 35.68, 139.69, 5,2,2,1,5,5,3,5,1, 3, 16.0, 4.3),
-    ("Bali", "Indonesia", "region_asia", "DPS", "Ngurah Rai International", -8.41, 115.19, 4,4,5,5,4,4,5,2,4, 1, 26.6, 4.1),
-    ("Bangkok", "Thailand", "region_asia", "BKK", "Suvarnabhumi", 13.76, 100.50, 4,3,2,2,5,5,4,5,1, 1, 28.4, 4.0),
-    ("Maldives", "Maldives", "region_asia", "MLE", "Velana International", 4.18, 73.51, 1,3,4,5,1,3,5,1,5, 3, 28.1, 4.6),
-    ("Dubai", "UAE", "region_middle_east", "DXB", "Dubai International", 25.20, 55.27, 2,4,1,4,4,4,4,5,1, 3, 28.0, 4.5),
-    ("AlUla", "Saudi Arabia", "region_middle_east", "ULH", "Prince Abdul Majeed", 26.61, 37.92, 5,5,5,1,1,3,4,1,5, 3, 26.0, 4.4),
-    ("Istanbul", "Turkey", "region_middle_east", "IST", "Istanbul Airport", 41.01, 28.98, 5,2,2,2,4,5,3,5,1, 2, 15.0, 4.1),
-    ("Marrakesh", "Morocco", "region_africa", "RAK", "Marrakesh Menara", 31.63, -7.99, 5,4,3,1,3,5,4,3,2, 2, 20.3, 4.0),
-    ("Cape Town", "South Africa", "region_africa", "CPT", "Cape Town International", -33.92, 18.42, 4,5,5,5,4,5,3,4,3, 2, 17.0, 4.2),
-    ("Zanzibar", "Tanzania", "region_africa", "ZNZ", "Abeid Amani Karume", -6.16, 39.20, 3,4,4,5,2,3,4,1,4, 2, 26.4, 4.0),
-    ("New York", "United States", "region_north_america", "JFK", "John F. Kennedy", 40.71, -74.01, 5,2,2,2,5,5,3,5,1, 3, 12.9, 4.1),
-    ("Banff", "Canada", "region_north_america", "YYC", "Calgary International", 51.18, -115.57, 2,5,5,1,2,3,4,1,5, 3, 3.0, 4.3),
-    ("Mexico City", "Mexico", "region_north_america", "MEX", "Benito Juarez", 19.43, -99.13, 5,3,3,1,5,5,3,5,1, 2, 17.0, 4.0),
-    ("Rio de Janeiro", "Brazil", "region_south_america", "GIG", "Galeao", -22.91, -43.17, 3,4,4,5,5,4,3,4,2, 2, 23.8, 4.0),
-    ("Cusco", "Peru", "region_south_america", "CUZ", "Alejandro Velasco Astete", -13.53, -71.97, 5,5,5,1,3,4,3,2,4, 1, 12.3, 3.9),
-    ("Patagonia", "Chile", "region_south_america", "PNT", "Teniente Julio Gallardo", -51.73, -72.51, 2,5,5,1,1,3,3,1,5, 3, 6.5, 4.0),
-    ("Sydney", "Australia", "region_oceania", "SYD", "Kingsford Smith", -33.87, 151.21, 3,4,4,5,4,5,4,5,2, 3, 18.3, 4.2),
-    ("Queenstown", "New Zealand", "region_oceania", "ZQN", "Queenstown Airport", -45.03, 168.66, 2,5,5,2,3,4,4,2,4, 3, 10.6, 4.3),
-]
-
-
-def _demo_frame() -> pd.DataFrame:
-    rows = []
-    for (city, country, region, iata, airport, lat, lon,
-         cul, adv, nat, bea, nig, cui, wel, urb, sec, budget, temp, stars) in _DEMO:
-        row = {
-            "city": city, "country": country, "iata": iata, "name": airport,
-            "latitude": lat, "longitude": lon,
-            "culture": cul, "adventure": adv, "nature": nat, "beaches": bea,
-            "nightlife": nig, "cuisine": cui, "wellness": wel, "urban": urb,
-            "seclusion": sec,
-            "budget_level_encoded": budget, "temp_avg_yearly": temp,
-            "HotelRating_encoded": stars, "rating_was_unknown": 0,
-            "has_airport": 1, "is_short_trip": 1, "is_one_week": 1,
-            "HotelName": f"The {city} House",
-        }
-        for col in REGION_COLS:
-            row[col] = 1 if col == region else 0
-        rows.append(row)
-    return pd.DataFrame(rows)
-
-
-def load_catalogue_file() -> tuple[pd.DataFrame, bool, list[str]]:
-    """Return (catalogue, is_real_data, missing_columns)."""
-    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), CSV_NAME)
-    if not os.path.exists(path):
-        path = CSV_NAME
-
-    if os.path.exists(path):
-        df = pd.read_csv(path)
-        missing = [c for c in REQUIRED if c not in df.columns]
-        if not missing:
-            for col in REGION_COLS + ["has_airport", "is_short_trip", "is_one_week",
-                                      "HotelRating_encoded", "rating_was_unknown"]:
-                if col not in df.columns:
-                    df[col] = 0
-            optional = [c for c in ("name", "iata", "HotelName", "Attractions")
-                        if c not in df.columns]
-            return df, True, optional
-        return _demo_frame(), False, missing
-
-    return _demo_frame(), False, []
-
-
-def catalogue_stats(df: pd.DataFrame) -> list[tuple[str, str]]:
-    cities = df["city"].nunique() if "city" in df else len(df)
-    countries = df["country"].nunique() if "country" in df else 0
-    regions = sum(1 for c in REGION_COLS if c in df.columns and df[c].sum() > 0)
-    return [
-        (f"{cities:,}", "Destinations ranked"),
-        (f"{countries:,}", "Countries covered"),
-        (f"{regions}", "World regions"),
-        ("9", "Travel dimensions"),
-    ]
-
-# ==========================================================================
 # HTML COMPONENTS — HTML component builders.
 # ==========================================================================
-
-from html import escape
 
 # --------------------------------------------------------------------------- #
 # icons — single source, stroked to match the design system
@@ -1569,7 +2240,9 @@ def build_splash() -> str:
     return _flatten(f"""
 <style>
 .tw-splash{{
-  position:fixed; inset:0; z-index:99999; display:grid; place-items:center;
+  /* purely decorative, so it must never intercept a click even mid-animation */
+  pointer-events:none;
+  position:fixed; inset:0; z-index:99998; display:grid; place-items:center;
   background:linear-gradient(180deg,#f1f4f7 0%,#e3e9ef 42%,#ced6df 100%);
   animation:twSplashOut .9s ease 4.4s forwards;
 }}
@@ -1705,10 +2378,8 @@ def _flatten(markup: str) -> str:
 
 
 
-
-
 # --------------------------------------------------------------------------- #
-# helpers
+# cached resources
 # --------------------------------------------------------------------------- #
 
 def html(markup: str) -> None:
@@ -1716,80 +2387,113 @@ def html(markup: str) -> None:
 
 
 @st.cache_data(show_spinner=False)
-def load_catalogue():
+def load_catalogue() -> tuple[pd.DataFrame, CatalogueReport]:
+    """Read and clean the catalogue. Cached on the data, not per session."""
     return load_catalogue_file()
 
 
 @st.cache_resource(show_spinner=False)
-def get_recommender(_df, fingerprint: str):
-    """fingerprint keeps the cache keyed to the catalogue, not the frame object."""
-    return Recommender(_df)
+def fitted_models(fingerprint: str) -> ModelBundle:
+    """Scaler and K-Means, fitted once per catalogue.
 
-
-def chart(fig) -> None:
-    """Render a figure full width across Streamlit versions.
-
-    `use_container_width` is deprecated in favour of `width`, but older installs
-    do not accept `width`, so try the current API and fall back.
+    `fingerprint` keys the cache to the catalogue's shape rather than to the
+    DataFrame, which is unhashable and changes identity on every rerun.
     """
-    cfg = {"displayModeBar": False}
-    try:
-        st.plotly_chart(fig, width="stretch", config=cfg)
-    except TypeError:
-        st.plotly_chart(fig, use_container_width=True, config=cfg)
+    df, _ = load_catalogue()
+    return fit_models(df)
 
 
-def card_payload(row, prefs: dict) -> dict:
+@st.cache_resource(show_spinner=False)
+def airport_index(fingerprint: str) -> AirportIndex:
+    """Searchable airport index, built once per catalogue."""
+    df, _ = load_catalogue()
+    return AirportIndex(df)
+
+
+def fingerprint(df: pd.DataFrame) -> str:
+    """A cheap, stable identity for a catalogue."""
+    return f"{len(df)}x{len(df.columns)}:{hash(tuple(sorted(df.columns)))}"
+
+
+# --------------------------------------------------------------------------- #
+# view models
+# --------------------------------------------------------------------------- #
+
+def card_payload(row, prefs: dict, airports: AirportIndex) -> dict:
     """Flatten a matched row into exactly what the card template needs."""
-    name, code = airport_of(row)
-    airport = None
-    if name and code:
-        airport = f"{name} ({code})"
-    elif name or code:
-        airport = name or code
-
+    airport = airports.resolve(row)
     tastes = tastes_of(row)
-    temp = float(row.get("temp_avg_yearly", 20) or 20)
-    tier = int(float(row.get("budget_level_encoded", 2) or 2))
+    temp = to_float(row.get("temp_avg_yearly", 20), 20.0)
+    tier = to_int(row.get("budget_level_encoded", 2), 2, 1, 3)
+
+    style = trip_style(row)
+    profile = row.get("profile")
+    if profile and profile not in style:
+        style = [profile] + style[:2]
+
+    hotel = row.get("HotelName")
+    if hotel is not None and pd.isna(hotel):
+        hotel = None
 
     return {
-        "city": clean(row.get("city")) or "Unknown",
-        "country": clean(row.get("country")) or "",
-        "match": f"{float(row.get('match', 0)):.0f}",
+        "city": str(row.get("city", "Unknown")),
+        "country": str(row.get("country", "") or ""),
+        "match": f"{to_float(row.get('match', 0), 0.0):.0f}",
         "art": destination_art(str(row.get("city", "x")), tastes, temp),
-        "tier": BUDGET_LABEL.get(min(3, max(1, tier)), "Mid-range"),
+        "tier": BUDGET_LABEL[tier],
         "daily": daily_cost(row),
         "temp": f"{temp:.0f}",
-        "style": trip_style(row),
+        "style": style,
         "region": region_of(row),
         "why": explain(row, prefs),
-        "airport": airport,
+        "airport": airport.label if airport else None,
         "season": best_season(row),
         "climate": climate_summary(row),
-        "hotel": clean(row.get("HotelName")),
+        "hotel": hotel,
         "attractions": attractions_of(row),
         "tip": travel_tip(row),
     }
+
+
+def data_notice(report: CatalogueReport, airports: AirportIndex,
+                df: pd.DataFrame) -> None:
+    """Tell the operator what the catalogue can and cannot support."""
+    if not report.is_real:
+        detail = report.error or (
+            f"Missing required columns: {', '.join(report.missing_required)}."
+            if report.missing_required
+            else f"{CSV_NAME} was not found beside app.py."
+        )
+        st.info(f"Running on the built-in demo catalogue. {detail} "
+                "Export final_df from the notebook to use your own data.", icon="ℹ️")
+        return
+
+    if not len(airports):
+        st.warning(
+            "No airport data found in the catalogue, so no airports can be shown. "
+            "Re-export final_df including the `name` and `iata` columns.",
+            icon="⚠️",
+        )
+        return
+
+    direct, total = coverage(df, airports)
+    if total and direct < total:
+        st.caption(
+            f"Catalogue: {report.rows_out:,} destinations from {report.source}. "
+            f"{direct:,} carry a matched airport; the rest resolve to their nearest "
+            f"airport from the {len(airports):,} in the dataset."
+        )
 
 
 # --------------------------------------------------------------------------- #
 # pages
 # --------------------------------------------------------------------------- #
 
-def page_home(df, is_real: bool, missing: list[str]) -> None:
+def page_home(df: pd.DataFrame, report: CatalogueReport,
+              airports: AirportIndex) -> None:
     html(navbar("home"))
     html(hero(catalogue_stats(df)))
-
-    if not is_real:
-        note = (
-            f"Missing columns: {', '.join(missing)}." if missing
-            else "tripwise_data.csv was not found beside app.py."
-        )
-        st.info(
-            f"Running on the built-in demo catalogue. {note} Export final_df from "
-            "the notebook to run TripWise on your own data.",
-            icon="ℹ️",
-        )
+    data_notice(report, airports, df)
 
     html(section_head(
         "How it works", "Three steps to a shortlist you trust",
@@ -1820,12 +2524,12 @@ def page_home(df, is_real: bool, missing: list[str]) -> None:
          + feature_card("sun", "Season guidance",
                            "The months worth travelling in, inferred from latitude and "
                            "climate rather than guessed.", 3)
-         + feature_card("plane", "Nearest airport",
-                           "The gateway airport and its code for every destination that "
-                           "has one on record.", 4)
-         + feature_card("chart", "Readable insights",
-                           "Plain-language readings of your results — climate fit, cost "
-                           "spread and how your matches cluster.", 5)
+         + feature_card("plane", "Nearest airport, always",
+                           "Every destination resolves to a gateway airport — by direct "
+                           "match where one exists, by distance otherwise.", 4)
+         + feature_card("layers", "Genuinely different options",
+                           "Results are spread across distinct destination profiles, so "
+                           "a shortlist offers real alternatives.", 5)
          + feature_card("shield", "Honest about gaps",
                            "When a detail is missing from the catalogue TripWise says so "
                            "instead of inventing a plausible answer.", 6)
@@ -1842,27 +2546,18 @@ def page_home(df, is_real: bool, missing: list[str]) -> None:
     html(footer())
 
 
-def page_planner(df, is_real: bool) -> None:
-    html(navbar("planner"))
-    html("""
-<div class="tw-section" style="margin-top:8px;">
-  <div class="tw-section__head tw-rise">
-    <span class="tw-eyebrow">AI Planner</span>
-    <h2>Tell us how you travel</h2>
-    <p>Rate what matters to you. 1 means you are indifferent, 5 means it would
-       shape the whole trip.</p>
-  </div>
-</div>""")
-
+def collect_answers() -> tuple[dict, bool]:
+    """Render the planner form and return the raw answers plus submit state."""
     with st.form("planner", border=False):
         html('<div class="tw-panel">')
-
         html('<div class="tw-fieldset__title">What you care about</div>')
+
         answers: dict = {}
         cols = st.columns(3, gap="large")
         for i, (key, label, hint) in enumerate(TASTES):
             with cols[i % 3]:
-                answers[key] = st.slider(label, 1, 5, 3, help=hint, key=f"t_{key}")
+                answers[key] = st.slider(label, TASTE_MIN, TASTE_MAX, 3,
+                                         help=hint, key=f"t_{key}")
 
         html('<div class="tw-fieldset__title">Budget and climate</div>')
         c1, c2, c3 = st.columns(3, gap="large")
@@ -1873,63 +2568,113 @@ def page_planner(df, is_real: bool) -> None:
         with c2:
             answers["temp"] = st.slider("Preferred average temperature (°C)", -5, 40, 22)
         with c3:
-            answers["stars"] = st.slider("Minimum accommodation standard", 1.0, 5.0, 4.0, 0.5)
+            answers["stars"] = st.slider("Minimum accommodation standard",
+                                         STARS_MIN, STARS_MAX, 4.0, 0.5)
 
         html('<div class="tw-fieldset__title">Where and how long</div>')
         c4, c5, c6 = st.columns(3, gap="large")
         with c4:
-            region_names = ["Anywhere"] + [REGION_LABEL[c] for c in REGION_COLS]
-            picked = st.selectbox("Preferred region", region_names)
+            names = ["Anywhere"] + [REGION_LABEL[c] for c in REGION_COLS]
+            picked = st.selectbox("Preferred region", names)
             answers["region"] = next(
                 (c for c in REGION_COLS if REGION_LABEL[c] == picked), None)
         with c5:
             length = st.radio("Trip length", ["Short trip", "One week"], horizontal=True)
             answers["trip_length"] = "short" if length == "Short trip" else "week"
-            answers["nights"] = 4 if length == "Short trip" else 7
         with c6:
-            answers["travellers"] = st.number_input("Travellers", 1, 12, 2)
+            answers["travellers"] = st.number_input(
+                "Travellers", TRAVELLERS_MIN, TRAVELLERS_MAX, 2)
 
+        answers["nights"] = st.slider("Nights", NIGHTS_MIN, 30,
+                                      4 if answers["trip_length"] == "short" else 7)
         answers["needs_airport"] = st.checkbox(
-            "Only show destinations with a nearby airport", value=True)
+            "Prefer destinations with a nearby airport", value=True)
 
         html("</div>")
         st.markdown("<div style='height:1.3rem'></div>", unsafe_allow_html=True)
         submitted = st.form_submit_button("Find my destinations  →", type="primary")
 
+    return answers, submitted
+
+
+def page_planner(df: pd.DataFrame, report: CatalogueReport,
+                 airports: AirportIndex) -> None:
+    html(navbar("planner"))
+    html("""
+<div class="tw-section" style="margin-top:8px;">
+<div class="tw-section__head tw-rise">
+<span class="tw-eyebrow">AI Planner</span>
+<h2>Tell us how you travel</h2>
+<p>Rate what matters to you. 1 means you are indifferent, 5 means it would
+shape the whole trip.</p>
+</div>
+</div>""")
+
+    raw_answers, submitted = collect_answers()
     if not submitted:
         html(footer())
         return
 
-    prefs = build_preferences(df, answers)
-    pool = df
-    if answers["needs_airport"] and "has_airport" in df.columns:
-        gated = df[df.apply(lambda r: any(airport_of(r)), axis=1)]
-        if len(gated) >= 6:
-            pool = gated
-
-    with st.spinner("Ranking destinations…"):
-        model = get_recommender(pool, f"{len(pool)}-{tuple(pool.columns)[:3]}")
-        results = model.rank(prefs, top_n=6)
-
-    render_results(results, prefs, answers)
-
-
-def render_results(results, prefs: dict, answers: dict) -> None:
-    if results.empty:
-        st.warning("No destinations matched. Try widening the region or climate.")
+    blocking = validate_catalogue(df)
+    if blocking:
+        st.error(blocking, icon="⚠️")
+        html(footer())
         return
+
+    checked = validate_answers(raw_answers)
+    for notice in checked.notices:
+        st.warning(notice, icon="⚠️")
+    answers = checked.answers
+
+    pool, pool_notices = validate_pool(df, answers)
+    for notice in pool_notices:
+        st.info(notice, icon="ℹ️")
+
+    result = None
+    with guard("recommendation") as failure:
+        bundle = fitted_models(fingerprint(df))
+        prefs = build_preference_vector(df, answers)
+        with st.spinner("Ranking destinations…"):
+            result = recommend(
+                df, bundle, prefs,
+                top_n=DEFAULT_TOP_N,
+                pool_index=pool.index.to_numpy(),
+            )
+    if failure or result is None:
+        st.error("Something went wrong while ranking destinations. "
+                 "Adjust a preference and try again.", icon="⚠️")
+        html(footer())
+        return
+
+    if result.empty:
+        st.warning("No destinations matched. Try widening the region or climate.",
+                   icon="ℹ️")
+        html(footer())
+        return
+
+    render_results(result, prefs, answers, airports)
+
+
+def render_results(result: Recommendation, prefs: dict,
+                   answers: dict, airports: AirportIndex) -> None:
+    frame = result.frame
 
     html(section_head(
         "Your matches", "Where you should go",
-        f"Ranked against your answers. Estimates assume {answers['travellers']} "
-        f"traveller(s) over {answers['nights']} nights."))
-    cards = "".join(
-        destination_card(card_payload(row, prefs), delay=(i % 6) + 1)
-        for i, (_, row) in enumerate(results.iterrows())
-    )
-    html(f'<div class="tw-grid tw-grid--3">{cards}</div>' + close_section())
+        f"Ranked against your answers from {result.considered:,} destinations. "
+        f"Estimates assume {answers['travellers']} traveller(s) over "
+        f"{answers['nights']} nights."))
 
-    readings = insights(results, prefs, answers)
+    cards = []
+    for i, (_, row) in enumerate(frame.iterrows()):
+        with guard(f"card for {row.get('city')}"):
+            cards.append(destination_card(card_payload(row, prefs, airports),
+                                             delay=(i % 6) + 1))
+    html(f'<div class="tw-grid tw-grid--3">{"".join(cards)}</div>' + close_section())
+
+    readings: list = []
+    with guard("insights"):
+        readings = travel_insights(frame, prefs, answers, result.profiles)
     if readings:
         html(section_head(
             "AI insights", "What your results say",
@@ -1939,15 +2684,28 @@ def render_results(results, prefs: dict, answers: dict) -> None:
                        for i, (t, b) in enumerate(readings))
              + "</div>" + close_section())
 
-    render_charts(results, answers)
+    with guard("charts") as failed:
+        render_charts(frame, answers)
+    if failed:
+        st.caption("Charts are unavailable for this result set.")
+
     html(footer())
 
 
-def render_charts(results, answers: dict) -> None:
+def chart(fig) -> None:
+    """Render a figure full width across Streamlit versions."""
+    cfg = {"displayModeBar": False}
+    try:
+        st.plotly_chart(fig, width="stretch", config=cfg)
+    except TypeError:
+        st.plotly_chart(fig, use_container_width=True, config=cfg)
+
+
+def render_charts(frame: pd.DataFrame, answers: dict) -> None:
     import plotly.express as px
 
     html(section_head("Comparison", "Your shortlist side by side",
-                         "The same six destinations, measured two ways."))
+                         "The same destinations, measured two ways."))
     left, right = st.columns(2, gap="large")
     axis = dict(showgrid=True, gridcolor="rgba(9,16,32,.07)", zeroline=False,
                 tickfont=dict(color="#55637A", size=12),
@@ -1955,12 +2713,13 @@ def render_charts(results, answers: dict) -> None:
     layout = dict(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                   font=dict(family="Inter, sans-serif", color="#080D18", size=13),
                   margin=dict(t=10, b=10, l=10, r=10), height=320, showlegend=False)
+    scale = ["#BAE6FD", "#0EA5E9", "#2563EB"]
 
     with left:
         html('<div class="tw-card tw-chart"><h4>Match strength</h4>'
              '<p>How closely each destination sits to your answers.</p>')
-        fig = px.bar(results.sort_values("match"), x="match", y="city", orientation="h",
-                     color="match", color_continuous_scale=["#BAE6FD", "#0EA5E9", "#2563EB"])
+        fig = px.bar(frame.sort_values("match"), x="match", y="city", orientation="h",
+                     color="match", color_continuous_scale=scale)
         fig.update_layout(**layout, xaxis=dict(**axis, title="Match %"),
                           yaxis=dict(**axis, title=""), coloraxis_showscale=False)
         fig.update_traces(hovertemplate="%{y}: %{x:.0f}%<extra></extra>")
@@ -1968,14 +2727,13 @@ def render_charts(results, answers: dict) -> None:
         html("</div>")
 
     with right:
-        costs = results.assign(
-            daily=[daily_cost(r) for _, r in results.iterrows()])
-        nights, people = answers["nights"], answers["travellers"]
-        costs["total"] = costs["daily"] * nights * people
+        costs = frame.assign(daily=[daily_cost(r) for _, r in frame.iterrows()])
+        costs["total"] = costs["daily"] * answers["nights"] * answers["travellers"]
         html('<div class="tw-card tw-chart"><h4>Estimated trip cost</h4>'
-             f'<p>{people} traveller(s), {nights} nights, before flights.</p>')
+             f'<p>{answers["travellers"]} traveller(s), {answers["nights"]} nights, '
+             'before flights.</p>')
         fig = px.bar(costs.sort_values("total"), x="total", y="city", orientation="h",
-                     color="total", color_continuous_scale=["#BAE6FD", "#0EA5E9", "#2563EB"])
+                     color="total", color_continuous_scale=scale)
         fig.update_layout(**layout, xaxis=dict(**axis, title="US$"),
                           yaxis=dict(**axis, title=""), coloraxis_showscale=False)
         fig.update_traces(hovertemplate="%{y}: $%{x:,.0f}<extra></extra>")
@@ -1994,20 +2752,27 @@ def main() -> None:
     view = params.get("view", "home")
 
     html(THEME_CSS)
-    df, is_real, missing = load_catalogue()
 
-    # The splash is painted over the page that renders beneath it in this same
-    # run, then fades itself out — so there is never a blank frame, no blocking
-    # sleep and no second rerun. It plays only on a bare first load; every link
-    # in the app carries a query param, so navigation never replays it.
+    df = report = airports = None
+    with guard("startup") as failure:
+        df, report = load_catalogue()
+        airports = airport_index(fingerprint(df))
+    if failure or df is None:
+        st.error("TripWise could not start: the destination catalogue failed to load. "
+                 "Check that tripwise_data.csv sits beside app.py.", icon="⚠️")
+        return
+
+    # The splash paints over the page rendering beneath it in this same run, then
+    # fades itself out — no blank frame, no blocking sleep, no second rerun. It
+    # plays only on a bare first load; every link carries a query param.
     if len(params) == 0 and not st.session_state.get("seen_splash", False):
         st.session_state["seen_splash"] = True
         html(build_splash())
 
     if view == "planner":
-        page_planner(df, is_real)
+        page_planner(df, report, airports)
     else:
-        page_home(df, is_real, missing)
+        page_home(df, report, airports)
 
 
 if __name__ == "__main__":
