@@ -8,6 +8,7 @@ import time
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+import streamlit.components.v1 as components
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -31,6 +32,265 @@ REGION_COLS = [
     "region_africa", "region_asia", "region_europe", "region_middle_east",
     "region_north_america", "region_oceania", "region_south_america",
 ]
+
+# Heart-shaped flight path (SVG user units, viewBox 0 0 1200 750).
+# The SAME string is drawn on screen AND fed to <animateMotion><mpath>, so the
+# plane rides exactly on the drawn line at any screen size — no CSS offset-path
+# drift between the guide and the aircraft.
+HEART_PATH = (
+    "M 120 660 C 230 600 300 520 360 460 C 300 430 250 380 255 310 "
+    "C 260 220 340 155 430 165 C 490 172 535 210 555 260 "
+    "C 575 210 620 172 680 165 C 770 155 850 220 855 310 "
+    "C 860 380 810 430 750 460 C 820 500 900 500 940 430 "
+    "C 985 355 985 270 940 200 C 1005 165 1060 130 1120 90"
+)
+
+# Top-view jet silhouette, nose pointing +x so rotate="auto" aligns it perfectly.
+PLANE_SHAPE = (
+    "M22,0 L8,-3.4 L-2,-16.5 L-8,-16.5 L-4,-3.4 L-14,-3.4 L-19,-8 L-22.5,-8 "
+    "L-20,-2.6 L-20,2.6 L-22.5,8 L-19,8 L-14,3.4 L-4,3.4 L-8,16.5 L-2,16.5 "
+    "L8,3.4 Z"
+)
+
+
+SPLASH_HTML = """<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{
+  display:grid;place-items:center;
+  background:linear-gradient(180deg,#f1f4f7 0%,#e3e9ef 42%,#ced6df 100%);
+  animation:out .8s ease 4.5s forwards;
+}
+@keyframes out{to{opacity:0}}
+
+.scene{width:min(96vw,1240px);aspect-ratio:1200/620;
+  animation:scenein 1.2s cubic-bezier(.2,.7,.3,1) both}
+@keyframes scenein{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:none}}
+svg{width:100%;height:100%;display:block;
+  filter:drop-shadow(0 30px 64px rgba(66,80,96,.22))}
+
+/* shades: hold closed, then glide up out of the opening */
+.shade{transform:translateY(0);animation:up 2.2s cubic-bezier(.72,0,.18,1) forwards}
+@keyframes up{to{transform:translateY(-386px)}}
+
+/* clouds drift sideways at different speeds for parallax */
+.drift{animation-name:dr;animation-timing-function:ease-in-out;
+  animation-iteration-count:infinite;animation-direction:alternate}
+@keyframes dr{from{transform:translateX(calc(var(--dx) * -1))}
+              to{transform:translateX(var(--dx))}}
+
+.mark{position:absolute;left:0;right:0;bottom:6%;text-align:center;opacity:0;
+  animation:mk 1s cubic-bezier(.2,.7,.3,1) 2.8s both}
+.mark .t{font-family:'Outfit',sans-serif;font-weight:800;
+  font-size:clamp(1.5rem,3.6vw,2.45rem);letter-spacing:-.005em;
+  background:linear-gradient(96deg,#0EA5E9,#2563EB);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  color:#2563EB;
+  filter:drop-shadow(0 0 22px rgba(14,165,233,.45)) drop-shadow(0 2px 3px rgba(255,255,255,.95))}
+.mark .s{font-family:'Inter',sans-serif;margin-top:.5rem;color:#5A6B7E;font-weight:500;
+  font-size:clamp(.62rem,1.35vw,.8rem);letter-spacing:.34em;text-transform:uppercase;
+  text-shadow:0 1px 2px rgba(255,255,255,.9)}
+@keyframes mk{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  .shade{animation-duration:.01s}
+  .drift{animation:none}
+  body{animation:out .5s linear 2s forwards}
+}
+</style></head><body>
+<div class="scene">
+<svg viewBox="0 0 1200 620" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="cabin" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f1f4f7"/><stop offset=".42" stop-color="#e3e9ef"/>
+    <stop offset="1" stop-color="#ced6df"/>
+  </linearGradient>
+  <radialGradient id="vign" cx="50%" cy="42%" r="72%">
+    <stop offset="55%" stop-color="#000" stop-opacity="0"/>
+    <stop offset="100%" stop-color="#48535f" stop-opacity=".16"/>
+  </radialGradient>
+  <filter id="winShadow" x="-25%" y="-25%" width="150%" height="150%">
+    <feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#54626f" flood-opacity=".33"/>
+  </filter>
+  <linearGradient id="bezel" x1=".25" y1="0" x2=".75" y2="1">
+    <stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#f4f6f8"/>
+    <stop offset="1" stop-color="#dbe1e7"/>
+  </linearGradient>
+  <linearGradient id="well" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#6f7883"/><stop offset=".28" stop-color="#98a1ab"/>
+    <stop offset=".75" stop-color="#c9d0d8"/><stop offset="1" stop-color="#eef1f4"/>
+  </linearGradient>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1a4a8c"/><stop offset=".34" stop-color="#4886c4"/>
+    <stop offset=".56" stop-color="#9ec8e8"/><stop offset=".72" stop-color="#d9eaf6"/>
+    <stop offset="1" stop-color="#c2d9ec"/>
+  </linearGradient>
+  <radialGradient id="sun">
+    <stop offset="0" stop-color="#fff6dc" stop-opacity=".85"/>
+    <stop offset="55%" stop-color="#ffe9b8" stop-opacity=".22"/>
+    <stop offset="100%" stop-color="#ffe9b8" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#d9dee4"/><stop offset=".08" stop-color="#f2f4f7"/>
+    <stop offset=".5" stop-color="#fafbfc"/><stop offset=".92" stop-color="#eceff3"/>
+    <stop offset="1" stop-color="#d3d9e0"/>
+  </linearGradient>
+  <linearGradient id="lipG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#d3d9e0"/><stop offset="1" stop-color="#b3bbc5"/>
+  </linearGradient>
+  <linearGradient id="gripG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#98a0aa"/><stop offset="1" stop-color="#727a85"/>
+  </linearGradient>
+  <linearGradient id="lipHi" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffffff" stop-opacity=".92"/>
+    <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="mDeepg" x1="0" y1="0" x2="0" y2="1"><stop offset="40%" stop-color="#fff" stop-opacity="0"/><stop offset="66%" stop-color="#fff" stop-opacity="1"/><stop offset="100%" stop-color="#fff" stop-opacity="1"/></linearGradient><mask id="mDeep" maskUnits="userSpaceOnUse" x="-40" y="0" width="300" height="326"><rect x="-40" y="0" width="300" height="326" fill="url(#mDeepg)"/></mask><linearGradient id="mDeckg" x1="0" y1="0" x2="0" y2="1"><stop offset="44%" stop-color="#fff" stop-opacity="0"/><stop offset="70%" stop-color="#fff" stop-opacity="1"/><stop offset="100%" stop-color="#fff" stop-opacity="1"/></linearGradient><mask id="mDeck" maskUnits="userSpaceOnUse" x="-40" y="0" width="300" height="326"><rect x="-40" y="0" width="300" height="326" fill="url(#mDeckg)"/></mask><linearGradient id="mLowg" x1="0" y1="0" x2="0" y2="1"><stop offset="58%" stop-color="#fff" stop-opacity="0"/><stop offset="84%" stop-color="#fff" stop-opacity="1"/><stop offset="100%" stop-color="#fff" stop-opacity="1"/></linearGradient><mask id="mLow" maskUnits="userSpaceOnUse" x="-40" y="0" width="300" height="326"><rect x="-40" y="0" width="300" height="326" fill="url(#mLowg)"/></mask><linearGradient id="mHighg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff" stop-opacity="1"/><stop offset="30%" stop-color="#fff" stop-opacity="0"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></linearGradient><mask id="mHigh" maskUnits="userSpaceOnUse" x="-40" y="0" width="300" height="326"><rect x="-40" y="0" width="300" height="326" fill="url(#mHighg)"/></mask>
+  <filter id="cA_0" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.009" numOctaves="5" seed="11" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -1.9 0 0 0 1.18"/></filter><filter id="cB_0" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.017" numOctaves="6" seed="5" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.5 0 0 0 1.45"/></filter><filter id="cC_0" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.034" numOctaves="5" seed="29" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -3.0 0 0 0 1.72"/></filter><filter id="cD_0" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="4" seed="41" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.6 0 0 0 1.3"/></filter><filter id="cA_1" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.009" numOctaves="5" seed="71" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -1.9 0 0 0 1.18"/></filter><filter id="cB_1" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.017" numOctaves="6" seed="65" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.5 0 0 0 1.45"/></filter><filter id="cC_1" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.034" numOctaves="5" seed="89" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -3.0 0 0 0 1.72"/></filter><filter id="cD_1" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="4" seed="101" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.6 0 0 0 1.3"/></filter><filter id="cA_2" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.009" numOctaves="5" seed="131" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -1.9 0 0 0 1.18"/></filter><filter id="cB_2" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.017" numOctaves="6" seed="125" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.5 0 0 0 1.45"/></filter><filter id="cC_2" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.034" numOctaves="5" seed="149" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -3.0 0 0 0 1.72"/></filter><filter id="cD_2" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="4" seed="161" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.6 0 0 0 1.3"/></filter>
+</defs>
+  <rect width="1200" height="620" fill="url(#cabin)"/>
+  <rect x="0" y="34" width="1200" height="2" fill="#c3cbd4" opacity=".55"/>
+  <rect x="0" y="37" width="1200" height="1" fill="#ffffff" opacity=".9"/>
+  <rect x="0" y="561" width="1200" height="2" fill="#c3cbd4" opacity=".5"/>
+  <rect x="0" y="564" width="1200" height="1" fill="#ffffff" opacity=".85"/>
+
+  <g transform="translate(72,78)">
+    <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="url(#bezel)"
+          filter="url(#winShadow)"/>
+    <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="none"
+          stroke="#aab3bd" stroke-width="1.1" opacity=".5"/>
+    <rect x="24" y="24" width="252" height="382" rx="76" ry="60" fill="url(#well)"/>
+    <rect x="32" y="34" width="236" height="362" rx="68" ry="54"
+          fill="#5c6672" opacity=".5"/>
+
+    <clipPath id="glass0">
+      <rect x="40" y="46" width="220" height="326" rx="62" ry="50"/>
+    </clipPath>
+
+    <g clip-path="url(#glass0)">
+      <rect x="40" y="46" width="220" height="326" fill="url(#sky)"/>
+      <g transform="translate(40,46)"><g class="drift" style="animation-duration:26s;animation-delay:-0s;--dx:16px"><rect x="0" y="46" width="300" height="326" filter="url(#cA_0)" mask="url(#mDeep)" opacity="0.85" transform="translate(0,0)"/></g><g class="drift" style="animation-duration:19s;animation-delay:-3s;--dx:26px"><rect x="0" y="46" width="300" height="326" filter="url(#cB_0)" mask="url(#mDeck)" opacity="1.0" transform="translate(0,0)"/></g><g class="drift" style="animation-duration:13s;animation-delay:-6s;--dx:38px"><rect x="0" y="46" width="300" height="326" filter="url(#cC_0)" mask="url(#mLow)" opacity="0.9" transform="translate(0,0)"/></g><g class="drift" style="animation-duration:34s;animation-delay:-9s;--dx:12px"><rect x="0" y="46" width="300" height="326" filter="url(#cD_0)" mask="url(#mHigh)" opacity="0.28" transform="translate(0,0)"/></g></g>
+      <ellipse cx="202.8" cy="156.84" rx="154.0" ry="136.92"
+               fill="url(#sun)" opacity=".55"/>
+
+      <!-- shade: starts closed, glides up out of the opening -->
+      <g class="shade" style="animation-delay:1.0s">
+        <rect x="36" y="44" width="228" height="330" fill="url(#shade)"/>
+        <rect x="36" y="332" width="228" height="42" fill="url(#lipG)"/>
+        <rect x="120.0" y="346" width="60" height="9" rx="4.5"
+              fill="url(#gripG)"/>
+      </g>
+
+      <!-- glass depth + reflection, always above the shade -->
+      <rect x="40" y="46" width="220" height="26" fill="#33404f" opacity=".34"/>
+      <rect x="40" y="46" width="13" height="326" fill="#33404f" opacity=".2"/>
+      <rect x="247" y="46" width="13" height="326" fill="#33404f" opacity=".2"/>
+      <path d="M40 296 L190 46 L250 46 L40 372 Z"
+            fill="#fff" opacity=".08"/>
+    </g>
+
+    <path d="M58 52 C100 20 200 20 242 52
+             C200 34 100 34 58 52 Z" fill="url(#lipHi)"/>
+  </g>
+  <g transform="translate(450,78)">
+    <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="url(#bezel)"
+          filter="url(#winShadow)"/>
+    <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="none"
+          stroke="#aab3bd" stroke-width="1.1" opacity=".5"/>
+    <rect x="24" y="24" width="252" height="382" rx="76" ry="60" fill="url(#well)"/>
+    <rect x="32" y="34" width="236" height="362" rx="68" ry="54"
+          fill="#5c6672" opacity=".5"/>
+
+    <clipPath id="glass1">
+      <rect x="40" y="46" width="220" height="326" rx="62" ry="50"/>
+    </clipPath>
+
+    <g clip-path="url(#glass1)">
+      <rect x="40" y="46" width="220" height="326" fill="url(#sky)"/>
+      <g transform="translate(40,46)"><g class="drift" style="animation-duration:28s;animation-delay:-1s;--dx:16px"><rect x="0" y="46" width="300" height="326" filter="url(#cA_1)" mask="url(#mDeep)" opacity="0.85" transform="translate(0,0)"/></g><g class="drift" style="animation-duration:21s;animation-delay:-4s;--dx:26px"><rect x="0" y="46" width="300" height="326" filter="url(#cB_1)" mask="url(#mDeck)" opacity="1.0" transform="translate(0,0)"/></g><g class="drift" style="animation-duration:15s;animation-delay:-7s;--dx:38px"><rect x="0" y="46" width="300" height="326" filter="url(#cC_1)" mask="url(#mLow)" opacity="0.9" transform="translate(0,0)"/></g><g class="drift" style="animation-duration:36s;animation-delay:-10s;--dx:12px"><rect x="0" y="46" width="300" height="326" filter="url(#cD_1)" mask="url(#mHigh)" opacity="0.28" transform="translate(0,0)"/></g></g>
+      <ellipse cx="202.8" cy="156.84" rx="154.0" ry="136.92"
+               fill="url(#sun)" opacity=".55"/>
+
+      <!-- shade: starts closed, glides up out of the opening -->
+      <g class="shade" style="animation-delay:1.12s">
+        <rect x="36" y="44" width="228" height="330" fill="url(#shade)"/>
+        <rect x="36" y="332" width="228" height="42" fill="url(#lipG)"/>
+        <rect x="120.0" y="346" width="60" height="9" rx="4.5"
+              fill="url(#gripG)"/>
+      </g>
+
+      <!-- glass depth + reflection, always above the shade -->
+      <rect x="40" y="46" width="220" height="26" fill="#33404f" opacity=".34"/>
+      <rect x="40" y="46" width="13" height="326" fill="#33404f" opacity=".2"/>
+      <rect x="247" y="46" width="13" height="326" fill="#33404f" opacity=".2"/>
+      <path d="M40 296 L190 46 L250 46 L40 372 Z"
+            fill="#fff" opacity=".08"/>
+    </g>
+
+    <path d="M58 52 C100 20 200 20 242 52
+             C200 34 100 34 58 52 Z" fill="url(#lipHi)"/>
+  </g>
+  <g transform="translate(828,78)">
+    <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="url(#bezel)"
+          filter="url(#winShadow)"/>
+    <rect x="0" y="0" width="300" height="430" rx="96" ry="78" fill="none"
+          stroke="#aab3bd" stroke-width="1.1" opacity=".5"/>
+    <rect x="24" y="24" width="252" height="382" rx="76" ry="60" fill="url(#well)"/>
+    <rect x="32" y="34" width="236" height="362" rx="68" ry="54"
+          fill="#5c6672" opacity=".5"/>
+
+    <clipPath id="glass2">
+      <rect x="40" y="46" width="220" height="326" rx="62" ry="50"/>
+    </clipPath>
+
+    <g clip-path="url(#glass2)">
+      <rect x="40" y="46" width="220" height="326" fill="url(#sky)"/>
+      <g transform="translate(40,46)"><g class="drift" style="animation-duration:30s;animation-delay:-2s;--dx:16px"><rect x="0" y="46" width="300" height="326" filter="url(#cA_2)" mask="url(#mDeep)" opacity="0.85" transform="translate(0,0)"/></g><g class="drift" style="animation-duration:23s;animation-delay:-5s;--dx:26px"><rect x="0" y="46" width="300" height="326" filter="url(#cB_2)" mask="url(#mDeck)" opacity="1.0" transform="translate(0,0)"/></g><g class="drift" style="animation-duration:17s;animation-delay:-8s;--dx:38px"><rect x="0" y="46" width="300" height="326" filter="url(#cC_2)" mask="url(#mLow)" opacity="0.9" transform="translate(0,0)"/></g><g class="drift" style="animation-duration:38s;animation-delay:-11s;--dx:12px"><rect x="0" y="46" width="300" height="326" filter="url(#cD_2)" mask="url(#mHigh)" opacity="0.28" transform="translate(0,0)"/></g></g>
+      <ellipse cx="202.8" cy="156.84" rx="154.0" ry="136.92"
+               fill="url(#sun)" opacity=".55"/>
+
+      <!-- shade: starts closed, glides up out of the opening -->
+      <g class="shade" style="animation-delay:1.24s">
+        <rect x="36" y="44" width="228" height="330" fill="url(#shade)"/>
+        <rect x="36" y="332" width="228" height="42" fill="url(#lipG)"/>
+        <rect x="120.0" y="346" width="60" height="9" rx="4.5"
+              fill="url(#gripG)"/>
+      </g>
+
+      <!-- glass depth + reflection, always above the shade -->
+      <rect x="40" y="46" width="220" height="26" fill="#33404f" opacity=".34"/>
+      <rect x="40" y="46" width="13" height="326" fill="#33404f" opacity=".2"/>
+      <rect x="247" y="46" width="13" height="326" fill="#33404f" opacity=".2"/>
+      <path d="M40 296 L190 46 L250 46 L40 372 Z"
+            fill="#fff" opacity=".08"/>
+    </g>
+
+    <path d="M58 52 C100 20 200 20 242 52
+             C200 34 100 34 58 52 Z" fill="url(#lipHi)"/>
+  </g>
+  <rect width="1200" height="620" fill="url(#vign)" pointer-events="none"/>
+</svg>
+</div>
+<div class="mark">
+  <div class="t">TripWise AI</div>
+  <div class="s">Plan smarter &middot; Travel further</div>
+</div>
+</body></html>"""
+
+
+SPLASH_CHROME_CSS = """
+<style>
+header, #MainMenu, footer, [data-testid="stToolbar"], [data-testid="stSidebar"]{display:none !important;}
+[data-testid="stAppViewContainer"] .main .block-container{padding:0 !important;max-width:100% !important;}
+.stApp{background:#070c16 !important;}
+iframe{position:fixed !important; inset:0 !important; width:100vw !important; height:100vh !important;
+       border:0 !important; z-index:99999 !important;}
+</style>
+"""
 
 
 # ----------------------------------------------------------------------------
@@ -86,7 +346,11 @@ def inject_css():
             letter-spacing: .01em;
             margin-bottom: .35rem !important;
         }
-        .tw-section-title{ font-weight:800; font-size:1.9rem; color:var(--text-dark); margin: 2.6rem 0 1.2rem 0; letter-spacing:-.01em;}
+        .tw-section-title{
+            font-weight:800; font-size:2rem; color:var(--text-dark);
+            margin: 2.6rem 0 1.2rem 0; letter-spacing:-.015em;
+            text-shadow: 0 1px 0 rgba(255,255,255,.85);
+        }
         .tw-muted{ color:var(--text-muted); font-size:1.05rem; line-height:1.6; }
 
         /* Consistent vertical rhythm between Streamlit widgets */
@@ -144,35 +408,26 @@ def inject_css():
             margin-bottom:1.6rem; display:block;
         }
 
-        /* ---------------- UNIFIED BUTTON SYSTEM ---------------- */
         .stButton>button{
-            border: none !important;
-            border-radius: 999px !important;
-            height: 3.2rem !important;
-            padding: 0 2.2rem !important;
-            font-family: 'Inter', sans-serif !important;
-            font-weight: 700 !important;
-            font-size: 1.05rem !important;
-            box-shadow: 0 10px 30px rgba(37,99,235,.32) !important;
-            transition: transform .22s ease, box-shadow .22s ease, background .22s ease !important;
-            background: linear-gradient(90deg, var(--sky), var(--blue)) !important;
-            color:white !important;
+            background: linear-gradient(90deg, var(--sky), var(--blue));
+            color:white; border:none; border-radius:999px;
+            padding:0.95rem 2.2rem; font-weight:700; font-size:1.1rem;
+            box-shadow: 0 10px 30px rgba(37,99,235,.35);
+            transition: all .25s ease;
         }
-        .stButton>button:hover{
-            transform: translateY(-3px) scale(1.03) !important;
-            box-shadow: 0 16px 40px rgba(37,99,235,.48) !important;
-        }
-        .stButton>button:active{ transform: translateY(-1px) scale(1.0) !important; }
+        .stButton>button:hover{ transform: translateY(-3px) scale(1.03); box-shadow:0 16px 40px rgba(37,99,235,.5); }
+        .stButton>button:active{ transform: translateY(-1px) scale(1.0); }
 
         .tw-back-btn button{
-            background: rgba(15,23,42,0.07) !important;
+            background: rgba(15,23,42,0.08) !important;
             color: var(--text-dark) !important;
-            box-shadow: 0 6px 18px rgba(15,23,42,.08) !important;
+            font-size: 0.95rem !important;
+            padding: 0.55rem 1.3rem !important;
+            box-shadow: none !important;
         }
         .tw-back-btn button:hover{
-            background: rgba(15,23,42,0.14) !important;
-            box-shadow: 0 10px 26px rgba(15,23,42,.14) !important;
-            transform: translateY(-3px) translateX(-2px) scale(1.02) !important;
+            background: rgba(15,23,42,0.15) !important;
+            transform: translateX(-3px) !important;
         }
 
         .tw-glass{
@@ -187,16 +442,23 @@ def inject_css():
         }
         .tw-glass:hover{ transform: translateY(-6px); box-shadow: 0 26px 70px rgba(37,99,235,.18); }
 
-        .tw-hero{ text-align:center; padding: 3.6rem 1rem 1.4rem 1rem; }
+        .tw-hero{ text-align:center; padding: 3.4rem 1rem 1.2rem 1rem; }
         .tw-hero h1{
-            font-size: 4.4rem; font-weight:900; color:var(--text-dark);
-            line-height:1.15; margin-bottom:1.3rem; letter-spacing:-.02em;
-            text-shadow: 0 6px 28px rgba(37,99,235,0.28);
+            font-size: 3.6rem; font-weight:800; color:var(--text-dark);
+            line-height:1.16; margin-bottom:1.2rem; letter-spacing:-.02em;
+            text-shadow: 0 1px 0 rgba(255,255,255,.9), 0 10px 34px rgba(37,99,235,.14);
             animation: fadeUp .9s ease both;
         }
+        /* the product name itself carries the brand gradient and a soft glow */
+        .tw-hero h1 .tw-glow{
+            background: linear-gradient(96deg, var(--sky), var(--blue));
+            -webkit-background-clip:text; background-clip:text;
+            -webkit-text-fill-color:transparent; color:var(--blue);
+            filter: drop-shadow(0 0 20px rgba(14,165,233,.4));
+        }
         .tw-hero p{
-            font-size:1.32rem; color:var(--text-muted); max-width:720px;
-            margin: 0 auto 2.3rem auto; line-height:1.7; font-weight:500;
+            font-size:1.3rem; color:var(--text-muted); max-width:700px;
+            margin: 0 auto 2.2rem auto; line-height:1.7;
             animation: fadeUp .9s ease .15s both;
         }
         .tw-badge{
@@ -211,21 +473,27 @@ def inject_css():
         .tw-float{ animation: floaty 5s ease-in-out infinite; display:inline-block; }
         .tw-float-slow{ animation: floaty 7s ease-in-out infinite; display:inline-block; }
 
-        .tw-illustration-row{ display:flex; justify-content:center; gap:2.4rem; font-size:5.4rem; margin: 1.4rem 0 2.8rem 0; flex-wrap:wrap; }
-
-        .tw-icon-circle{
-            width:112px; height:112px; border-radius:26px;
-            background: linear-gradient(135deg, var(--sky), var(--blue));
-            display:flex; align-items:center; justify-content:center;
-            font-size:3.2rem; margin-bottom:1rem; color:white;
-            box-shadow: 0 14px 32px rgba(14,165,233,.34);
+        /* Floating travel icons. clamp() lets them grow on desktop without
+           overflowing narrow screens; flex-wrap is the safety net below that. */
+        .tw-illustration-row{
+            display:flex; justify-content:center; align-items:center; flex-wrap:wrap;
+            gap: clamp(1.2rem, 3.5vw, 3rem);
+            font-size: clamp(3.2rem, 8vw, 7rem);
+            line-height:1; margin: 2rem 0 3rem 0;
+        }
+        .tw-illustration-row span{
+            filter: drop-shadow(0 14px 26px rgba(37,99,235,.28));
         }
 
-        /* Equal-height, aligned card grid */
-        div[data-testid="stHorizontalBlock"]{ align-items: stretch; }
-        div[data-testid="column"] > div{ height:100%; }
-        .tw-glass{ height:100%; display:flex; flex-direction:column; }
-        .tw-feature-card{ min-height:260px; justify-content:flex-start; }
+        .tw-icon-circle{
+            width: clamp(88px, 9vw, 116px); height: clamp(88px, 9vw, 116px);
+            border-radius:28px;
+            background: linear-gradient(135deg, var(--sky), var(--blue));
+            display:flex; align-items:center; justify-content:center;
+            font-size: clamp(2.6rem, 4vw, 3.4rem); line-height:1;
+            margin-bottom:1.1rem; color:white;
+            box-shadow: 0 16px 34px rgba(14,165,233,.34);
+        }
 
         .tw-result-card{
             background: linear-gradient(135deg, #EEF4FC 0%, #E1EBFA 100%);
@@ -237,6 +505,26 @@ def inject_css():
             display:inline-block; padding:.35rem .9rem; border-radius:999px;
             background: rgba(30,58,138,.14); color:var(--blue); font-weight:800; font-size:.9rem;
         }
+
+        /* ---------------- RESULT DETAIL ROWS (hotel + airport) ---------------- */
+        .tw-detail{
+            display:flex; align-items:flex-start; gap:.6rem;
+            margin-top:.6rem; color:#1E293B; font-size:1.04rem; line-height:1.5;
+        }
+        .tw-detail b{ color:#0F172A; }
+        .tw-detail-ic{ font-size:1.15rem; line-height:1.4; flex:0 0 auto; }
+        .tw-detail-muted{ color:#64748B; }
+
+        /* ---------------- NAV / SECTION-LINK CARDS (Home -> Insights / Models) ---------------- */
+        .tw-navcard{
+            display:block; text-decoration:none; height:100%;
+        }
+        .tw-navcard-inner{
+            background: rgba(219,234,254,0.6);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(30,58,138,0.15); border-radius: 24px;
+            padding: 2rem; height:100%; box-shadow: var(--shadow);
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -247,102 +535,17 @@ def inject_css():
 # SPLASH SCREEN
 # ----------------------------------------------------------------------------
 def render_splash():
-    st.markdown(
-        """
-        <style>
-        .tw-splash-wrap{
-            position:fixed; inset:0; z-index:9999;
-            background: linear-gradient(180deg, #DFF6FB 0%, #B9E7F2 35%, #79CFE0 70%, #4CB8CE 100%);
-            display:flex; align-items:center; justify-content:center;
-            animation: splashFade 5s ease forwards;
-            overflow:hidden;
-        }
-        .tw-wave{
-            position:absolute; bottom:-10%; left:-10%; width:120%; height:40%;
-            background: rgba(255,255,255,0.25);
-            border-radius:45%;
-            animation: waveSway 8s ease-in-out infinite;
-        }
-        .tw-wave.tw-wave-2{
-            bottom:-16%; background: rgba(255,255,255,0.18);
-            animation: waveSway 10s ease-in-out infinite reverse;
-        }
-        @keyframes waveSway{
-            0%,100%{ transform: translateX(0) translateY(0) rotate(0deg); }
-            50%{ transform: translateX(-3%) translateY(1%) rotate(1deg); }
-        }
-        @keyframes splashFade{ 0%{opacity:0;} 8%{opacity:1;} 88%{opacity:1;} 100%{opacity:0;} }
-        .tw-splash-canvas{
-            position:relative; width:min(90vw,1100px); aspect-ratio:1200/750;
-            animation: mapZoom 5s ease forwards;
-        }
-        @keyframes mapZoom{ 0%{transform:scale(1.12);} 100%{transform:scale(1);} }
-        .tw-flight-scale{
-            position:absolute; inset:0;
-            transform: scale(0.72);
-            transform-origin: 50% 50%;
-        }
-        .tw-cloud{ position:absolute; opacity:.55; filter:blur(0.5px); animation: cloudDrift linear infinite; }
-        @keyframes cloudDrift{ from{transform: translateX(0);} to{transform: translateX(60px);} }
-        .tw-plane{
-            position:absolute; top:0; left:0; font-size:2.6rem;
-            offset-path: path("M 120 660 C 230 600 300 520 360 460 C 300 430 250 380 255 310 C 260 220 340 155 430 165 C 490 172 535 210 555 260 C 575 210 620 172 680 165 C 770 155 850 220 855 310 C 860 380 810 430 750 460 C 820 500 900 500 940 430 C 985 355 985 270 940 200 C 1005 165 1060 130 1120 90");
-            offset-rotate: auto;
-            animation: flyMotion 4.6s cubic-bezier(.45,.05,.55,.95) forwards, planeFloat 1.4s ease-in-out infinite;
-        }
-        @keyframes flyMotion{ 0%{offset-distance:0%; opacity:0;} 5%{opacity:1;} 96%{offset-distance:100%; opacity:1;} 100%{offset-distance:100%; opacity:0;} }
-        @keyframes planeFloat{ 0%,100%{margin-top:0px;} 50%{margin-top:-6px;} }
-        .tw-splash-logo{
-            position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-            flex-direction:column; opacity:0; animation: logoIn 1.1s ease 4.0s forwards;
-        }
-        @keyframes logoIn{ 0%{opacity:0; transform:scale(.88);} 100%{opacity:1; transform:scale(1);} }
-        .tw-splash-logo .tw-splash-title{
-            font-family:'Outfit', sans-serif; font-weight:800; font-size:2.8rem; color:white;
-            letter-spacing:.03em; text-shadow: 0 8px 30px rgba(0,0,0,.18);
-        }
-        .tw-splash-logo .tw-splash-sub{
-            font-family:'Inter', sans-serif; color:rgba(255,255,255,.92); margin-top:.5rem;
-            font-size:1.05rem; letter-spacing:.06em; text-transform:uppercase; font-weight:500;
-        }
-        </style>
+    """Airplane-window boarding splash rendered via components.html (an iframe).
 
-        <div class="tw-splash-wrap">
-          <div class="tw-wave"></div>
-          <div class="tw-wave tw-wave-2"></div>
-          <div class="tw-splash-canvas">
-            <div class="tw-flight-scale">
-              <svg viewBox="0 0 1200 750" width="100%" height="100%" style="position:absolute; inset:0;">
-                <g fill="#ffffff" opacity="0.28">
-                  <ellipse cx="180" cy="180" rx="150" ry="90"/>
-                  <ellipse cx="420" cy="140" rx="120" ry="70"/>
-                  <ellipse cx="230" cy="420" rx="140" ry="110"/>
-                  <ellipse cx="650" cy="200" rx="180" ry="100"/>
-                  <ellipse cx="780" cy="450" rx="160" ry="120"/>
-                  <ellipse cx="1020" cy="250" rx="150" ry="90"/>
-                  <ellipse cx="980" cy="560" rx="120" ry="80"/>
-                </g>
-                <path d="M 120 660 C 230 600 300 520 360 460 C 300 430 250 380 255 310 C 260 220 340 155 430 165 C 490 172 535 210 555 260 C 575 210 620 172 680 165 C 770 155 850 220 855 310 C 860 380 810 430 750 460 C 820 500 900 500 940 430 C 985 355 985 270 940 200 C 1005 165 1060 130 1120 90"
-                      fill="none" stroke="#0F172A" stroke-width="4" stroke-dasharray="2 14" stroke-linecap="round" opacity="0.75"/>
-                <g transform="translate(105,635)">
-                  <path d="M15 0 C24 0 30 7 30 15 C30 26 15 40 15 40 C15 40 0 26 0 15 C0 7 6 0 15 0 Z" fill="#EF4444"/>
-                  <circle cx="15" cy="15" r="7" fill="white"/>
-                </g>
-              </svg>
-              <div class="tw-plane">✈️</div>
-            </div>
-            <div class="tw-cloud" style="top:12%; left:8%; font-size:2.2rem; animation-duration:9s;">☁️</div>
-            <div class="tw-cloud" style="top:28%; left:60%; font-size:1.6rem; animation-duration:12s;">☁️</div>
-            <div class="tw-cloud" style="top:65%; left:20%; font-size:1.8rem; animation-duration:10s;">☁️</div>
-            <div class="tw-splash-logo">
-              <div class="tw-splash-title">✈️ TripWise AI</div>
-              <div class="tw-splash-sub">Plan smarter. Travel further.</div>
-            </div>
-          </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    components.html reliably renders full HTML/CSS/JS. st.markdown does not: its
+    Markdown parser treats indented HTML as a code block and prints it as text,
+    which is why the raw CSS was showing on screen.
+
+    Shades start closed, hold ~1s, then glide up to reveal the clouds. The photo
+    frame is a fixed PNG with the glass punched out, so only the shades and the
+    drifting clouds move (subtle in-flight parallax).
+    """
+    components.html(SPLASH_HTML, height=760, scrolling=False)
 
 
 # ----------------------------------------------------------------------------
@@ -400,7 +603,7 @@ def page_home(df: pd.DataFrame):
         """
         <div class="tw-hero">
             <span class="tw-badge">✨ AI-Powered Travel Planning</span>
-            <h1>✈️ Plan Smarter with<br/>TripWise AI</h1>
+            <h1>✈️ Plan Smarter with<br/><span class="tw-glow">TripWise AI</span></h1>
             <p>Your intelligent travel companion that creates personalized itineraries,
             predicts travel costs, recommends destinations, and helps you explore the
             world effortlessly.</p>
@@ -438,7 +641,7 @@ def page_home(df: pd.DataFrame):
         with c:
             st.markdown(
                 f"""
-                <div class="tw-glass tw-feature-card">
+                <div class="tw-glass">
                     <div class="tw-icon-circle">{icon}</div>
                     <div style="font-weight:800; font-size:1.25rem; margin-bottom:.6rem; color:#0F172A;">{title}</div>
                     <div class="tw-muted" style="font-size:1.02rem; line-height:1.6;">{desc}</div>
@@ -447,52 +650,51 @@ def page_home(df: pd.DataFrame):
                 unsafe_allow_html=True,
             )
 
-    render_insights(df)
-    render_models_used()
-
-
-def render_models_used():
-    st.markdown('<div class="tw-section-title">🤖 Models Used</div>', unsafe_allow_html=True)
-
-    models = [
-        {
-            "icon": "🎯",
-            "name": "Cosine Similarity",
-            "purpose": "Recommends destinations that best match an individual traveler's stated preferences.",
-            "how": "Every destination and every user profile is represented as a vector of scaled features (culture, nature, budget, climate...). Cosine Similarity measures the angle between the user's vector and each destination's vector — the smaller the angle, the closer the match.",
-            "why": "It works well with structured, interpretable features and doesn't require historical user ratings, which this dataset doesn't have.",
-            "contribution": "It powers the core \"Find my destinations\" engine on the Destination Explorer page.",
-        },
-        {
-            "icon": "🧩",
-            "name": "K-Means Clustering",
-            "purpose": "Groups destinations with similar characteristics into clusters, revealing natural travel-style patterns in the data.",
-            "how": "The algorithm partitions all destinations into K groups by minimizing the distance between each destination and its cluster's center, based on the same scaled features used for recommendations.",
-            "why": "It's a simple, well-established unsupervised method suited for exploratory pattern discovery when there are no predefined labels.",
-            "contribution": "It helps surface destination \"types\" (e.g. beach & budget-friendly vs. cultural & luxury) that complement the direct recommendations.",
-        },
-    ]
-
-    cols = st.columns(2)
-    for c, m in zip(cols, models):
-        with c:
-            st.markdown(
-                f"""
-                <div class="tw-glass" style="min-height:100%;">
-                    <div class="tw-icon-circle">{m['icon']}</div>
-                    <div style="font-weight:800; font-size:1.35rem; margin-bottom:.8rem; color:#0F172A;">{m['name']}</div>
-                    <div style="margin-bottom:.7rem;"><span style="font-weight:700; color:#2563EB;">Purpose — </span><span class="tw-muted">{m['purpose']}</span></div>
-                    <div style="margin-bottom:.7rem;"><span style="font-weight:700; color:#2563EB;">How it works — </span><span class="tw-muted">{m['how']}</span></div>
-                    <div style="margin-bottom:.7rem;"><span style="font-weight:700; color:#2563EB;">Why we chose it — </span><span class="tw-muted">{m['why']}</span></div>
-                    <div><span style="font-weight:700; color:#2563EB;">Contribution — </span><span class="tw-muted">{m['contribution']}</span></div>
+    # Instead of rendering the Insights charts and the Models explanation inline,
+    # link out to their own dedicated pages — keeps Home short and focused.
+    st.markdown('<div class="tw-section-title">Explore more</div>', unsafe_allow_html=True)
+    nc1, nc2 = st.columns(2)
+    with nc1:
+        st.markdown(
+            """
+            <div class="tw-navcard-inner">
+                <div class="tw-icon-circle">📊</div>
+                <div style="font-weight:800; font-size:1.3rem; margin-bottom:.5rem; color:#0F172A;">Key Insights</div>
+                <div class="tw-muted" style="font-size:1.02rem; line-height:1.6;">
+                    Charts on destinations by region, budget level, and climate across our dataset.
                 </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("View Insights →", use_container_width=True, key="go_insights"):
+            go_to("Insights")
+    with nc2:
+        st.markdown(
+            """
+            <div class="tw-navcard-inner">
+                <div class="tw-icon-circle">🤖</div>
+                <div style="font-weight:800; font-size:1.3rem; margin-bottom:.5rem; color:#0F172A;">Models Used</div>
+                <div class="tw-muted" style="font-size:1.02rem; line-height:1.6;">
+                    How Cosine Similarity and K-Means power the recommendation engine.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("View Models →", use_container_width=True, key="go_models"):
+            go_to("Models Used")
 
 
-def render_insights(df: pd.DataFrame):
+# ----------------------------------------------------------------------------
+# PAGE: KEY INSIGHTS (own page, linked from Home)
+# ----------------------------------------------------------------------------
+def page_insights(df: pd.DataFrame):
     st.markdown('<div class="tw-section-title">📊 Key Insights</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="tw-muted">A quick look at the destinations in our dataset.</p>',
+        unsafe_allow_html=True,
+    )
 
     plot_bg = "rgba(0,0,0,0)"
     accent_scale = ["#0EA5E9", "#2563EB", "#38BDF8", "#60A5FA", "#93C5FD", "#0284C7", "#1D4ED8"]
@@ -565,8 +767,78 @@ def render_insights(df: pd.DataFrame):
 
 
 # ----------------------------------------------------------------------------
+# PAGE: MODELS USED (own page, linked from Home)
+# ----------------------------------------------------------------------------
+def page_models_used():
+    st.markdown('<div class="tw-section-title">🤖 Models Used</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="tw-muted">The two techniques behind TripWise AI\'s recommendations.</p>',
+        unsafe_allow_html=True,
+    )
+
+    models = [
+        {
+            "icon": "🎯",
+            "name": "Cosine Similarity",
+            "purpose": "Recommends destinations that best match an individual traveler's stated preferences.",
+            "how": "Every destination and every user profile is represented as a vector of scaled features (culture, nature, budget, climate...). Cosine Similarity measures the angle between the user's vector and each destination's vector — the smaller the angle, the closer the match.",
+            "why": "It works well with structured, interpretable features and doesn't require historical user ratings, which this dataset doesn't have.",
+            "contribution": "It powers the core \"Find my destinations\" engine on the Destination Explorer page.",
+        },
+        {
+            "icon": "🧩",
+            "name": "K-Means Clustering",
+            "purpose": "Groups destinations with similar characteristics into clusters, revealing natural travel-style patterns in the data.",
+            "how": "The algorithm partitions all destinations into K groups by minimizing the distance between each destination and its cluster's center, based on the same scaled features used for recommendations.",
+            "why": "It's a simple, well-established unsupervised method suited for exploratory pattern discovery when there are no predefined labels.",
+            "contribution": "It helps surface destination \"types\" (e.g. beach & budget-friendly vs. cultural & luxury) that complement the direct recommendations.",
+        },
+    ]
+
+    cols = st.columns(2)
+    for c, m in zip(cols, models):
+        with c:
+            st.markdown(
+                f"""
+                <div class="tw-glass" style="min-height:100%;">
+                    <div class="tw-icon-circle">{m['icon']}</div>
+                    <div style="font-weight:800; font-size:1.35rem; margin-bottom:.8rem; color:#0F172A;">{m['name']}</div>
+                    <div style="margin-bottom:.7rem;"><span style="font-weight:700; color:#2563EB;">Purpose — </span><span class="tw-muted">{m['purpose']}</span></div>
+                    <div style="margin-bottom:.7rem;"><span style="font-weight:700; color:#2563EB;">How it works — </span><span class="tw-muted">{m['how']}</span></div>
+                    <div style="margin-bottom:.7rem;"><span style="font-weight:700; color:#2563EB;">Why we chose it — </span><span class="tw-muted">{m['why']}</span></div>
+                    <div><span style="font-weight:700; color:#2563EB;">Contribution — </span><span class="tw-muted">{m['contribution']}</span></div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+
+# ----------------------------------------------------------------------------
 # PAGE: DESTINATION EXPLORER (real recommendation engine)
 # ----------------------------------------------------------------------------
+def _clean(value):
+    """Return a stripped string, or None for missing / placeholder values."""
+    if value is None or pd.isna(value):
+        return None
+    text = str(value).strip()
+    if text == "" or text.lower() in {"unknown", "not specified", "nan", "none"}:
+        return None
+    return text
+
+
+def _airport_of(row):
+    """Best available airport identity for a row, as (name, code).
+
+    The notebook fills cities that found no airport match with "Unknown", so a
+    row may carry an "Unknown" name, a has_airport flag of 0, or no airport
+    columns at all if the CSV was exported without them. Any of those means
+    there is nothing to show, and each is reported the same way.
+    """
+    name = _clean(row.get("name"))
+    code = _clean(row.get("iata")) or _clean(row.get("icao"))
+    return (name, code) if (name or code) else (None, None)
+
+
 def page_destination_explorer(df: pd.DataFrame):
     st.markdown('<div class="tw-section-title">📍 Destination Explorer</div>', unsafe_allow_html=True)
     st.markdown('<p class="tw-muted">Tell us what you love, and we\'ll match you with the best destinations.</p>', unsafe_allow_html=True)
@@ -645,90 +917,64 @@ def page_destination_explorer(df: pd.DataFrame):
             .head(8)
         )
 
+        missing = [c for c in ("name", "iata") if c not in df.columns]
+        if missing:
+            st.warning(
+                "No nearest airport can be shown: tripwise_data.csv has no "
+                + " or ".join(f"{c}" for c in missing)
+                + " column. Re-export final_df from the notebook with the "
+                "airport columns included."
+            )
+
         st.markdown('<div class="tw-section-title">Top matches for you</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<p class="tw-muted" style="margin-top:-.6rem;">'
+            'Each card is a suggested hotel in that city, with its nearest airport.</p>',
+            unsafe_allow_html=True,
+        )
+
         for _, row in top.iterrows():
             match_pct = round(row["similarity_score"] * 100, 1)
-            hotel_name = row["HotelName"] if "HotelName" in row and pd.notna(row["HotelName"]) else "Not available"
-            has_airport_flag = bool(row["has_airport"]) if "has_airport" in row and pd.notna(row["has_airport"]) else False
-            airport_text = "✈️ Nearby airport available" if has_airport_flag else "🚗 No nearby airport in our data"
+
+            hotel_name = _clean(row.get("HotelName"))
+            airport_name, airport_iata = _airport_of(row)
+            has_air = airport_name is not None or airport_iata is not None
+
+            # Line 1 — make it explicit this is a hotel pick for this city.
+            if hotel_name:
+                hotel_html = (
+                    f'<div class="tw-detail"><span class="tw-detail-ic">🏨</span>'
+                    f'<span><b>Suggested hotel</b> in {row["city"]} — {hotel_name}</span></div>'
+                )
+            else:
+                hotel_html = (
+                    f'<div class="tw-detail"><span class="tw-detail-ic">🏨</span>'
+                    f'<span><b>Suggested stay</b> in {row["city"]}</span></div>'
+                )
+
+            # Line 2 — nearest airport, name + IATA code, or a clear fallback.
+            if has_air:
+                code = f' <span class="tw-score-pill" style="font-size:.78rem;">{airport_iata}</span>' if airport_iata else ""
+                label = airport_name or "Airport"
+                airport_html = (
+                    f'<div class="tw-detail"><span class="tw-detail-ic">🛫</span>'
+                    f'<span><b>Nearest airport</b> — {label}{code}</span></div>'
+                )
+            else:
+                airport_html = (
+                    '<div class="tw-detail tw-detail-muted"><span class="tw-detail-ic">🛫</span>'
+                    '<span>No major airport on record for this city</span></div>'
+                )
+
             st.markdown(
                 f"""
                 <div class="tw-result-card">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem;">
-                        <div style="font-weight:800; font-size:1.3rem; color:#0F172A;">📍 {row['city']}, {row['country']}</div>
+                        <div style="font-weight:800; font-size:1.35rem; color:#0F172A;">📍 {row['city']}, {row['country']}</div>
                         <span class="tw-score-pill">{match_pct}% match</span>
                     </div>
-                    <div style="margin-top:.7rem; font-size:1rem; color:#0F172A;">
-                        🏨 <strong>Suggested hotel:</strong> {hotel_name}
-                    </div>
-                    <div class="tw-muted" style="margin-top:.3rem; font-size:.95rem;">{airport_text}</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-        render_recommendation_insights(top.iloc[0], df)
-
-
-def render_recommendation_insights(row: pd.Series, df: pd.DataFrame):
-    """Beautiful icon-card insights explaining the #1 recommended destination."""
-    st.markdown('<div class="tw-section-title">🔎 Insights for your top match</div>', unsafe_allow_html=True)
-
-    trait_cols = ["culture", "adventure", "nature", "beaches", "nightlife", "cuisine", "wellness", "urban", "seclusion"]
-    trait_labels = {
-        "culture": ("🏛️", "Cultural"), "adventure": ("🧗", "Adventure"), "nature": ("🌿", "Nature"),
-        "beaches": ("🏖️", "Beach"), "nightlife": ("🌃", "Nightlife"), "cuisine": ("🍽️", "Culinary"),
-        "wellness": ("🧘", "Wellness"), "urban": ("🏙️", "Urban"), "seclusion": ("🏝️", "Secluded"),
-    }
-    top_trait = max(trait_cols, key=lambda c: row[c])
-    trait_icon, trait_name = trait_labels[top_trait]
-
-    budget_labels = {1: "Budget-friendly", 2: "Mid-range", 3: "Luxury"}
-    budget_text = budget_labels.get(int(row["budget_level_encoded"]), "Mid-range")
-
-    temp = row["temp_avg_yearly"]
-    if temp < 12:
-        season_text = "Best in Summer (cooler climate year-round)"
-    elif temp > 25:
-        season_text = "Best in Spring or Fall (avoid peak summer heat)"
-    else:
-        season_text = "Great almost year-round (mild climate)"
-
-    duration_text = "Short trip (2–4 days)" if row.get("is_short_trip", 0) == 1 else "One week or longer"
-
-    similar = (
-        df[(df["city"] != row["city"])]
-        .assign(_diff=lambda d: (d[trait_cols] - row[trait_cols]).abs().sum(axis=1))
-        .sort_values("_diff")
-        .head(3)["city"]
-        .tolist()
-    )
-    similar_text = ", ".join(similar) if similar else "No close matches found"
-
-    region_col = [c for c in REGION_COLS if row.get(c, 0) == 1]
-    region_name = region_col[0].replace("region_", "").replace("_", " ").title() if region_col else "this region"
-    region_share = round(df[region_col[0]].mean() * 100, 1) if region_col else 0
-    pattern_text = f"{region_share}% of destinations in our dataset are in {region_name}"
-
-    insight_cards = [
-        ("💡", "Why this destination", f"Its strongest trait is {trait_name.lower()} ({int(row[top_trait])}/5), closely matching what you asked for."),
-        ("🧭", "Trip style", f"{trait_icon} {trait_name} getaway"),
-        ("💰", "Estimated budget", budget_text),
-        ("🗓️", "Best travel season", season_text),
-        ("⏱️", "Suggested duration", duration_text),
-        ("🌍", "Similar destinations", similar_text),
-        ("📊", "Dataset pattern", pattern_text),
-    ]
-
-    cols = st.columns(3)
-    for i, (icon, title, text) in enumerate(insight_cards):
-        with cols[i % 3]:
-            st.markdown(
-                f"""
-                <div class="tw-glass tw-feature-card" style="min-height:220px;">
-                    <div class="tw-icon-circle" style="width:60px; height:60px; font-size:1.7rem; border-radius:16px;">{icon}</div>
-                    <div style="font-weight:800; font-size:1.08rem; margin-bottom:.5rem; color:#0F172A;">{title}</div>
-                    <div class="tw-muted" style="font-size:.96rem; line-height:1.55;">{text}</div>
+                    {hotel_html}
+                    {airport_html}
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -775,15 +1021,26 @@ def main():
     if "history" not in st.session_state:
         st.session_state.history = []
 
+    # First open only: show the boarding splash full-screen, then hand off to the
+    # homepage. The component is an iframe, so we blow it up to cover the viewport
+    # and hide Streamlit's chrome while it plays; during the splash nothing else is
+    # rendered, so targeting iframe here is safe (no charts exist yet).
     if not st.session_state.splash_done:
-        placeholder = st.empty()
-        with placeholder.container():
-            render_splash()
-        time.sleep(4.8)
+        st.markdown(SPLASH_CHROME_CSS, unsafe_allow_html=True)
+        render_splash()
+        time.sleep(5.2)
         st.session_state.splash_done = True
-        placeholder.empty()
+        st.session_state.fade_home = True
         st.rerun()
-        return
+        st.stop()
+
+    # gentle one-time fade of the homepage right after the splash
+    if st.session_state.pop("fade_home", False):
+        st.markdown(
+            "<style>@keyframes twHomeIn{from{opacity:0}to{opacity:1}}"
+            ".block-container{animation:twHomeIn .7s ease both;}</style>",
+            unsafe_allow_html=True,
+        )
 
     render_sidebar()
     render_back_button()
@@ -794,6 +1051,11 @@ def main():
     elif st.session_state.page == "Destination Explorer":
         df = load_data()
         page_destination_explorer(df)
+    elif st.session_state.page == "Insights":
+        df = load_data()
+        page_insights(df)
+    elif st.session_state.page == "Models Used":
+        page_models_used()
     else:
         icon, desc = PAGE_CONTENT[st.session_state.page]
         page_placeholder(st.session_state.page, icon, desc)
