@@ -450,6 +450,43 @@ _DEMO: list[tuple] = [
 ]
 
 
+# Exports rename things. Each canonical column is accepted under any of these
+# spellings, so a catalogue that calls its airport column "airport_name" or
+# "IATA" still resolves instead of silently losing the feature.
+COLUMN_ALIASES: dict[str, tuple[str, ...]] = {
+    "name": ("name", "airport_name", "airportname", "airport", "Airport",
+             "AirportName", "name_airport", "nearest_airport"),
+    "iata": ("iata", "iata_code", "IATA", "IATA_code", "iatacode",
+             "airport_code", "code"),
+    "icao": ("icao", "icao_code", "ICAO", "icaocode"),
+    "city": ("city", "City", "cityName", "city_name", "destination"),
+    "country": ("country", "Country", "countyName", "country_name"),
+    "HotelName": ("HotelName", "hotel_name", "hotelname", "hotel"),
+    "Attractions": ("Attractions", "attractions", "nearby_attractions"),
+    "latitude_airport": ("latitude_airport", "airport_latitude", "lat_airport"),
+    "longitude_airport": ("longitude_airport", "airport_longitude", "lon_airport"),
+}
+
+
+def _apply_aliases(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+    """Rename recognised alternative spellings to the canonical column names."""
+    lowered = {str(c).strip().lower(): c for c in df.columns}
+    renames: dict[str, str] = {}
+    found: list[str] = []
+
+    for canonical, options in COLUMN_ALIASES.items():
+        if canonical in df.columns:
+            continue
+        for option in options:
+            actual = lowered.get(option.lower())
+            if actual and actual not in renames:
+                renames[actual] = canonical
+                found.append(f"{actual} -> {canonical}")
+                break
+
+    return (df.rename(columns=renames), found) if renames else (df, found)
+
+
 @dataclass
 class CatalogueReport:
     """What happened during load — surfaced in the UI, not swallowed."""
@@ -460,6 +497,8 @@ class CatalogueReport:
     missing_required: list[str] = field(default_factory=list)
     missing_optional: list[str] = field(default_factory=list)
     coerced: list[str] = field(default_factory=list)
+    aliased: list[str] = field(default_factory=list)
+    columns_seen: list[str] = field(default_factory=list)
     dropped_rows: int = 0
     error: str = ""
 
@@ -573,6 +612,12 @@ def load_catalogue_file(path: str | None = None) -> tuple[pd.DataFrame, Catalogu
         return df, report
 
     report.rows_in = len(raw)
+    report.columns_seen = [str(c) for c in raw.columns]
+    raw, aliased = _apply_aliases(raw)
+    report.aliased = aliased
+    if aliased:
+        log.info("column aliases applied: %s", ", ".join(aliased))
+
     missing = [c for c in REQUIRED_COLS if c not in raw.columns]
     if missing:
         log.error("%s is missing required columns: %s", CSV_NAME, missing)
@@ -2470,10 +2515,32 @@ def data_notice(report: CatalogueReport, airports: AirportIndex,
 
     if not len(airports):
         st.warning(
-            "No airport data found in the catalogue, so no airports can be shown. "
-            "Re-export final_df including the `name` and `iata` columns.",
+            f"**No airport data in {report.source}.** The catalogue loaded "
+            f"{report.rows_out:,} destinations, but no column holding airport "
+            "names or codes was found, so no airports can be shown.",
             icon="⚠️",
         )
+        with st.expander("How to fix this"):
+            st.markdown(
+                "TripWise looks for a **`name`** column (airport name) and an "
+                "**`iata`** column (airport code), and also accepts the common "
+                "alternative spellings `airport_name`, `airport`, `IATA` and "
+                "`iata_code`.\n\n"
+                "In the notebook, these columns come from the airports merge. If "
+                "the export selected only the model features they will have been "
+                "dropped. Re-export keeping them:"
+            )
+            st.code(
+                'keep = list(final_df.columns)   # keep everything, not just features\n'
+                'final_df[keep].to_csv("tripwise_data.csv", index=False)\n\n'
+                '# confirm before uploading:\n'
+                'print([c for c in final_df.columns\n'
+                '       if "name" in c.lower() or "iata" in c.lower()])',
+                language="python",
+            )
+            if report.columns_seen:
+                st.caption(f"Columns found in {report.source}:")
+                st.code(", ".join(report.columns_seen), language="text")
         return
 
     direct, total = coverage(df, airports)
