@@ -1,29 +1,35 @@
 """
 Layer test — finds which part of TripWise breaks interaction.
 
-The plain Streamlit test passed, so the browser and the deployment are fine and
-the fault is inside the application. TripWise adds two things on top of plain
-widgets: a stylesheet, and cards built from injected HTML. This file switches
-them on one at a time.
+Levels 1 to 3 already passed: plain widgets, the stylesheet and the injected
+HTML cards are all fine. So the fault is one of the heavier widgets the real app
+uses and the earlier test did not.
 
-Self-contained on purpose — no package folder, no data file, nothing to upload
-beyond this single file.
+Levels 4 to 7 add them one at a time. They matter more than they look, because
+Streamlit renders *every* tab panel up front — the map in the Explore tab loads
+even while the Home tab is showing. A component that fails to initialise can
+take the whole page's JavaScript down with it, which stops buttons and tabs
+responding while everything still looks normal.
+
+Self-contained: no package, no data file, dummy data throughout.
 
 HOW TO USE
 
-Put ?level=1 at the end of the page address, press Enter, then press the button
-and click the tabs. Repeat for 2 and 3:
+Put ?level=4 at the end of the page address, press Enter, then press the button
+and click the tabs. Repeat for 5, 6 and 7:
 
-    ...streamlit.app/?level=1     plain widgets       (expected to work)
-    ...streamlit.app/?level=2     + the stylesheet
-    ...streamlit.app/?level=3     + custom HTML cards
+    ?level=4     + a form containing sliders
+    ?level=5     + st.map            <- prime suspect
+    ?level=6     + a plotly chart
+    ?level=7     + st.dataframe
 
-The first level where the count stops rising is the culprit. The level is read
-from the address bar so it can be changed even if clicking is broken.
+The first level where the count stops rising is the culprit.
 """
 
 from __future__ import annotations
 
+import numpy as np
+import pandas as pd
 import streamlit as st
 
 st.set_page_config(page_title="TripWise layer test", page_icon="🔬", layout="wide")
@@ -290,7 +296,6 @@ def icon(name: str) -> str:
 
 
 def card(icon_name: str, title: str, body: str) -> str:
-    """One feature card, byte-for-byte the markup the real app injects."""
     return f"""
 <div class="tw-card tw-feat tw-rise">
 <div class="tw-feat__icon">{icon(icon_name)}</div>
@@ -299,30 +304,46 @@ def card(icon_name: str, title: str, body: str) -> str:
 </div>"""
 
 
+@st.cache_data(show_spinner=False)
+def sample_frame() -> pd.DataFrame:
+    """Dummy destinations, so no data file is needed."""
+    rng = np.random.default_rng(7)
+    n = 40
+    return pd.DataFrame({
+        "city": [f"City {i}" for i in range(n)],
+        "lat": rng.uniform(-50, 60, n),
+        "lon": rng.uniform(-160, 160, n),
+        "match": rng.uniform(40, 95, n).round(1),
+        "cost": rng.integers(60, 400, n),
+    })
+
+
 def current_level() -> int:
-    raw = st.query_params.get("level", "1")
+    raw = st.query_params.get("level", "4")
     if isinstance(raw, (list, tuple)):
-        raw = raw[0] if raw else "1"
+        raw = raw[0] if raw else "4"
     try:
-        return max(1, min(3, int(str(raw).strip())))
+        return max(1, min(7, int(str(raw).strip())))
     except (TypeError, ValueError):
-        return 1
+        return 4
 
 
 LEVEL = current_level()
 
-# ---------------------------------------------------------------- level 2
 if LEVEL >= 2:
     st.markdown(STYLESHEET, unsafe_allow_html=True)
 
 st.title(f"🔬 Layer test — level {LEVEL}")
 st.caption({
-    1: "Plain widgets only. Nothing from TripWise.",
-    2: "Plus the TripWise stylesheet.",
+    1: "Plain widgets only.",
+    2: "Plus the stylesheet.",
     3: "Plus custom HTML cards.",
+    4: "Plus a form containing sliders.",
+    5: "Plus st.map  <- prime suspect",
+    6: "Plus a plotly chart.",
+    7: "Plus st.dataframe.",
 }[LEVEL])
-st.markdown("Change the number at the end of the address: "
-            "`?level=1`, `?level=2`, `?level=3`.")
+st.markdown("Change the number at the end of the address: `?level=4` … `?level=7`.")
 
 st.divider()
 
@@ -354,15 +375,62 @@ st.divider()
 # ---------------------------------------------------------------- level 3
 if LEVEL >= 3:
     st.subheader("Custom HTML cards")
-    cols = st.columns(3, gap="medium")
-    for col, (ic, title, body) in zip(cols, [
-        ("compass", "First card", "Injected HTML, exactly as the real app does it."),
-        ("wallet", "Second card", "If the button stopped counting, this is the cause."),
-        ("sun", "Third card", "Each card is a single st.markdown call."),
+    for col, (ic, title, body) in zip(st.columns(3, gap="medium"), [
+        ("compass", "First card", "Injected HTML, as the real app does it."),
+        ("wallet", "Second card", "Same markup, same styling."),
+        ("sun", "Third card", "One st.markdown call each."),
     ]):
         with col:
             st.markdown(card(ic, title, body), unsafe_allow_html=True)
     st.divider()
 
-st.caption("Report the highest level where the count still rises, and the first "
-           "level where it stops. That identifies the layer at fault.")
+# ---------------------------------------------------------------- level 4
+if LEVEL >= 4:
+    st.subheader("Form with sliders")
+    with st.form("test_form", border=False):
+        cols = st.columns(3, gap="medium")
+        for i in range(9):
+            with cols[i % 3]:
+                st.slider(f"Preference {i + 1}", 1, 5, 3, key=f"pref_{i}")
+        if st.form_submit_button("Submit the form", type="primary"):
+            st.success("The form submitted.")
+    st.divider()
+
+# ---------------------------------------------------------------- level 5
+if LEVEL >= 5:
+    st.subheader("Map")
+    st.caption("st.map pulls map tiles from the internet. If that is blocked or "
+               "fails, the page's JavaScript can stop responding entirely.")
+    try:
+        st.map(sample_frame()[["lat", "lon"]], size=30, color="#2563EB")
+    except Exception as exc:                       # noqa: BLE001 - diagnostic
+        st.error(f"map failed: {exc}")
+    st.divider()
+
+# ---------------------------------------------------------------- level 6
+if LEVEL >= 6:
+    st.subheader("Plotly chart")
+    try:
+        import plotly.express as px
+        frame = sample_frame().nlargest(8, "match")
+        fig = px.bar(frame, x="match", y="city", orientation="h")
+        fig.update_layout(height=300, margin=dict(t=10, b=10, l=10, r=10))
+        try:
+            st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+        except TypeError:
+            st.plotly_chart(fig, use_container_width=True,
+                            config={"displayModeBar": False})
+    except Exception as exc:                       # noqa: BLE001 - diagnostic
+        st.error(f"chart failed: {exc}")
+    st.divider()
+
+# ---------------------------------------------------------------- level 7
+if LEVEL >= 7:
+    st.subheader("Dataframe")
+    try:
+        st.dataframe(sample_frame(), hide_index=True)
+    except Exception as exc:                       # noqa: BLE001 - diagnostic
+        st.error(f"dataframe failed: {exc}")
+    st.divider()
+
+st.caption("Report the first level where the count stops rising.")
