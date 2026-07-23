@@ -136,6 +136,12 @@ AIRPORT_MAX_KM = 450.0
 
 CSV_NAME = "tripwise_data.csv"
 
+# Bumping this invalidates every cached resource. Streamlit keeps cached objects
+# across a hot reload, so an instance built by a previous version of a class can
+# survive into new code that expects fields it does not have. Any change to a
+# cached return type must bump this.
+CACHE_VERSION = "3.1.0"
+
 # ==========================================================================
 # ERROR HANDLING — Logging and failure containment.
 # ==========================================================================
@@ -505,6 +511,15 @@ class CatalogueReport:
     @property
     def healthy(self) -> bool:
         return self.is_real and not self.missing_required and not self.error
+
+    def get(self, field_name: str, default=None):
+        """Read a field that a cached older instance may predate.
+
+        Streamlit keeps cached objects across hot reloads, so a report built by
+        a previous version of this class can outlive it. Readers use this rather
+        than attribute access so a stale instance degrades instead of raising.
+        """
+        return getattr(self, field_name, default)
 
 
 def _demo_frame() -> pd.DataFrame:
@@ -2432,8 +2447,12 @@ def html(markup: str) -> None:
 
 
 @st.cache_data(show_spinner=False)
-def load_catalogue() -> tuple[pd.DataFrame, CatalogueReport]:
-    """Read and clean the catalogue. Cached on the data, not per session."""
+def load_catalogue(cache_version: str = CACHE_VERSION):
+    """Read and clean the catalogue, cached on the data rather than per session.
+
+    `cache_version` is part of the key so a release that changes the shape of
+    the report cannot be served a stale object from a previous build.
+    """
     return load_catalogue_file()
 
 
@@ -2456,8 +2475,9 @@ def airport_index(fingerprint: str) -> AirportIndex:
 
 
 def fingerprint(df: pd.DataFrame) -> str:
-    """A cheap, stable identity for a catalogue."""
-    return f"{len(df)}x{len(df.columns)}:{hash(tuple(sorted(df.columns)))}"
+    """A cheap, stable identity for a catalogue, scoped to this release."""
+    return (f"{CACHE_VERSION}:{len(df)}x{len(df.columns)}:"
+            f"{hash(tuple(sorted(str(c) for c in df.columns)))}")
 
 
 # --------------------------------------------------------------------------- #
@@ -2502,22 +2522,32 @@ def card_payload(row, prefs: dict, airports: AirportIndex) -> dict:
 
 def data_notice(report: CatalogueReport, airports: AirportIndex,
                 df: pd.DataFrame) -> None:
-    """Tell the operator what the catalogue can and cannot support."""
-    if not report.is_real:
-        detail = report.error or (
-            f"Missing required columns: {', '.join(report.missing_required)}."
-            if report.missing_required
-            else f"{CSV_NAME} was not found beside app.py."
-        )
+    """Tell the operator what the catalogue can and cannot support.
+
+    Every field is read through `report.get`, because Streamlit can serve a
+    cached report built by an earlier version of the class, which would not
+    carry fields added since.
+    """
+    source = report.get("source", "the catalogue")
+    rows_out = report.get("rows_out", len(df))
+
+    if not report.get("is_real", True):
+        missing = report.get("missing_required", [])
+        if report.get("error", ""):
+            detail = report.get("error", "")
+        elif missing:
+            detail = "Missing required columns: " + ", ".join(missing) + "."
+        else:
+            detail = f"{CSV_NAME} was not found beside app.py."
         st.info(f"Running on the built-in demo catalogue. {detail} "
                 "Export final_df from the notebook to use your own data.", icon="ℹ️")
         return
 
     if not len(airports):
         st.warning(
-            f"**No airport data in {report.source}.** The catalogue loaded "
-            f"{report.rows_out:,} destinations, but no column holding airport "
-            "names or codes was found, so no airports can be shown.",
+            f"**No airport data in {source}.** The catalogue loaded "
+            f"{rows_out:,} destinations, but no column holding airport names or "
+            "codes was found, so no airports can be shown.",
             icon="⚠️",
         )
         with st.expander("How to fix this"):
@@ -2526,27 +2556,20 @@ def data_notice(report: CatalogueReport, airports: AirportIndex,
                 "**`iata`** column (airport code), and also accepts the common "
                 "alternative spellings `airport_name`, `airport`, `IATA` and "
                 "`iata_code`.\n\n"
-                "In the notebook, these columns come from the airports merge. If "
-                "the export selected only the model features they will have been "
-                "dropped. Re-export keeping them:"
+                "These columns come from the airports merge in the notebook. If "
+                "the export selected only the model features, they were dropped. "
+                "Re-export keeping them, then reload this page."
             )
-            st.code(
-                'keep = list(final_df.columns)   # keep everything, not just features\n'
-                'final_df[keep].to_csv("tripwise_data.csv", index=False)\n\n'
-                '# confirm before uploading:\n'
-                'print([c for c in final_df.columns\n'
-                '       if "name" in c.lower() or "iata" in c.lower()])',
-                language="python",
-            )
-            if report.columns_seen:
-                st.caption(f"Columns found in {report.source}:")
-                st.code(", ".join(report.columns_seen), language="text")
+            seen = report.get("columns_seen", [])
+            if seen:
+                st.caption(f"Columns found in {source}:")
+                st.code(", ".join(str(c) for c in seen), language="text")
         return
 
     direct, total = coverage(df, airports)
     if total and direct < total:
         st.caption(
-            f"Catalogue: {report.rows_out:,} destinations from {report.source}. "
+            f"Catalogue: {rows_out:,} destinations from {source}. "
             f"{direct:,} carry a matched airport; the rest resolve to their nearest "
             f"airport from the {len(airports):,} in the dataset."
         )
