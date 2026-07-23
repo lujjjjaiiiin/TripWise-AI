@@ -7,9 +7,8 @@ Generated from the modular project by build_single.py: identical code with the
 package inlined, so it deploys without a folder alongside it. Banners mark the
 module each section came from; edit the modules, not this file.
 
-Python does the thinking — loading and validating the catalogue, resolving
-airports, ranking destinations and deriving costs, seasons and insights.
-Everything visible is custom markup styled by the design system.
+Every control is a real Streamlit widget. Custom HTML is used only to display
+cards and headings, never to build interaction.
 """
 
 from __future__ import annotations
@@ -1203,13 +1202,13 @@ def validate_catalogue(df: pd.DataFrame) -> str:
     return ""
 
 # ==========================================================================
-# DESIGN SYSTEM — The whole visual language in one place.
+# STYLING — Visual styling.
 # ==========================================================================
 
 FONTS = (
     "https://fonts.googleapis.com/css2?"
-    "family=Plus+Jakarta+Sans:wght@400;500;600;700;800&"
-    "family=Inter:wght@400;450;500;600&"
+    "family=Plus+Jakarta+Sans:wght@500;600;700;800&"
+    "family=Inter:wght@400;500;600&"
     "family=JetBrains+Mono:wght@400;500&display=swap"
 )
 
@@ -1217,432 +1216,239 @@ THEME_CSS = """
 <style>
 @import url('__FONTS__');
 
-/* ========================================================================
-   TOKENS
-   ===================================================================== */
 :root{
-  --ink:#080D18;
-  --ink-2:#1B2536;
-  --slate:#55637A;
-  --slate-2:#8494A8;
+  --ink:#0A1220;
+  --slate:#5A6B80;
+  --slate-2:#8B9AAC;
   --sky:#0EA5E9;
   --blue:#2563EB;
-  --deep:#1E3A8A;
-  --line:rgba(9,16,32,.08);
-  --line-2:rgba(9,16,32,.14);
-  --glass:rgba(255,255,255,.72);
-  --glass-2:rgba(255,255,255,.55);
-
-  --r-xl:34px; --r-lg:24px; --r-md:16px; --r-sm:10px;
-
-  --sh-1:0 1px 2px rgba(9,16,32,.04), 0 4px 14px rgba(9,16,32,.05);
-  --sh-2:0 2px 6px rgba(9,16,32,.05), 0 18px 42px rgba(37,99,235,.10);
-  --sh-3:0 30px 70px rgba(37,99,235,.17);
-  --sh-btn:0 10px 26px rgba(37,99,235,.32);
-
+  --line:rgba(10,18,32,.09);
+  --card:rgba(255,255,255,.78);
+  --r-lg:22px; --r-md:14px; --r-sm:10px;
+  --sh-1:0 1px 2px rgba(10,18,32,.04), 0 6px 20px rgba(10,18,32,.06);
+  --sh-2:0 20px 46px rgba(37,99,235,.13);
   --ease:cubic-bezier(.22,.75,.28,1);
-  --nav-h:70px;
 }
 
-/* ========================================================================
-   STREAMLIT CHROME — removed so the page reads as a website
-   ===================================================================== */
-#MainMenu, footer, [data-testid="stStatusWidget"], [data-testid="stDecoration"],
-[data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"],
-[data-testid="stToolbar"]{ display:none !important; }
-/* Streamlit's header sits at the top of the viewport with its own stacking
-   context and swallows clicks aimed at the fixed navbar underneath it. */
-[data-testid="stHeader"]{ display:none !important; }
-
+/* ---- page surface ---------------------------------------------------- */
 .stApp{
   background:
-    radial-gradient(1100px 620px at 8% -6%,  rgba(14,165,233,.16), transparent 62%),
-    radial-gradient(900px 560px at 96% 2%,   rgba(37,99,235,.14),  transparent 60%),
-    radial-gradient(760px 620px at 50% 108%, rgba(14,165,233,.10), transparent 62%),
-    linear-gradient(180deg,#FBFDFF 0%,#F1F5FA 52%,#EAF0F7 100%);
+    radial-gradient(900px 520px at 6% -8%, rgba(14,165,233,.13), transparent 60%),
+    radial-gradient(760px 480px at 96% 0%, rgba(37,99,235,.11), transparent 58%),
+    linear-gradient(180deg,#FBFDFF 0%,#F2F6FB 55%,#EBF1F8 100%);
   background-attachment:fixed;
 }
-.block-container{
-  max-width:1180px !important;
-  padding:22px 22px 90px 22px !important;
-}
-[data-testid="stVerticalBlock"]{ gap:0 !important; }
-html{ scroll-behavior:smooth; }
-html{ scroll-padding-top:24px; }
+#MainMenu, footer{ visibility:hidden; }
+.block-container{ max-width:1120px; padding-top:2.2rem; padding-bottom:5rem; }
 
-/* ========================================================================
-   TYPE
-   ===================================================================== */
-html, body, [class*="css"], .stApp{
+html, body, .stApp, [class*="css"]{
   font-family:'Inter',system-ui,-apple-system,sans-serif;
-  color:var(--ink);
-  -webkit-font-smoothing:antialiased;
+  color:var(--ink); -webkit-font-smoothing:antialiased;
 }
+::selection{ background:rgba(14,165,233,.2); }
+
+/* ---- type ------------------------------------------------------------ */
 .tw-display{
   font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;
-  letter-spacing:-.035em; line-height:1.04; color:var(--ink);
+  letter-spacing:-.035em; line-height:1.05; color:var(--ink);
+  font-size:clamp(2.1rem,5vw,3.6rem); margin:.6rem 0 1rem;
 }
-.tw-eyebrow{
-  font-family:'JetBrains Mono',ui-monospace,monospace;
-  font-size:.68rem; letter-spacing:.24em; text-transform:uppercase;
-  color:var(--blue); display:inline-flex; align-items:center; gap:.6rem;
-}
-.tw-eyebrow::before{
-  content:""; width:24px; height:1px;
-  background:linear-gradient(90deg,var(--sky),transparent);
-}
-.tw-lede{ color:var(--slate); font-size:1.06rem; line-height:1.72; }
-.tw-mono{ font-family:'JetBrains Mono',ui-monospace,monospace; }
 .tw-grad{
-  background:linear-gradient(96deg,var(--sky) 0%,var(--blue) 55%,var(--deep) 100%);
+  background:linear-gradient(96deg,var(--sky),var(--blue));
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:var(--blue);
-  filter:drop-shadow(0 0 26px rgba(14,165,233,.34));
 }
-::selection{ background:rgba(14,165,233,.22); }
-:focus-visible{ outline:2px solid var(--blue); outline-offset:3px; border-radius:8px; }
-
-/* ========================================================================
-   NAVBAR — a Streamlit column row dressed as a nav bar
-
-   The controls are real widgets rather than anchors, so the styling has to
-   reach into Streamlit's markup. Everything below scopes to .tw-navwrap so it
-   cannot leak into the buttons on the rest of the page.
-   ===================================================================== */
-.tw-navwrap{
-  position:relative; margin:-14px -12px 6px; padding:10px 18px 8px;
-  background:rgba(255,255,255,.72);
-  backdrop-filter:blur(20px) saturate(1.6);
-  -webkit-backdrop-filter:blur(20px) saturate(1.6);
-  border:1px solid rgba(255,255,255,.85);
-  border-radius:var(--r-lg); box-shadow:var(--sh-1);
+.tw-eyebrow{
+  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.68rem;
+  letter-spacing:.22em; text-transform:uppercase; color:var(--blue);
 }
-.tw-brand{ display:flex; align-items:center; gap:.6rem; }
-.tw-brand svg{ width:26px; height:26px; flex:0 0 auto; }
+.tw-lede{ color:var(--slate); font-size:1.04rem; line-height:1.7; max-width:640px; }
+.tw-h2{
+  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;
+  font-size:clamp(1.5rem,3vw,2.1rem); letter-spacing:-.028em;
+  margin:.4rem 0 .5rem; color:var(--ink);
+}
+.tw-sub{ color:var(--slate); font-size:.98rem; line-height:1.65; margin:0 0 .4rem; }
+.tw-mono{ font-family:'JetBrains Mono',ui-monospace,monospace; }
+
+/* ---- brand row ------------------------------------------------------- */
+.tw-brand{ display:flex; align-items:center; gap:.6rem; margin-bottom:.2rem; }
+.tw-brand svg{ width:28px; height:28px; }
 .tw-brand b{
-  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1.08rem;
-  letter-spacing:-.02em; color:var(--ink); white-space:nowrap;
+  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1.15rem;
+  letter-spacing:-.02em;
 }
 
-/* in-page section links stay as anchors — they only scroll, never navigate */
-a.tw-navlink{
-  display:block; text-align:center; text-decoration:none; color:var(--slate);
-  font-size:.9rem; font-weight:500; padding:.5rem .4rem; border-radius:99px;
-  transition:color .22s var(--ease), background .22s var(--ease);
-}
-a.tw-navlink:hover{ color:var(--blue); background:rgba(9,16,32,.045); }
-
-/* nav buttons: flat until hovered, gradient pill when active */
-.tw-navwrap [data-testid="stButton"] > button{
-  width:100%; padding:.5rem .4rem; font-size:.9rem; font-weight:500;
-  border-radius:99px; box-shadow:none; border:1px solid transparent;
-}
-.tw-navwrap [data-testid="stButton"] > button[kind="secondary"]{
-  background:transparent; color:var(--slate);
-}
-.tw-navwrap [data-testid="stButton"] > button[kind="secondary"]:hover{
-  background:rgba(9,16,32,.045); color:var(--blue); transform:none;
-}
-.tw-navwrap [data-testid="stButton"] > button[kind="primary"]{
-  background:linear-gradient(96deg,var(--sky),var(--blue));
-  color:#fff; box-shadow:0 8px 20px rgba(37,99,235,.28);
-}
-.tw-navwrap [data-testid="stButton"] > button[kind="primary"]:hover{
-  transform:translateY(-1px); box-shadow:0 12px 26px rgba(37,99,235,.36);
-}
-.tw-navwrap [data-testid="stVerticalBlock"]{ gap:0 !important; }
-
-/* ========================================================================
-   BUTTONS — one definition, used by links and Streamlit alike
-   ===================================================================== */
-.tw-btn, .stButton>button, .stDownloadButton>button, .stFormSubmitButton>button{
-  display:inline-flex; align-items:center; justify-content:center; gap:.55rem;
-  font-family:'Inter',sans-serif; font-weight:600; font-size:.95rem;
-  padding:.82rem 1.6rem; border-radius:99px; border:1px solid transparent;
-  text-decoration:none; cursor:pointer; white-space:nowrap;
-  background:linear-gradient(96deg,var(--sky),var(--blue));
-  color:#fff !important; box-shadow:var(--sh-btn);
-  transition:transform .26s var(--ease), box-shadow .26s var(--ease), filter .26s var(--ease);
-}
-.tw-btn:hover, .stButton>button:hover, .stFormSubmitButton>button:hover{
-  transform:translateY(-2px); box-shadow:0 18px 40px rgba(37,99,235,.42);
-  filter:saturate(1.08);
-}
-.tw-btn:active, .stButton>button:active, .stFormSubmitButton>button:active{
-  transform:translateY(0);
-}
-.tw-btn--ghost{
-  background:rgba(255,255,255,.8); color:var(--ink) !important;
-  border-color:var(--line-2); box-shadow:var(--sh-1);
-}
-.tw-btn--ghost:hover{ border-color:var(--sky); color:var(--blue) !important; }
-.tw-btn--sm{ padding:.55rem 1.1rem; font-size:.85rem; }
-
-/* ========================================================================
-   SURFACES
-   ===================================================================== */
-.tw-card{
-  position:relative; background:var(--glass);
-  backdrop-filter:blur(18px) saturate(1.4);
-  -webkit-backdrop-filter:blur(18px) saturate(1.4);
-  border:1px solid rgba(255,255,255,.86);
-  border-radius:var(--r-lg); box-shadow:var(--sh-2);
-  transition:transform .38s var(--ease), box-shadow .38s var(--ease);
-}
-.tw-card::before{
-  content:""; position:absolute; inset:0 0 auto; height:1px;
-  border-radius:var(--r-lg) var(--r-lg) 0 0;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.96),transparent);
-}
-.tw-card:hover{ transform:translateY(-6px); box-shadow:var(--sh-3); }
-
-.tw-section{ margin:clamp(64px,9vw,116px) 0 0; scroll-margin-top:24px; }
-.tw-section__head{ max-width:680px; margin-bottom:2.4rem; }
-.tw-section__head h2{
-  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;
-  font-size:clamp(1.9rem,3.6vw,2.7rem); letter-spacing:-.03em;
-  margin:.7rem 0 .7rem; color:var(--ink); line-height:1.1;
-}
-.tw-section__head p{ color:var(--slate); font-size:1.02rem; line-height:1.7; margin:0; }
-
-/* equal-height responsive grids */
-.tw-grid{ display:grid; gap:20px; }
-.tw-grid--3{ grid-template-columns:repeat(auto-fit,minmax(268px,1fr)); }
-.tw-grid--2{ grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); }
-.tw-grid > *{ height:100%; }
-
-/* ========================================================================
-   FEATURE CARD
-   ===================================================================== */
-.tw-feat{ padding:2rem 1.7rem; display:flex; flex-direction:column; }
-.tw-feat__icon{
-  width:76px; height:76px; border-radius:22px; display:grid; place-items:center;
-  background:linear-gradient(140deg,var(--sky),var(--blue));
-  box-shadow:0 16px 32px rgba(14,165,233,.32); margin-bottom:1.3rem; flex:0 0 auto;
-}
-.tw-feat__icon svg{ width:36px; height:36px; fill:none; stroke:#fff; stroke-width:1.7;
-  stroke-linecap:round; stroke-linejoin:round; }
-.tw-feat h3{
-  font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:1.14rem;
-  letter-spacing:-.015em; margin:0 0 .55rem; color:var(--ink);
-}
-.tw-feat p{ color:var(--slate); font-size:.94rem; line-height:1.68; margin:0; }
-
-/* ========================================================================
-   DESTINATION CARD
-   ===================================================================== */
-.tw-dest{ overflow:hidden; display:flex; flex-direction:column; }
-.tw-dest__art{ position:relative; height:186px; overflow:hidden; flex:0 0 auto; }
-.tw-dest__art svg{ width:100%; height:100%; display:block;
-  transition:transform .7s var(--ease); }
-.tw-dest:hover .tw-dest__art svg{ transform:scale(1.07); }
-.tw-dest__scrim{
-  position:absolute; inset:auto 0 0 0; height:64%;
-  background:linear-gradient(180deg,transparent,rgba(6,12,24,.66));
-}
-.tw-dest__place{ position:absolute; left:18px; bottom:14px; right:96px; }
-.tw-dest__place h3{
-  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; color:#fff;
-  font-size:1.32rem; letter-spacing:-.02em; margin:0; line-height:1.15;
-  text-shadow:0 2px 14px rgba(0,0,0,.4);
-}
-.tw-dest__place span{ color:rgba(255,255,255,.86); font-size:.82rem; }
-.tw-dest__match{
-  position:absolute; right:14px; top:14px; padding:.42rem .7rem; border-radius:99px;
-  background:rgba(255,255,255,.92); backdrop-filter:blur(8px);
-  font-family:'JetBrains Mono',monospace; font-size:.78rem; font-weight:500;
-  color:var(--blue); box-shadow:0 6px 18px rgba(0,0,0,.18);
-}
-.tw-dest__body{ padding:1.25rem 1.35rem 1.4rem; display:flex; flex-direction:column;
-  gap:1rem; flex:1 1 auto; }
-
-.tw-facts{ display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; }
-.tw-facts div span{
-  display:block; font-family:'JetBrains Mono',monospace; font-size:.6rem;
-  letter-spacing:.14em; text-transform:uppercase; color:var(--slate-2); margin-bottom:.2rem;
-}
-.tw-facts div b{ font-size:.94rem; font-weight:600; color:var(--ink); }
-
-.tw-why{
-  border-left:2px solid var(--sky); padding:.15rem 0 .15rem .85rem;
-  color:var(--slate); font-size:.9rem; line-height:1.62;
-}
-.tw-why b{ color:var(--ink-2); font-weight:600; }
-
-.tw-chips{ display:flex; flex-wrap:wrap; gap:.4rem; }
-.tw-chip{
-  padding:.3rem .68rem; border-radius:99px; font-size:.74rem; font-weight:500;
-  background:rgba(14,165,233,.1); color:#0369A1;
-}
-.tw-chip--muted{ background:rgba(9,16,32,.05); color:var(--slate); }
-
-.tw-meta{ border-top:1px solid var(--line); padding-top:.85rem; display:grid; gap:.5rem; }
-.tw-meta__row{ display:flex; gap:.6rem; align-items:flex-start;
-  font-size:.86rem; color:var(--slate); line-height:1.55; }
-.tw-meta__row svg{ width:15px; height:15px; flex:0 0 auto; margin-top:2px;
-  stroke:var(--sky); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-.tw-meta__row b{ color:var(--ink-2); font-weight:600; }
-
-/* ========================================================================
-   INSIGHT CARD
-   ===================================================================== */
-.tw-insight{ padding:1.5rem 1.6rem; display:flex; gap:1.1rem; align-items:flex-start; }
-.tw-insight__dot{
-  width:42px; height:42px; border-radius:14px; flex:0 0 auto; display:grid; place-items:center;
-  background:linear-gradient(140deg,rgba(14,165,233,.16),rgba(37,99,235,.16));
-  border:1px solid rgba(37,99,235,.16);
-}
-.tw-insight__dot svg{ width:20px; height:20px; stroke:var(--blue); fill:none;
-  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-.tw-insight h4{
-  font-family:'Plus Jakarta Sans',sans-serif; font-size:.98rem; font-weight:700;
-  margin:0 0 .35rem; color:var(--ink); letter-spacing:-.01em;
-}
-.tw-insight p{ margin:0; font-size:.92rem; line-height:1.68; color:var(--slate); }
-
-/* ========================================================================
-   HERO
-   ===================================================================== */
-.tw-hero{ position:relative; padding:clamp(28px,5vw,54px) 0 0; }
-.tw-hero__inner{ max-width:820px; }
-.tw-hero h1{
-  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;
-  font-size:clamp(2.6rem,6.6vw,5rem); letter-spacing:-.042em; line-height:1.02;
-  margin:1.2rem 0 1.4rem; color:var(--ink);
-}
-.tw-hero p.tw-lede{ font-size:clamp(1rem,1.6vw,1.18rem); max-width:620px; }
-.tw-hero__cta{ display:flex; gap:.8rem; flex-wrap:wrap; margin-top:2.2rem; }
-.tw-hero__stats{
-  display:flex; gap:clamp(1.6rem,4vw,3.4rem); flex-wrap:wrap; margin-top:3.4rem;
-  padding-top:2rem; border-top:1px solid var(--line);
+/* ---- stats ----------------------------------------------------------- */
+.tw-stats{
+  display:flex; gap:clamp(1.4rem,4vw,3rem); flex-wrap:wrap;
+  padding:1.4rem 0 .2rem; border-top:1px solid var(--line); margin-top:1.8rem;
 }
 .tw-stat b{
-  display:block; font-family:'JetBrains Mono',monospace; font-weight:500;
-  font-size:clamp(1.5rem,3vw,2rem); letter-spacing:-.03em; color:var(--ink);
+  display:block; font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-weight:500; font-size:clamp(1.3rem,2.6vw,1.75rem);
+  letter-spacing:-.03em; color:var(--ink);
 }
-.tw-stat span{ font-size:.78rem; color:var(--slate); letter-spacing:.03em; }
+.tw-stat span{ font-size:.76rem; color:var(--slate); }
 
-/* the plane drifting across the hero */
-.tw-hero__plane{
-  position:absolute; right:-2%; top:6%; width:min(46%,470px); pointer-events:none;
-  opacity:.95;
+/* ---- cards ----------------------------------------------------------- */
+.tw-card{
+  background:var(--card);
+  backdrop-filter:blur(16px) saturate(1.35);
+  -webkit-backdrop-filter:blur(16px) saturate(1.35);
+  border:1px solid rgba(255,255,255,.86);
+  border-radius:var(--r-lg); box-shadow:var(--sh-1);
+  transition:transform .34s var(--ease), box-shadow .34s var(--ease);
+  height:100%; overflow:hidden;
 }
-.tw-hero__plane svg{ width:100%; height:auto; overflow:visible; }
-@media (max-width:900px){ .tw-hero__plane{ display:none; } }
+.tw-card:hover{ transform:translateY(-4px); box-shadow:var(--sh-2); }
 
-/* ========================================================================
-   FORM — Streamlit widgets restyled into bespoke controls
-   ===================================================================== */
-.tw-panel{
-  background:var(--glass); backdrop-filter:blur(18px) saturate(1.4);
-  -webkit-backdrop-filter:blur(18px) saturate(1.4);
-  border:1px solid rgba(255,255,255,.86); border-radius:var(--r-xl);
-  box-shadow:var(--sh-2); padding:clamp(1.4rem,3vw,2.4rem);
+.tw-feat{ padding:1.6rem 1.4rem; }
+.tw-feat__icon{
+  width:60px; height:60px; border-radius:18px; display:grid; place-items:center;
+  background:linear-gradient(140deg,var(--sky),var(--blue));
+  box-shadow:0 12px 26px rgba(14,165,233,.3); margin-bottom:1rem;
 }
-.tw-fieldset{ margin:0 0 .4rem; }
-.tw-fieldset__title{
-  font-family:'JetBrains Mono',monospace; font-size:.66rem; letter-spacing:.2em;
-  text-transform:uppercase; color:var(--slate-2); margin:1.8rem 0 1rem;
-  display:flex; align-items:center; gap:.7rem;
+.tw-feat__icon svg{ width:28px; height:28px; fill:none; stroke:#fff;
+  stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.tw-feat h3{
+  font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:1.06rem;
+  margin:0 0 .45rem; letter-spacing:-.015em; color:var(--ink);
 }
-.tw-fieldset__title::after{ content:""; flex:1; height:1px; background:var(--line); }
+.tw-feat p{ color:var(--slate); font-size:.92rem; line-height:1.65; margin:0; }
+
+/* ---- destination card ------------------------------------------------ */
+.tw-dest__art{ position:relative; height:172px; overflow:hidden; }
+.tw-dest__art svg{ width:100%; height:100%; display:block; }
+.tw-dest__scrim{
+  position:absolute; inset:auto 0 0 0; height:66%;
+  background:linear-gradient(180deg,transparent,rgba(6,12,24,.7));
+}
+.tw-dest__place{ position:absolute; left:16px; bottom:12px; right:90px; }
+.tw-dest__place h3{
+  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; color:#fff;
+  font-size:1.26rem; letter-spacing:-.02em; margin:0; line-height:1.15;
+  text-shadow:0 2px 12px rgba(0,0,0,.42);
+}
+.tw-dest__place span{ color:rgba(255,255,255,.88); font-size:.8rem; }
+.tw-dest__match{
+  position:absolute; right:12px; top:12px; padding:.36rem .62rem; border-radius:99px;
+  background:rgba(255,255,255,.93);
+  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.74rem;
+  color:var(--blue); box-shadow:0 4px 14px rgba(0,0,0,.18);
+}
+.tw-dest__body{ padding:1.1rem 1.25rem 1.3rem; display:grid; gap:.9rem; }
+
+.tw-facts{ display:grid; grid-template-columns:repeat(3,1fr); gap:.4rem; }
+.tw-facts span{
+  display:block; font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:.58rem; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--slate-2); margin-bottom:.15rem;
+}
+.tw-facts b{ font-size:.92rem; font-weight:600; color:var(--ink); }
+
+.tw-why{
+  border-left:2px solid var(--sky); padding:.1rem 0 .1rem .8rem;
+  color:var(--slate); font-size:.88rem; line-height:1.6;
+}
+.tw-chips{ display:flex; flex-wrap:wrap; gap:.35rem; }
+.tw-chip{
+  padding:.26rem .62rem; border-radius:99px; font-size:.72rem; font-weight:500;
+  background:rgba(14,165,233,.11); color:#0369A1;
+}
+.tw-chip--muted{ background:rgba(10,18,32,.05); color:var(--slate); }
+
+.tw-meta{ border-top:1px solid var(--line); padding-top:.8rem; display:grid; gap:.45rem; }
+.tw-meta__row{ display:flex; gap:.55rem; align-items:flex-start;
+  font-size:.84rem; color:var(--slate); line-height:1.5; }
+.tw-meta__row svg{ width:14px; height:14px; flex:0 0 auto; margin-top:3px;
+  stroke:var(--sky); fill:none; stroke-width:1.9;
+  stroke-linecap:round; stroke-linejoin:round; }
+.tw-meta__row b{ color:var(--ink); font-weight:600; }
+
+/* ---- insight --------------------------------------------------------- */
+.tw-insight{ padding:1.3rem 1.4rem; display:flex; gap:1rem; align-items:flex-start; }
+.tw-insight__dot{
+  width:38px; height:38px; border-radius:12px; flex:0 0 auto; display:grid;
+  place-items:center; background:linear-gradient(140deg,rgba(14,165,233,.16),rgba(37,99,235,.16));
+  border:1px solid rgba(37,99,235,.16);
+}
+.tw-insight__dot svg{ width:18px; height:18px; stroke:var(--blue); fill:none;
+  stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.tw-insight h4{
+  font-family:'Plus Jakarta Sans',sans-serif; font-size:.95rem; font-weight:700;
+  margin:0 0 .3rem; color:var(--ink);
+}
+.tw-insight p{ margin:0; font-size:.89rem; line-height:1.65; color:var(--slate); }
+
+/* ---- Streamlit widgets, styled in place ------------------------------ */
+.stButton>button, .stFormSubmitButton>button, .stDownloadButton>button{
+  font-family:'Inter',sans-serif; font-weight:600; font-size:.94rem;
+  border-radius:99px; padding:.66rem 1.5rem; border:1px solid var(--line);
+  transition:transform .22s var(--ease), box-shadow .22s var(--ease);
+}
+.stButton>button[kind="primary"], .stFormSubmitButton>button{
+  background:linear-gradient(96deg,var(--sky),var(--blue));
+  color:#fff; border:none; box-shadow:0 10px 24px rgba(37,99,235,.3);
+}
+.stButton>button[kind="primary"]:hover, .stFormSubmitButton>button:hover{
+  transform:translateY(-2px); box-shadow:0 16px 34px rgba(37,99,235,.4);
+}
+.stButton>button[kind="secondary"]{ background:rgba(255,255,255,.85); color:var(--ink); }
+.stButton>button[kind="secondary"]:hover{ border-color:var(--sky); color:var(--blue); }
+
+/* tabs carry the navigation, so they get a little more presence */
+.stTabs [data-baseweb="tab-list"]{
+  gap:.3rem; border-bottom:1px solid var(--line); padding-bottom:.2rem;
+}
+.stTabs [data-baseweb="tab"]{
+  font-family:'Inter',sans-serif; font-weight:600; font-size:.95rem;
+  color:var(--slate); padding:.6rem 1.1rem; border-radius:12px 12px 0 0;
+}
+.stTabs [aria-selected="true"]{ color:var(--blue) !important; }
+.stTabs [data-baseweb="tab-highlight"]{ background:var(--blue); height:2.5px; }
 
 [data-testid="stSlider"] label, .stSelectbox label, .stRadio label,
 .stCheckbox label, .stNumberInput label, .stMultiSelect label{
-  font-family:'Inter',sans-serif !important; font-size:.86rem !important;
-  font-weight:600 !important; color:var(--ink-2) !important;
-  letter-spacing:-.005em !important; margin-bottom:.15rem !important;
-}
-[data-testid="stSlider"]{ direction:ltr !important; padding:.1rem 0 .4rem; }
-[data-testid="stSlider"] *{ direction:ltr !important; }
-[data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"]{
-  background:#fff !important; border:2px solid var(--blue) !important;
-  box-shadow:0 2px 10px rgba(37,99,235,.34) !important;
-}
-[data-testid="stTickBarMin"], [data-testid="stTickBarMax"]{
-  font-family:'JetBrains Mono',monospace !important; font-size:.66rem !important;
-  color:var(--slate-2) !important;
+  font-size:.86rem !important; font-weight:600 !important; color:var(--ink) !important;
 }
 [data-testid="stThumbValue"]{
-  font-family:'JetBrains Mono',monospace !important; font-size:.72rem !important;
-  color:#fff !important; background:var(--blue) !important;
-  padding:.1rem .45rem !important; border-radius:7px !important;
+  font-family:'JetBrains Mono',ui-monospace,monospace !important;
+  font-size:.72rem !important; color:#fff !important;
+  background:var(--blue) !important; padding:.08rem .42rem !important;
+  border-radius:7px !important;
+}
+[data-testid="stTickBarMin"], [data-testid="stTickBarMax"]{
+  font-family:'JetBrains Mono',ui-monospace,monospace !important;
+  font-size:.64rem !important; color:var(--slate-2) !important;
 }
 div[data-baseweb="select"] > div{
   background:rgba(255,255,255,.9) !important; border-radius:var(--r-sm) !important;
-  border:1px solid var(--line-2) !important; min-height:2.9rem !important;
-  font-size:.94rem !important; box-shadow:var(--sh-1) !important;
-  transition:border-color .22s var(--ease), box-shadow .22s var(--ease) !important;
+  border:1px solid var(--line) !important; min-height:2.8rem !important;
 }
-div[data-baseweb="select"] > div:hover{ border-color:var(--sky) !important; }
-div[data-baseweb="select"] > div:focus-within{
-  border-color:var(--blue) !important; box-shadow:0 0 0 3px rgba(37,99,235,.14) !important;
-}
-.stNumberInput input, .stTextInput input{
-  background:rgba(255,255,255,.9) !important; border-radius:var(--r-sm) !important;
-  border:1px solid var(--line-2) !important; min-height:2.9rem !important;
-}
-div[role="radiogroup"]{ gap:.5rem !important; }
 div[role="radiogroup"] label{
-  background:rgba(255,255,255,.85); border:1px solid var(--line-2);
-  border-radius:99px; padding:.42rem .95rem !important; margin:0 !important;
-  transition:all .22s var(--ease);
+  background:rgba(255,255,255,.85); border:1px solid var(--line);
+  border-radius:99px; padding:.38rem .9rem !important; margin:0 .4rem 0 0 !important;
 }
-div[role="radiogroup"] label:hover{ border-color:var(--sky); }
-
-/* ========================================================================
-   CHARTS
-   ===================================================================== */
-.tw-chart{ padding:1.4rem 1.5rem 1rem; }
-.tw-chart h4{
-  font-family:'Plus Jakarta Sans',sans-serif; font-size:1rem; font-weight:700;
-  margin:0 0 .2rem; color:var(--ink); letter-spacing:-.015em;
+[data-testid="stMetricValue"]{
+  font-family:'JetBrains Mono',ui-monospace,monospace; font-weight:500;
 }
-.tw-chart p{ margin:0 0 .6rem; font-size:.84rem; color:var(--slate); }
-.js-plotly-plot .plotly text{ font-family:'Inter',sans-serif !important; }
-
-/* ========================================================================
-   FOOTER / CONTACT
-   ===================================================================== */
-.tw-foot{
-  margin-top:clamp(64px,9vw,110px); padding:2.6rem 0 .5rem;
-  border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:1.6rem;
-  justify-content:space-between; align-items:flex-start;
+[data-testid="stExpander"] details{
+  border:1px solid var(--line); border-radius:var(--r-md);
+  background:rgba(255,255,255,.65);
 }
-.tw-foot__note{ color:var(--slate-2); font-size:.82rem; line-height:1.7; max-width:420px; }
-.tw-foot a{ color:var(--blue); text-decoration:none; }
-.tw-foot a:hover{ text-decoration:underline; }
 
-/* ========================================================================
-   ENTRANCE ANIMATION
-   ===================================================================== */
-.tw-rise{ opacity:0; transform:translateY(20px); animation:twRise .8s var(--ease) forwards; }
-@keyframes twRise{ to{ opacity:1; transform:none; } }
-.d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}
-.d4{animation-delay:.26s}.d5{animation-delay:.33s}.d6{animation-delay:.4s}
-.tw-float{ animation:twFloat 7s ease-in-out infinite; }
-@keyframes twFloat{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+/* ---- entrance -------------------------------------------------------- */
+.tw-rise{ animation:twRise .6s var(--ease) both; }
+@keyframes twRise{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
 
-/* ========================================================================
-   RESPONSIVE
-   ===================================================================== */
-@media (max-width:820px){
-  .tw-navwrap [data-testid="stButton"] > button{ font-size:.8rem; padding:.45rem .2rem; }
-  a.tw-navlink{ font-size:.8rem; padding:.45rem .2rem; }
+@media (max-width:640px){
   .tw-facts{ grid-template-columns:repeat(2,1fr); }
-}
-@media (max-width:560px){
-  .tw-brand b{ font-size:.9rem; }
-  .tw-navwrap [data-testid="stButton"] > button{ font-size:.72rem; }
-  .tw-hero__cta .tw-btn{ width:100%; }
-  .tw-dest__place{ right:88px; }
+  .tw-dest__place{ right:80px; }
 }
 @media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{
-    animation-duration:.01ms !important; animation-iteration-count:1 !important;
-    transition-duration:.01ms !important; scroll-behavior:auto !important;
-  }
-  .tw-card:hover, .tw-dest:hover .tw-dest__art svg{ transform:none; }
+  *,*::before,*::after{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  .tw-card:hover{ transform:none; }
 }
 </style>
 """.replace("__FONTS__", FONTS)
@@ -1908,16 +1714,12 @@ def destination_art(city: str, tastes: dict, temp_c: float) -> str:
     )
 
 # ==========================================================================
-# HTML COMPONENTS — HTML component builders.
+# DISPLAY MARKUP — HTML builders.
 # ==========================================================================
-
-# --------------------------------------------------------------------------- #
-# icons — single source, stroked to match the design system
-# --------------------------------------------------------------------------- #
 
 ICONS = {
     "compass": '<circle cx="12" cy="12" r="9"/><path d="m15.6 8.4-2 5.2-5.2 2 2-5.2z"/>',
-    "sparkle": '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/><circle cx="12" cy="12" r="3"/>',
+    "sparkle": '<path d="M12 3v3.6M12 17.4V21M3 12h3.6M17.4 12H21M5.6 5.6l2.6 2.6M15.8 15.8l2.6 2.6M18.4 5.6l-2.6 2.6M8.2 15.8l-2.6 2.6"/><circle cx="12" cy="12" r="3"/>',
     "wallet": '<path d="M3 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M16 11h5v4h-5a2 2 0 0 1 0-4z"/>',
     "sun": '<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/>',
     "globe": '<circle cx="12" cy="12" r="9"/><path d="M3.5 9h17M3.5 15h17M12 3a15 15 0 0 1 0 18A15 15 0 0 1 12 3z"/>',
@@ -1927,42 +1729,24 @@ ICONS = {
     "calendar": '<rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
     "tag": '<path d="M3 12.5V5a2 2 0 0 1 2-2h7.5L21 11.5 12.5 20z"/><circle cx="7.8" cy="7.8" r="1.4"/>',
     "bulb": '<path d="M9.2 17h5.6M10 21h4"/><path d="M12 3a6 6 0 0 1 3.6 10.8c-.5.4-.8 1-.8 1.6H9.2c0-.6-.3-1.2-.8-1.6A6 6 0 0 1 12 3z"/>',
-    "chart": '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
     "layers": '<path d="M12 3 3 8l9 5 9-5z"/><path d="m3 13 9 5 9-5M3 18l9 5 9-5"/>',
 }
 
 
-def icon(name: str, cls: str = "") -> str:
-    body = ICONS.get(name, ICONS["sparkle"])
-    c = f' class="{cls}"' if cls else ""
-    return f'<svg viewBox="0 0 24 24"{c}>{body}</svg>'
+def icon(name: str) -> str:
+    return f'<svg viewBox="0 0 24 24">{ICONS.get(name, ICONS["sparkle"])}</svg>'
 
 
-def _e(v) -> str:
-    return escape(str(v), quote=True)
+def _e(value) -> str:
+    return escape(str(value), quote=True)
 
 
-# --------------------------------------------------------------------------- #
-# chrome
-# --------------------------------------------------------------------------- #
-
-# (label, view) — Features/About/Contact are in-page anchors on the home view
-NAV_ITEMS: list[tuple[str, str]] = [
-    ("Home", "home"),
-    ("Features", "#features"),
-    ("AI Planner", "planner"),
-    ("About", "#about"),
-    ("Contact", "#contact"),
-]
-
-
-def brand_mark() -> str:
-    """The logo, rendered as markup because it never needs to be clickable."""
+def brand() -> str:
     return """
 <div class="tw-brand">
-<svg viewBox="0 0 24 24" fill="none" stroke="url(#navg)" stroke-width="1.8"
+<svg viewBox="0 0 24 24" fill="none" stroke="url(#bg1)" stroke-width="1.8"
 stroke-linecap="round" stroke-linejoin="round">
-<defs><linearGradient id="navg" x1="0" y1="0" x2="1" y2="1">
+<defs><linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1">
 <stop offset="0%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#2563EB"/>
 </linearGradient></defs>
 <path d="M2 13.4 21 4l-4.6 16.2-4.1-6.1z"/><path d="m12.3 14.1-3.4 6.9-1-5"/>
@@ -1971,476 +1755,111 @@ stroke-linecap="round" stroke-linejoin="round">
 </div>"""
 
 
-def nav_open() -> str:
-    return '<div class="tw-navwrap">'
-
-
-def nav_close() -> str:
-    return "</div>"
-
-
-def section_head(eyebrow: str, title: str, blurb: str = "", anchor: str = "") -> str:
-    a = f' id="{anchor}"' if anchor else ""
-    p = f"<p>{blurb}</p>" if blurb else ""
-    return f"""
-<div class="tw-section"{a}>
-  <div class="tw-section__head tw-rise">
-    <span class="tw-eyebrow">{eyebrow}</span>
-    <h2>{title}</h2>{p}
-  </div>"""
-
-
-def close_section() -> str:
-    return "</div>"
-
-
-# --------------------------------------------------------------------------- #
-# hero
-# --------------------------------------------------------------------------- #
-
 def hero(stats: list[tuple[str, str]]) -> str:
-    stat_html = "".join(
-        f'<div class="tw-stat"><b>{_e(v)}</b><span>{_e(lbl)}</span></div>'
-        for v, lbl in stats
+    cells = "".join(
+        f'<div class="tw-stat"><b>{_e(v)}</b><span>{_e(label)}</span></div>'
+        for v, label in stats
     )
     return f"""
-<div class="tw-hero">
-  <div class="tw-hero__plane tw-float">
-    <svg viewBox="0 0 420 260" fill="none">
-      <defs>
-        <linearGradient id="pg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#2563EB"/>
-        </linearGradient>
-        <linearGradient id="trailg" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stop-color="#0EA5E9" stop-opacity="0"/>
-          <stop offset="100%" stop-color="#2563EB" stop-opacity=".55"/>
-        </linearGradient>
-      </defs>
-      <path d="M10 210 C120 200 210 150 290 70" stroke="url(#trailg)" stroke-width="3"
-            stroke-dasharray="2 12" stroke-linecap="round"/>
-      <g transform="translate(300,62) rotate(-38)">
-        <path d="M46 0 L16 -7 L-6 -34 L-18 -34 L-9 -7 L-30 -7 L-40 -17 L-48 -17
-                 L-42 -5 L-42 5 L-48 17 L-40 17 L-30 7 L-9 7 L-18 34 L-6 34 L16 7 Z"
-              fill="url(#pg)"/>
-        <path d="M46 0 L16 -7 L-9 -7 L-9 7 L16 7 Z" fill="#fff" opacity=".28"/>
-      </g>
-      <circle cx="300" cy="62" r="46" fill="url(#pg)" opacity=".1"/>
-    </svg>
-  </div>
-  <div class="tw-hero__inner">
-    <span class="tw-eyebrow tw-rise d1">Intelligent travel planning</span>
-    <h1 class="tw-rise d2">Plan Smarter with<br/><span class="tw-grad">TripWise AI</span></h1>
-    <p class="tw-lede tw-rise d3">
-      Tell us how you like to travel and TripWise ranks real destinations against
-      your answers — with the cost, the climate, the right season and the nearest
-      airport worked out before you commit to anything.
-    </p>
-    <div class="tw-hero__cta tw-rise d4">
-      <a class="tw-btn tw-btn--ghost" href="#features">See how it works</a>
-    </div>
-    <div class="tw-hero__stats tw-rise d5">{stat_html}</div>
-  </div>
+<div class="tw-rise">
+<span class="tw-eyebrow">Intelligent travel planning</span>
+<h1 class="tw-display">Plan smarter with<br/><span class="tw-grad">TripWise AI</span></h1>
+<p class="tw-lede">Tell us how you like to travel and TripWise ranks real
+destinations against your answers &mdash; with the cost, the climate, the right
+season and the nearest airport worked out before you commit to anything.</p>
+<div class="tw-stats">{cells}</div>
 </div>"""
 
 
-# --------------------------------------------------------------------------- #
-# cards
-# --------------------------------------------------------------------------- #
+def heading(eyebrow: str, title: str, sub: str = "") -> str:
+    tail = f'<p class="tw-sub">{_e(sub)}</p>' if sub else ""
+    return (f'<div class="tw-rise" style="margin-top:2.2rem">'
+            f'<span class="tw-eyebrow">{_e(eyebrow)}</span>'
+            f'<div class="tw-h2">{_e(title)}</div>{tail}</div>')
 
-def feature_card(icon_name: str, title: str, body: str, delay: int = 1) -> str:
+
+def feature(icon_name: str, title: str, body: str) -> str:
     return f"""
-<div class="tw-card tw-feat tw-rise d{delay}">
-  <div class="tw-feat__icon">{icon(icon_name)}</div>
-  <h3>{_e(title)}</h3>
-  <p>{_e(body)}</p>
+<div class="tw-card tw-feat tw-rise">
+<div class="tw-feat__icon">{icon(icon_name)}</div>
+<h3>{_e(title)}</h3>
+<p>{_e(body)}</p>
 </div>"""
 
 
-def insight_card(title: str, body: str, delay: int = 1) -> str:
+def insight(title: str, body: str) -> str:
     return f"""
-<div class="tw-card tw-insight tw-rise d{delay}">
-  <div class="tw-insight__dot">{icon('bulb')}</div>
-  <div><h4>{_e(title)}</h4><p>{_e(body)}</p></div>
+<div class="tw-card tw-insight tw-rise">
+<div class="tw-insight__dot">{icon('bulb')}</div>
+<div><h4>{_e(title)}</h4><p>{_e(body)}</p></div>
 </div>"""
 
 
-def destination_card(d: dict, delay: int = 1) -> str:
-    """`d` is the plain dict assembled by app.py, never a raw dataframe row."""
-    facts = f"""
-    <div class="tw-facts">
-      <div><span>Budget</span><b>{_e(d['tier'])}</b></div>
-      <div><span>Per day</span><b>${_e(d['daily'])}</b></div>
-      <div><span>Climate</span><b>{_e(d['temp'])}&deg;C</b></div>
-    </div>"""
-
+def destination(d: dict) -> str:
+    """`d` is the flat dict assembled by app.py, never a dataframe row."""
     chips = "".join(f'<span class="tw-chip">{_e(s)}</span>' for s in d["style"])
     if d.get("region"):
         chips += f'<span class="tw-chip tw-chip--muted">{_e(d["region"])}</span>'
 
-    rows = []
-    if d.get("airport"):
-        rows.append((("plane"), "Nearest airport", d["airport"]))
-    else:
-        rows.append((("plane"), "Nearest airport", "None recorded for this city"))
-    rows.append((("calendar"), "Best season", d["season"]))
-    rows.append((("sun"), "Weather", d["climate"]))
+    rows = [("plane", "Nearest airport",
+             d["airport"] or "None recorded in the catalogue"),
+            ("calendar", "Best season", d["season"]),
+            ("sun", "Weather", d["climate"])]
     if d.get("hotel"):
-        rows.append((("tag"), "Suggested stay", d["hotel"]))
+        rows.append(("tag", "Suggested stay", d["hotel"]))
     if d.get("attractions"):
-        rows.append((("pin"), "Nearby", ", ".join(d["attractions"])))
-    rows.append((("bulb"), "Tip", d["tip"]))
+        rows.append(("pin", "Nearby", ", ".join(d["attractions"])))
+    rows.append(("bulb", "Tip", d["tip"]))
 
     meta = "".join(
-        f'<div class="tw-meta__row">{icon(ic)}<div><b>{_e(lbl)}</b> — {_e(val)}</div></div>'
-        for ic, lbl, val in rows
+        f'<div class="tw-meta__row">{icon(ic)}<div><b>{_e(label)}</b> &mdash; {_e(val)}</div></div>'
+        for ic, label, val in rows
     )
 
     return f"""
-<div class="tw-card tw-dest tw-rise d{delay}">
-  <div class="tw-dest__art">
-    {d['art']}
-    <div class="tw-dest__scrim"></div>
-    <div class="tw-dest__match">{_e(d['match'])}% match</div>
-    <div class="tw-dest__place">
-      <h3>{_e(d['city'])}</h3><span>{_e(d['country'])}</span>
-    </div>
-  </div>
-  <div class="tw-dest__body">
-    {facts}
-    <div class="tw-chips">{chips}</div>
-    <div class="tw-why">{_e(d['why'])}</div>
-    <div class="tw-meta">{meta}</div>
-  </div>
+<div class="tw-card tw-rise">
+<div class="tw-dest__art">
+{d['art']}
+<div class="tw-dest__scrim"></div>
+<div class="tw-dest__match">{_e(d['match'])}% match</div>
+<div class="tw-dest__place"><h3>{_e(d['city'])}</h3><span>{_e(d['country'])}</span></div>
+</div>
+<div class="tw-dest__body">
+<div class="tw-facts">
+<div><span>Budget</span><b>{_e(d['tier'])}</b></div>
+<div><span>Per day</span><b>${_e(d['daily'])}</b></div>
+<div><span>Climate</span><b>{_e(d['temp'])}&deg;C</b></div>
+</div>
+<div class="tw-chips">{chips}</div>
+<div class="tw-why">{_e(d['why'])}</div>
+<div class="tw-meta">{meta}</div>
+</div>
 </div>"""
 
 
-# --------------------------------------------------------------------------- #
-# static content blocks
-# --------------------------------------------------------------------------- #
-
-def about_block() -> str:
-    return """
-<div class="tw-grid tw-grid--2">
-  <div class="tw-card tw-feat tw-rise d1">
-    <div class="tw-feat__icon">%s</div>
-    <h3>Recommendations you can trace</h3>
-    <p>TripWise compares your answers against every destination in its catalogue
-       across nine travel dimensions, climate, budget tier and accommodation
-       standard, then ranks by how closely each one sits to what you described.
-       Every card explains its own reasoning in plain language.</p>
-  </div>
-  <div class="tw-card tw-feat tw-rise d2">
-    <div class="tw-feat__icon">%s</div>
-    <h3>Grounded in real data</h3>
-    <p>Destinations, airports, accommodation standards and climate averages come
-       from a curated catalogue rather than generated text, so a recommendation
-       always points at somewhere that exists — and tells you when a detail is
-       missing instead of inventing one.</p>
-  </div>
-</div>""" % (icon("sparkle"), icon("shield"))
-
-
-def contact_block() -> str:
-    return """
-<div class="tw-card tw-feat tw-rise d1" style="padding:2.4rem 2rem;">
-  <div class="tw-grid tw-grid--2" style="align-items:center;">
-    <div>
-      <h3 style="font-size:1.5rem;margin-bottom:.7rem;">Bring TripWise to your travellers</h3>
-      <p>Agencies, airlines and tourism boards can run TripWise against their own
-         catalogue — your destinations, your inventory, your branding.</p>
-    </div>
-    <div style="display:flex;gap:.7rem;flex-wrap:wrap;justify-content:flex-end;">
-      <a class="tw-btn" href="mailto:hello@tripwise.ai" target="_top">Talk to us</a>
-      <a class="tw-btn tw-btn--ghost" href="?view=planner" target="_top">Try the planner</a>
-    </div>
-  </div>
-</div>"""
-
-
-def footer() -> str:
-    return """
-<div class="tw-foot">
-  <div class="tw-foot__note">
-    <b style="color:var(--ink);">TripWise AI</b><br/>
-    Destination matching, cost estimates and climate guidance from a curated
-    travel catalogue. Figures are planning estimates, not quotes — confirm
-    prices and seasons before booking.
-  </div>
-  <div class="tw-foot__note" style="text-align:right;">
-    <a href="#features">Features</a> &nbsp;·&nbsp;
-    <a href="#about">About</a> &nbsp;·&nbsp;
-    <a href="mailto:hello@tripwise.ai">Contact</a>
-  </div>
-</div>"""
-
-# ==========================================================================
-# SPLASH — Generate the TripWise boarding splash as one self-contained HTML string.
-# ==========================================================================
-
-SPL_W, SPL_H = 1200, 620
-WIN_W, WIN_H = 300, 430
-WIN_Y = 78
-WIN_X = [72, 450, 828]
-
-# glass opening, relative to each window's top-left
-GX, GY, GW, GH = 40, 46, 220, 326
-GRX, GRY = 62, 50
-
-CLOUD_LAYERS = [
-    # id, baseFrequency, octaves, seed, matrix slope, matrix offset, opacity,
-    # mask id, drift seconds, drift px
-    ("cA", 0.009, 5, 11, -1.9, 1.18, 0.85, "mDeep", 26, 16),
-    ("cB", 0.017, 6, 5, -2.5, 1.45, 1.00, "mDeck", 19, 26),
-    ("cC", 0.034, 5, 29, -3.0, 1.72, 0.90, "mLow", 13, 38),
-    ("cD", 0.013, 4, 41, -2.6, 1.30, 0.28, "mHigh", 34, 12),
-]
-
-
-def cloud_filters() -> str:
-    out = []
-    for cid, freq, octv, seed, slope, off, *_ in CLOUD_LAYERS:
-        out.append(
-            f'<filter id="{cid}" x="0" y="0" width="100%" height="100%">'
-            f'<feTurbulence type="fractalNoise" baseFrequency="{freq}" '
-            f'numOctaves="{octv}" seed="{seed}" stitchTiles="stitch"/>'
-            f'<feColorMatrix type="matrix" values="'
-            f'0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  {slope} 0 0 0 {off}"/>'
-            f"</filter>"
-        )
-    return "".join(out)
-
-
-def deck_masks() -> str:
-    """Vertical ramps that place each cloud layer relative to the horizon."""
-    ramps = {
-        "mDeep": [(0.40, 0), (0.66, 1), (1.0, 1)],
-        "mDeck": [(0.44, 0), (0.70, 1), (1.0, 1)],
-        "mLow": [(0.58, 0), (0.84, 1), (1.0, 1)],
-        "mHigh": [(0.0, 1), (0.30, 0), (1.0, 0)],
-    }
-    out = []
-    for name, stops in ramps.items():
-        s = "".join(
-            f'<stop offset="{p * 100:.0f}%" stop-color="#fff" stop-opacity="{v}"/>'
-            for p, v in stops
-        )
-        out.append(
-            f'<linearGradient id="{name}g" x1="0" y1="0" x2="0" y2="1">{s}</linearGradient>'
-            f'<mask id="{name}" maskUnits="userSpaceOnUse" x="-40" y="0" '
-            f'width="{GW + 80}" height="{GH}">'
-            f'<rect x="-40" y="0" width="{GW + 80}" height="{GH}" fill="url(#{name}g)"/>'
-            f"</mask>"
-        )
-    return "".join(out)
-
-
-def window_svg(i: int, x: int) -> str:
-    """One window: moulded surround, recessed well, glass, sky, shade."""
-    gid = f"glass{i}"
-    seed_shift = i * 60
-    delay = 1.0 + i * 0.12
-
-    clouds = []
-    for n, (cid, freq, octv, seed, slope, off, op, mask, dur, dist) in enumerate(CLOUD_LAYERS):
-        # a per-window filter so each window shows a different piece of sky
-        wid = f"{cid}_{i}"
-        clouds.append(
-            f'<g class="tw-drift" style="animation-duration:{dur + i * 2}s;'
-            f"animation-delay:-{n * 3 + i}s;--dx:{dist}px\">"
-            f'<rect x="{GX - 40}" y="{GY}" width="{GW + 80}" height="{GH}" '
-            f'filter="url(#{wid})" mask="url(#{mask})" opacity="{op}" '
-            f'transform="translate(0,0)"/>'
-            f"</g>"
-        )
-
+def about() -> str:
     return f"""
-  <g transform="translate({x},{WIN_Y})">
-    <rect x="0" y="0" width="{WIN_W}" height="{WIN_H}" rx="96" ry="78" fill="url(#bezel)"
-          filter="url(#winShadow)"/>
-    <rect x="0" y="0" width="{WIN_W}" height="{WIN_H}" rx="96" ry="78" fill="none"
-          stroke="#aab3bd" stroke-width="1.1" opacity=".5"/>
-    <rect x="24" y="24" width="{WIN_W - 48}" height="{WIN_H - 48}" rx="76" ry="60" fill="url(#well)"/>
-    <rect x="32" y="34" width="{WIN_W - 64}" height="{WIN_H - 68}" rx="68" ry="54"
-          fill="#5c6672" opacity=".5"/>
-
-    <clipPath id="{gid}">
-      <rect x="{GX}" y="{GY}" width="{GW}" height="{GH}" rx="{GRX}" ry="{GRY}"/>
-    </clipPath>
-
-    <g clip-path="url(#{gid})">
-      <rect x="{GX}" y="{GY}" width="{GW}" height="{GH}" fill="url(#sky)"/>
-      <g transform="translate({GX},{GY})">{''.join(clouds)}</g>
-      <ellipse cx="{GX + GW * 0.74}" cy="{GY + GH * 0.34}" rx="{GW * 0.7}" ry="{GH * 0.42}"
-               fill="url(#sun)" opacity=".55"/>
-
-      <!-- shade: starts closed, glides up out of the opening -->
-      <g class="tw-shade" style="animation-delay:{delay}s">
-        <rect x="{GX - 4}" y="{GY - 2}" width="{GW + 8}" height="{GH + 4}" fill="url(#shade)"/>
-        <rect x="{GX - 4}" y="{GY + GH - 40}" width="{GW + 8}" height="42" fill="url(#lipG)"/>
-        <rect x="{GX + GW / 2 - 30}" y="{GY + GH - 26}" width="60" height="9" rx="4.5"
-              fill="url(#gripG)"/>
-      </g>
-
-      <!-- glass depth + reflection, always above the shade -->
-      <rect x="{GX}" y="{GY}" width="{GW}" height="26" fill="#33404f" opacity=".34"/>
-      <rect x="{GX}" y="{GY}" width="13" height="{GH}" fill="#33404f" opacity=".2"/>
-      <rect x="{GX + GW - 13}" y="{GY}" width="13" height="{GH}" fill="#33404f" opacity=".2"/>
-      <path d="M{GX} {GY + 250} L{GX + 150} {GY} L{GX + 210} {GY} L{GX} {GY + GH} Z"
-            fill="#fff" opacity=".08"/>
-    </g>
-
-    <path d="M{GX + 18} {GY + 6} C{GX + 60} {GY - 26} {GX + GW - 60} {GY - 26} {GX + GW - 18} {GY + 6}
-             C{GX + GW - 60} {GY - 12} {GX + 60} {GY - 12} {GX + 18} {GY + 6} Z" fill="url(#lipHi)"/>
-  </g>"""
+<div class="tw-card tw-feat tw-rise">
+<div class="tw-feat__icon">{icon('sparkle')}</div>
+<h3>Recommendations you can trace</h3>
+<p>TripWise compares your answers against every destination across nine travel
+dimensions, climate, budget tier and accommodation standard, then ranks by how
+closely each sits to what you described. Results are spread across distinct
+destination profiles so a shortlist offers real alternatives, and every card
+explains its own reasoning in plain language.</p>
+</div>"""
 
 
-def build_splash() -> str:
-    windows = "".join(window_svg(i, x) for i, x in enumerate(WIN_X))
-
-    # per-window copies of each cloud filter, re-seeded so no two windows match
-    per_window = []
-    for i in range(3):
-        for cid, freq, octv, seed, slope, off, *_ in CLOUD_LAYERS:
-            per_window.append(
-                f'<filter id="{cid}_{i}" x="0" y="0" width="100%" height="100%">'
-                f'<feTurbulence type="fractalNoise" baseFrequency="{freq}" '
-                f'numOctaves="{octv}" seed="{seed + i * 60}" stitchTiles="stitch"/>'
-                f'<feColorMatrix type="matrix" values="'
-                f'0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  {slope} 0 0 0 {off}"/>'
-                f"</filter>"
-            )
-
-    return _flatten(f"""
-<style>
-.tw-splash{{
-  /* purely decorative, so it must never intercept a click even mid-animation */
-  pointer-events:none;
-  position:fixed; inset:0; z-index:99998; display:grid; place-items:center;
-  background:linear-gradient(180deg,#f1f4f7 0%,#e3e9ef 42%,#ced6df 100%);
-  animation:twSplashOut .9s ease 4.4s forwards;
-}}
-@keyframes twSplashOut{{ to{{ opacity:0; visibility:hidden; pointer-events:none; }} }}
-.tw-splash .tw-scene{{
-  width:min(96vw,1240px); aspect-ratio:{SPL_W}/{SPL_H};
-  animation:twSceneIn 1.2s cubic-bezier(.2,.7,.3,1) both;
-}}
-@keyframes twSceneIn{{ from{{ opacity:0; transform:scale(1.05); }} to{{ opacity:1; transform:none; }} }}
-.tw-splash .tw-scene svg{{
-  width:100%; height:100%; display:block;
-  filter:drop-shadow(0 30px 64px rgba(66,80,96,.22));
-}}
-.tw-splash .tw-shade{{
-  transform:translateY(0);
-  animation:twShadeUp 2.2s cubic-bezier(.72,0,.18,1) forwards;
-}}
-@keyframes twShadeUp{{ to{{ transform:translateY(-{GH + 60}px); }} }}
-.tw-splash .tw-drift{{
-  animation-name:twDrift; animation-timing-function:ease-in-out;
-  animation-iteration-count:infinite; animation-direction:alternate;
-}}
-@keyframes twDrift{{
-  from{{ transform:translateX(calc(var(--dx) * -1)); }}
-  to{{ transform:translateX(var(--dx)); }}
-}}
-.tw-splash .tw-mark{{
-  position:absolute; left:0; right:0; bottom:7%; text-align:center; opacity:0;
-  animation:twMarkIn 1s cubic-bezier(.2,.7,.3,1) 2.8s both;
-}}
-.tw-splash .tw-mark .t{{
-  font-family:'Plus Jakarta Sans','Outfit',sans-serif; font-weight:800;
-  font-size:clamp(1.5rem,3.6vw,2.45rem); letter-spacing:-.02em;
-  background:linear-gradient(96deg,#0EA5E9,#2563EB);
-  -webkit-background-clip:text; background-clip:text;
-  -webkit-text-fill-color:transparent; color:#2563EB;
-  filter:drop-shadow(0 0 22px rgba(14,165,233,.45));
-}}
-.tw-splash .tw-mark .s{{
-  font-family:'Inter',sans-serif; margin-top:.5rem; color:#5A6B7E; font-weight:500;
-  font-size:clamp(.62rem,1.35vw,.8rem); letter-spacing:.34em; text-transform:uppercase;
-}}
-@keyframes twMarkIn{{ from{{ opacity:0; transform:translateY(12px); }} to{{ opacity:1; transform:none; }} }}
-@media (prefers-reduced-motion:reduce){{
-  .tw-splash .tw-shade{{ animation-duration:.01s; }}
-  .tw-splash .tw-drift{{ animation:none; }}
-  .tw-splash{{ animation:twSplashOut .5s linear 1.8s forwards; }}
-}}
-</style>
-<div class="tw-splash" aria-hidden="true">
-<div class="tw-scene">
-<svg viewBox="0 0 {SPL_W} {SPL_H}" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<linearGradient id="bezel" x1=".25" y1="0" x2=".75" y2="1">
-<stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#f4f6f8"/>
-<stop offset="1" stop-color="#dbe1e7"/>
-</linearGradient>
-<linearGradient id="cabin" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#f1f4f7"/><stop offset=".42" stop-color="#e3e9ef"/>
-<stop offset="1" stop-color="#ced6df"/>
-</linearGradient>
-<radialGradient id="vign" cx="50%" cy="42%" r="72%">
-<stop offset="55%" stop-color="#000" stop-opacity="0"/>
-<stop offset="100%" stop-color="#48535f" stop-opacity=".16"/>
-</radialGradient>
-<filter id="winShadow" x="-25%" y="-25%" width="150%" height="150%">
-<feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#54626f" flood-opacity=".33"/>
-</filter>
-<linearGradient id="well" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#6f7883"/><stop offset=".28" stop-color="#98a1ab"/>
-<stop offset=".75" stop-color="#c9d0d8"/><stop offset="1" stop-color="#eef1f4"/>
-</linearGradient>
-<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#1a4a8c"/><stop offset=".34" stop-color="#4886c4"/>
-<stop offset=".56" stop-color="#9ec8e8"/><stop offset=".72" stop-color="#d9eaf6"/>
-<stop offset="1" stop-color="#c2d9ec"/>
-</linearGradient>
-<radialGradient id="sun">
-<stop offset="0" stop-color="#fff6dc" stop-opacity=".85"/>
-<stop offset="55%" stop-color="#ffe9b8" stop-opacity=".22"/>
-<stop offset="100%" stop-color="#ffe9b8" stop-opacity="0"/>
-</radialGradient>
-<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0" stop-color="#d9dee4"/><stop offset=".08" stop-color="#f2f4f7"/>
-<stop offset=".5" stop-color="#fafbfc"/><stop offset=".92" stop-color="#eceff3"/>
-<stop offset="1" stop-color="#d3d9e0"/>
-</linearGradient>
-<linearGradient id="lipG" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#d3d9e0"/><stop offset="1" stop-color="#b3bbc5"/>
-</linearGradient>
-<linearGradient id="gripG" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#98a0aa"/><stop offset="1" stop-color="#727a85"/>
-</linearGradient>
-<linearGradient id="lipHi" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#ffffff" stop-opacity=".92"/>
-<stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
-</linearGradient>
-{deck_masks()}
-{''.join(per_window)}
-</defs>
-<rect width="{SPL_W}" height="{SPL_H}" fill="url(#cabin)"/>
-<rect x="0" y="{SPL_H*0.055:.0f}" width="{SPL_W}" height="2" fill="#c3cbd4" opacity=".55"/>
-<rect x="0" y="{SPL_H*0.055+3:.0f}" width="{SPL_W}" height="1" fill="#ffffff" opacity=".9"/>
-<rect x="0" y="{SPL_H*0.905:.0f}" width="{SPL_W}" height="2" fill="#c3cbd4" opacity=".5"/>
-<rect x="0" y="{SPL_H*0.905+3:.0f}" width="{SPL_W}" height="1" fill="#ffffff" opacity=".85"/>
-{windows}
-<rect width="{SPL_W}" height="{SPL_H}" fill="url(#vign)" pointer-events="none"/>
-</svg>
-</div>
-<div class="tw-mark">
-<div class="t">TripWise AI</div>
-<div class="s">Plan smarter &middot; Travel further</div>
-</div>
-</div>
-""")
-
-
-def _flatten(markup: str) -> str:
-    """Strip leading indentation from every line.
-
-    Streamlit renders this through its Markdown parser, which treats any line
-    indented four spaces or more as a code block and would print the markup as
-    text instead of rendering it.
-    """
-    return "\n".join(line.lstrip() for line in markup.splitlines() if line.strip())
+def data_promise() -> str:
+    return f"""
+<div class="tw-card tw-feat tw-rise">
+<div class="tw-feat__icon">{icon('shield')}</div>
+<h3>Grounded in real data</h3>
+<p>Destinations, airports, accommodation standards and climate averages come
+from a curated catalogue rather than generated text, so a recommendation always
+points somewhere that exists. When a detail is missing, TripWise says so instead
+of inventing one.</p>
+</div>"""
 
 # ==========================================================================
 # APPLICATION — TripWise AI — an AI travel platform.
@@ -2451,56 +1870,44 @@ def _flatten(markup: str) -> str:
 
 
 
-# --------------------------------------------------------------------------- #
-# cached resources
-# --------------------------------------------------------------------------- #
-
 def html(markup: str) -> None:
     st.markdown(markup, unsafe_allow_html=True)
 
 
-@st.cache_data(show_spinner=False)
-def load_catalogue(cache_version: str = CACHE_VERSION):
-    """Read and clean the catalogue, cached on the data rather than per session.
+# --------------------------------------------------------------------------- #
+# cached resources
+# --------------------------------------------------------------------------- #
 
-    `cache_version` is part of the key so a release that changes the shape of
-    the report cannot be served a stale object from a previous build.
-    """
+@st.cache_data(show_spinner=False)
+def load_catalogue(version: str = CACHE_VERSION):
+    """Parse and clean the catalogue once. `version` busts the cache on release."""
     return load_catalogue_file()
 
 
 @st.cache_resource(show_spinner=False)
 def fitted_models(fingerprint: str) -> ModelBundle:
-    """Scaler and K-Means, fitted once per catalogue.
-
-    `fingerprint` keys the cache to the catalogue's shape rather than to the
-    DataFrame, which is unhashable and changes identity on every rerun.
-    """
     df, _ = load_catalogue()
     return fit_models(df)
 
 
 @st.cache_resource(show_spinner=False)
 def airport_index(fingerprint: str) -> AirportIndex:
-    """Searchable airport index, built once per catalogue."""
     df, _ = load_catalogue()
     return AirportIndex(df)
 
 
 def fingerprint(df: pd.DataFrame) -> str:
-    """A cheap, stable identity for a catalogue, scoped to this release."""
+    """Stable identity for a catalogue, scoped to this release."""
     return (f"{CACHE_VERSION}:{len(df)}x{len(df.columns)}:"
-            f"{hash(tuple(sorted(str(c) for c in df.columns)))}")
+            f"{'|'.join(sorted(str(c) for c in df.columns))[:200]}")
 
 
 # --------------------------------------------------------------------------- #
-# view models
+# view model
 # --------------------------------------------------------------------------- #
 
 def card_payload(row, prefs: dict, airports: AirportIndex) -> dict:
-    """Flatten a matched row into exactly what the card template needs."""
     airport = airports.resolve(row)
-    tastes = tastes_of(row)
     temp = to_float(row.get("temp_avg_yearly", 20), 20.0)
     tier = to_int(row.get("budget_level_encoded", 2), 2, 1, 3)
 
@@ -2517,7 +1924,8 @@ def card_payload(row, prefs: dict, airports: AirportIndex) -> dict:
         "city": str(row.get("city", "Unknown")),
         "country": str(row.get("country", "") or ""),
         "match": f"{to_float(row.get('match', 0), 0.0):.0f}",
-        "art": destination_art(str(row.get("city", "x")), tastes, temp),
+        "art": destination_art(str(row.get("city", "x")),
+                               tastes_of(row), temp),
         "tier": BUDGET_LABEL[tier],
         "daily": daily_cost(row),
         "temp": f"{temp:.0f}",
@@ -2533,16 +1941,14 @@ def card_payload(row, prefs: dict, airports: AirportIndex) -> dict:
     }
 
 
-def data_notice(report: CatalogueReport, airports: AirportIndex,
-                df: pd.DataFrame) -> None:
-    """Tell the operator what the catalogue can and cannot support.
+def data_notice(report, airports: AirportIndex, df: pd.DataFrame) -> None:
+    """Report what the catalogue can and cannot support.
 
-    Every field is read through `report.get`, because Streamlit can serve a
-    cached report built by an earlier version of the class, which would not
-    carry fields added since.
+    Fields are read through `report.get` because Streamlit may hand back a
+    cached report built by an earlier release of the class.
     """
     source = report.get("source", "the catalogue")
-    rows_out = report.get("rows_out", len(df))
+    rows = report.get("rows_out", len(df))
 
     if not report.get("is_real", True):
         missing = report.get("missing_required", [])
@@ -2552,27 +1958,19 @@ def data_notice(report: CatalogueReport, airports: AirportIndex,
             detail = "Missing required columns: " + ", ".join(missing) + "."
         else:
             detail = f"{CSV_NAME} was not found beside app.py."
-        st.info(f"Running on the built-in demo catalogue. {detail} "
-                "Export final_df from the notebook to use your own data.", icon="ℹ️")
+        st.info(f"Running on the built-in demo catalogue. {detail}", icon="ℹ️")
         return
 
     if not len(airports):
         st.warning(
-            f"**No airport data in {source}.** The catalogue loaded "
-            f"{rows_out:,} destinations, but no column holding airport names or "
-            "codes was found, so no airports can be shown.",
-            icon="⚠️",
-        )
+            f"**No airport data in {source}.** {rows:,} destinations loaded, but "
+            "no column holding airport names or codes was found.", icon="⚠️")
         with st.expander("How to fix this"):
             st.markdown(
-                "TripWise looks for a **`name`** column (airport name) and an "
-                "**`iata`** column (airport code), and also accepts the common "
-                "alternative spellings `airport_name`, `airport`, `IATA` and "
-                "`iata_code`.\n\n"
-                "These columns come from the airports merge in the notebook. If "
-                "the export selected only the model features, they were dropped. "
-                "Re-export keeping them, then reload this page."
-            )
+                "TripWise looks for a **`name`** column and an **`iata`** column, "
+                "and accepts the spellings `airport_name`, `airport`, `IATA` and "
+                "`iata_code`. They come from the airports merge in the notebook; "
+                "if the export kept only the model features, they were dropped.")
             seen = report.get("columns_seen", [])
             if seen:
                 st.caption(f"Columns found in {source}:")
@@ -2581,133 +1979,87 @@ def data_notice(report: CatalogueReport, airports: AirportIndex,
 
     direct, total = coverage(df, airports)
     if total and direct < total:
-        st.caption(
-            f"Catalogue: {rows_out:,} destinations from {source}. "
-            f"{direct:,} carry a matched airport; the rest resolve to their nearest "
-            f"airport from the {len(airports):,} in the dataset."
-        )
+        st.caption(f"{rows:,} destinations from {source}. {direct:,} carry a "
+                   f"matched airport; the rest resolve to the nearest of "
+                   f"{len(airports):,} known airports.")
 
 
 # --------------------------------------------------------------------------- #
-# pages
+# tabs
 # --------------------------------------------------------------------------- #
 
-
-def navigate(view: str) -> None:
-    """Switch view without a page reload, preserving session state."""
-    st.query_params["view"] = view
-    st.rerun()
-
-
-def render_nav(active: str) -> None:
-    """The top bar.
-
-    Navigation runs on real Streamlit buttons rather than anchor tags. Anchors
-    inside st.markdown proved unreliable in the deployed environment, and this
-    route is better regardless: setting a query param and rerunning switches
-    view in place instead of forcing a full page load, so session state and
-    cached models survive.
-    """
-    html(nav_open())
-    brand, links, cta = st.columns([3, 7, 2.4], vertical_alignment="center")
-
-    with brand:
-        html(brand_mark())
-
-    with links:
-        cols = st.columns(len(NAV_ITEMS))
-        for col, (label, target) in zip(cols, NAV_ITEMS):
-            with col:
-                if target.startswith("#"):
-                    # in-page section: a link is right here, no navigation needed
-                    html(f'<a class="tw-navlink" href="{target}">{label}</a>')
-                elif st.button(label, key=f"nav_{target}",
-                               type="primary" if active == target else "secondary"):
-                    navigate(target)
-
-    with cta:
-        if st.button("Start planning", key="nav_cta", type="primary"):
-            navigate("planner")
-
-    html(nav_close())
-
-
-def page_home(df: pd.DataFrame, report: CatalogueReport,
-              airports: AirportIndex) -> None:
-    render_nav("home")
+def tab_home(df: pd.DataFrame, report, airports: AirportIndex) -> None:
     html(hero(catalogue_stats(df)))
-    cta, _ = st.columns([1, 3])
-    with cta:
-        if st.button("Start planning  →", key="hero_cta", type="primary"):
-            navigate("planner")
     data_notice(report, airports, df)
 
-    html(section_head(
-        "How it works", "Three steps to a shortlist you trust",
-        "No account, no browsing through hundreds of listings. Describe how you "
-        "travel and the ranking does the narrowing.", anchor="features"))
-    html('<div class="tw-grid tw-grid--3">'
-         + feature_card("compass", "Describe your trip",
-                           "Nine travel dimensions, a budget tier and a climate target. "
-                           "It takes about a minute and you can revise any of it.", 1)
-         + feature_card("sparkle", "See a ranked shortlist",
-                           "Destinations are ordered by how closely they match what you "
-                           "described, each one explaining its own reasoning.", 2)
-         + feature_card("wallet", "Plan around real numbers",
-                           "Daily spend, best season, nearest airport and local tips — "
-                           "enough to judge a trip before you commit to it.", 3)
-         + "</div>" + close_section())
+    html(heading("How it works", "Three steps to a shortlist you trust",
+                    "Describe how you travel and the ranking does the narrowing."))
+    for col, (ic, title, body) in zip(st.columns(3, gap="medium"), [
+        ("compass", "Describe your trip",
+         "Nine travel dimensions, a budget tier and a climate target. About a minute."),
+        ("sparkle", "See a ranked shortlist",
+         "Destinations ordered by how closely they match, each explaining its reasoning."),
+        ("wallet", "Plan around real numbers",
+         "Daily spend, best season, nearest airport and local tips before you commit."),
+    ]):
+        with col:
+            html(feature(ic, title, body))
 
-    html(section_head(
-        "Capabilities", "Everything you need to travel smarter",
-        "Built for travellers who want a decision, not a search results page."))
-    html('<div class="tw-grid tw-grid--3">'
-         + feature_card("globe", "Global catalogue",
-                           "Destinations across every inhabited region, each carrying "
-                           "climate, budget and accommodation data.", 1)
-         + feature_card("wallet", "Costs before booking",
-                           "Per-day estimates from budget tier and accommodation "
-                           "standard, scaled to your party and trip length.", 2)
-         + feature_card("sun", "Season guidance",
-                           "The months worth travelling in, inferred from latitude and "
-                           "climate rather than guessed.", 3)
-         + feature_card("plane", "Nearest airport, always",
-                           "Every destination resolves to a gateway airport — by direct "
-                           "match where one exists, by distance otherwise.", 4)
-         + feature_card("layers", "Genuinely different options",
-                           "Results are spread across distinct destination profiles, so "
-                           "a shortlist offers real alternatives.", 5)
-         + feature_card("shield", "Honest about gaps",
-                           "When a detail is missing from the catalogue TripWise says so "
-                           "instead of inventing a plausible answer.", 6)
-         + "</div>" + close_section())
+    html(heading("Capabilities", "Everything you need to travel smarter"))
+    features = [
+        ("globe", "Global catalogue",
+         "Destinations across every inhabited region, each carrying climate, "
+         "budget and accommodation data."),
+        ("wallet", "Costs before booking",
+         "Per-day estimates from budget tier and accommodation standard, scaled "
+         "to your party and trip length."),
+        ("sun", "Season guidance",
+         "The months worth travelling in, inferred from latitude and climate."),
+        ("plane", "Nearest airport, always",
+         "Every destination resolves to a gateway airport — by direct match "
+         "where one exists, by distance otherwise."),
+        ("layers", "Genuinely different options",
+         "Results spread across distinct destination profiles, so a shortlist "
+         "offers real alternatives."),
+        ("shield", "Honest about gaps",
+         "When a detail is missing from the catalogue TripWise says so rather "
+         "than inventing a plausible answer."),
+    ]
+    for start in (0, 3):
+        for col, (ic, title, body) in zip(st.columns(3, gap="medium"),
+                                          features[start:start + 3]):
+            with col:
+                html(feature(ic, title, body))
 
-    html(section_head(
-        "About", "Advanced recommendation technology, quietly",
-        "You should not need to understand the machinery to trust the result.",
-        anchor="about"))
-    html(about_block() + close_section())
+    html(heading("About", "Advanced recommendation technology, quietly",
+                    "You should not need to understand the machinery to trust "
+                    "the result."))
+    left, right = st.columns(2, gap="medium")
+    with left:
+        html(about())
+    with right:
+        html(data_promise())
 
-    html(section_head("Contact", "Ready when you are", "", anchor="contact"))
-    html(contact_block() + close_section())
-    html(footer())
+    html(heading("Contact", "Bring TripWise to your travellers"))
+    st.markdown(
+        "Agencies, airlines and tourism boards can run TripWise against their "
+        "own catalogue — your destinations, your inventory, your branding. "
+        "Reach us at **hello@tripwise.ai**.")
 
 
-def collect_answers() -> tuple[dict, bool]:
-    """Render the planner form and return the raw answers plus submit state."""
+def planner_form() -> tuple[dict, bool]:
+    """Collect preferences. Every control is a native widget."""
     with st.form("planner", border=False):
-        html('<div class="tw-panel">')
-        html('<div class="tw-fieldset__title">What you care about</div>')
-
+        st.markdown("**What you care about**")
         answers: dict = {}
-        cols = st.columns(3, gap="large")
+        cols = st.columns(3, gap="medium")
         for i, (key, label, hint) in enumerate(TASTES):
             with cols[i % 3]:
-                answers[key] = st.slider(label, TASTE_MIN, TASTE_MAX, 3,
-                                         help=hint, key=f"t_{key}")
+                answers[key] = st.slider(label, TASTE_MIN, TASTE_MAX,
+                                         3, help=hint, key=f"t_{key}")
 
-        html('<div class="tw-fieldset__title">Budget and climate</div>')
-        c1, c2, c3 = st.columns(3, gap="large")
+        st.markdown("**Budget and climate**")
+        c1, c2, c3 = st.columns(3, gap="medium")
         with c1:
             answers["budget"] = st.select_slider(
                 "Budget level", options=[1, 2, 3], value=2,
@@ -2718,129 +2070,108 @@ def collect_answers() -> tuple[dict, bool]:
             answers["stars"] = st.slider("Minimum accommodation standard",
                                          STARS_MIN, STARS_MAX, 4.0, 0.5)
 
-        html('<div class="tw-fieldset__title">Where and how long</div>')
-        c4, c5, c6 = st.columns(3, gap="large")
+        st.markdown("**Where and how long**")
+        c4, c5, c6 = st.columns(3, gap="medium")
         with c4:
             names = ["Anywhere"] + [REGION_LABEL[c] for c in REGION_COLS]
             picked = st.selectbox("Preferred region", names)
             answers["region"] = next(
                 (c for c in REGION_COLS if REGION_LABEL[c] == picked), None)
         with c5:
-            length = st.radio("Trip length", ["Short trip", "One week"], horizontal=True)
-            answers["trip_length"] = "short" if length == "Short trip" else "week"
+            answers["nights"] = st.slider("Nights", NIGHTS_MIN, 30, 7)
+            answers["trip_length"] = "short" if answers["nights"] <= 4 else "week"
         with c6:
             answers["travellers"] = st.number_input(
                 "Travellers", TRAVELLERS_MIN, TRAVELLERS_MAX, 2)
 
-        answers["nights"] = st.slider("Nights", NIGHTS_MIN, 30,
-                                      4 if answers["trip_length"] == "short" else 7)
         answers["needs_airport"] = st.checkbox(
             "Prefer destinations with a nearby airport", value=True)
 
-        html("</div>")
-        st.markdown("<div style='height:1.3rem'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:.8rem'></div>", unsafe_allow_html=True)
         submitted = st.form_submit_button("Find my destinations  →", type="primary")
 
     return answers, submitted
 
 
-def page_planner(df: pd.DataFrame, report: CatalogueReport,
-                 airports: AirportIndex) -> None:
-    render_nav("planner")
-    html("""
-<div class="tw-section" style="margin-top:8px;">
-<div class="tw-section__head tw-rise">
-<span class="tw-eyebrow">AI Planner</span>
-<h2>Tell us how you travel</h2>
-<p>Rate what matters to you. 1 means you are indifferent, 5 means it would
-shape the whole trip.</p>
-</div>
-</div>""")
+def tab_planner(df: pd.DataFrame, airports: AirportIndex) -> None:
+    html(heading("AI Planner", "Tell us how you travel",
+                    "Rate what matters to you. 1 means indifferent, 5 means it "
+                    "would shape the whole trip."))
 
-    raw_answers, submitted = collect_answers()
+    raw, submitted = planner_form()
     if not submitted:
-        html(footer())
+        st.caption("Set your preferences above, then press Find my destinations.")
         return
 
     blocking = validate_catalogue(df)
     if blocking:
         st.error(blocking, icon="⚠️")
-        html(footer())
         return
 
-    checked = validate_answers(raw_answers)
-    for notice in checked.notices:
-        st.warning(notice, icon="⚠️")
+    checked = validate_answers(raw)
+    for note in checked.notices:
+        st.warning(note, icon="⚠️")
     answers = checked.answers
 
-    pool, pool_notices = validate_pool(df, answers)
-    for notice in pool_notices:
-        st.info(notice, icon="ℹ️")
+    pool, notes = validate_pool(df, answers)
+    for note in notes:
+        st.info(note, icon="ℹ️")
 
     result = None
-    with guard("recommendation") as failure:
+    with guard("recommendation") as failed:
         bundle = fitted_models(fingerprint(df))
         prefs = build_preference_vector(df, answers)
         with st.spinner("Ranking destinations…"):
-            result = recommend(
-                df, bundle, prefs,
-                top_n=DEFAULT_TOP_N,
-                pool_index=pool.index.to_numpy(),
-            )
-    if failure or result is None:
-        st.error("Something went wrong while ranking destinations. "
-                 "Adjust a preference and try again.", icon="⚠️")
-        html(footer())
+            result = recommend(df, bundle, prefs,
+                                           top_n=DEFAULT_TOP_N,
+                                           pool_index=pool.index.to_numpy())
+    if failed or result is None:
+        st.error("Something went wrong while ranking. Adjust a preference and "
+                 "try again.", icon="⚠️")
         return
-
     if result.empty:
         st.warning("No destinations matched. Try widening the region or climate.",
                    icon="ℹ️")
-        html(footer())
         return
 
+    st.session_state["last_result"] = result
+    st.session_state["last_prefs"] = prefs
+    st.session_state["last_answers"] = answers
     render_results(result, prefs, answers, airports)
 
 
-def render_results(result: Recommendation, prefs: dict,
-                   answers: dict, airports: AirportIndex) -> None:
+def render_results(result, prefs: dict, answers: dict, airports: AirportIndex) -> None:
     frame = result.frame
+    html(heading("Your matches", "Where you should go",
+                    f"Ranked from {result.considered:,} destinations. Estimates "
+                    f"assume {answers['travellers']} traveller(s) over "
+                    f"{answers['nights']} nights."))
 
-    html(section_head(
-        "Your matches", "Where you should go",
-        f"Ranked against your answers from {result.considered:,} destinations. "
-        f"Estimates assume {answers['travellers']} traveller(s) over "
-        f"{answers['nights']} nights."))
-
-    cards = []
-    for i, (_, row) in enumerate(frame.iterrows()):
-        with guard(f"card for {row.get('city')}"):
-            cards.append(destination_card(card_payload(row, prefs, airports),
-                                             delay=(i % 6) + 1))
-    html(f'<div class="tw-grid tw-grid--3">{"".join(cards)}</div>' + close_section())
+    rows = list(frame.iterrows())
+    for start in range(0, len(rows), 3):
+        for col, (_, row) in zip(st.columns(3, gap="medium"), rows[start:start + 3]):
+            with col, guard(f"card for {row.get('city')}"):
+                html(destination(card_payload(row, prefs, airports)))
 
     readings: list = []
     with guard("insights"):
         readings = travel_insights(frame, prefs, answers, result.profiles)
     if readings:
-        html(section_head(
-            "AI insights", "What your results say",
-            "Read from the shortlist as a whole, not any single destination."))
-        html('<div class="tw-grid tw-grid--2">'
-             + "".join(insight_card(t, b, (i % 6) + 1)
-                       for i, (t, b) in enumerate(readings))
-             + "</div>" + close_section())
+        html(heading("AI insights", "What your results say",
+                        "Read from the shortlist as a whole."))
+        for start in range(0, len(readings), 2):
+            for col, (title, body) in zip(st.columns(2, gap="medium"),
+                                          readings[start:start + 2]):
+                with col:
+                    html(insight(title, body))
 
     with guard("charts") as failed:
         render_charts(frame, answers)
     if failed:
         st.caption("Charts are unavailable for this result set.")
 
-    html(footer())
-
 
 def chart(fig) -> None:
-    """Render a figure full width across Streamlit versions."""
     cfg = {"displayModeBar": False}
     try:
         st.plotly_chart(fig, width="stretch", config=cfg)
@@ -2851,43 +2182,85 @@ def chart(fig) -> None:
 def render_charts(frame: pd.DataFrame, answers: dict) -> None:
     import plotly.express as px
 
-    html(section_head("Comparison", "Your shortlist side by side",
-                         "The same destinations, measured two ways."))
-    left, right = st.columns(2, gap="large")
-    axis = dict(showgrid=True, gridcolor="rgba(9,16,32,.07)", zeroline=False,
-                tickfont=dict(color="#55637A", size=12),
-                title_font=dict(color="#55637A", size=12))
+    html(heading("Comparison", "Your shortlist side by side"))
+    axis = dict(showgrid=True, gridcolor="rgba(10,18,32,.07)", zeroline=False,
+                tickfont=dict(color="#5A6B80", size=12),
+                title_font=dict(color="#5A6B80", size=12))
     layout = dict(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                  font=dict(family="Inter, sans-serif", color="#080D18", size=13),
+                  font=dict(family="Inter, sans-serif", color="#0A1220", size=13),
                   margin=dict(t=10, b=10, l=10, r=10), height=320, showlegend=False)
     scale = ["#BAE6FD", "#0EA5E9", "#2563EB"]
 
+    left, right = st.columns(2, gap="medium")
     with left:
-        html('<div class="tw-card tw-chart"><h4>Match strength</h4>'
-             '<p>How closely each destination sits to your answers.</p>')
-        fig = px.bar(frame.sort_values("match"), x="match", y="city", orientation="h",
-                     color="match", color_continuous_scale=scale)
+        st.markdown("**Match strength**")
+        fig = px.bar(frame.sort_values("match"), x="match", y="city",
+                     orientation="h", color="match", color_continuous_scale=scale)
         fig.update_layout(**layout, xaxis=dict(**axis, title="Match %"),
                           yaxis=dict(**axis, title=""), coloraxis_showscale=False)
         fig.update_traces(hovertemplate="%{y}: %{x:.0f}%<extra></extra>")
         chart(fig)
-        html("</div>")
-
     with right:
         costs = frame.assign(daily=[daily_cost(r) for _, r in frame.iterrows()])
         costs["total"] = costs["daily"] * answers["nights"] * answers["travellers"]
-        html('<div class="tw-card tw-chart"><h4>Estimated trip cost</h4>'
-             f'<p>{answers["travellers"]} traveller(s), {answers["nights"]} nights, '
-             'before flights.</p>')
-        fig = px.bar(costs.sort_values("total"), x="total", y="city", orientation="h",
-                     color="total", color_continuous_scale=scale)
+        st.markdown(f"**Estimated trip cost** — {answers['travellers']} "
+                    f"traveller(s), {answers['nights']} nights, before flights")
+        fig = px.bar(costs.sort_values("total"), x="total", y="city",
+                     orientation="h", color="total", color_continuous_scale=scale)
         fig.update_layout(**layout, xaxis=dict(**axis, title="US$"),
                           yaxis=dict(**axis, title=""), coloraxis_showscale=False)
         fig.update_traces(hovertemplate="%{y}: $%{x:,.0f}<extra></extra>")
         chart(fig)
-        html("</div>")
 
-    html(close_section())
+
+def tab_explore(df: pd.DataFrame, airports: AirportIndex) -> None:
+    html(heading("Explore", "Browse the whole catalogue",
+                    "Filter, then look at where things land."))
+
+    c1, c2, c3 = st.columns([1.4, 1, 1.2], gap="medium")
+    with c1:
+        regions = st.multiselect(
+            "Region", REGION_COLS,
+            format_func=lambda c: REGION_LABEL[c], placeholder="All regions")
+    with c2:
+        tiers = st.multiselect("Budget", [1, 2, 3],
+                               format_func=lambda v: BUDGET_LABEL[v],
+                               placeholder="Any budget")
+    with c3:
+        lo, hi = st.slider("Average temperature (°C)", -10, 40, (-10, 40))
+
+    view = df
+    if regions:
+        mask = pd.Series(False, index=df.index)
+        for col in regions:
+            if col in df.columns:
+                mask |= df[col] == 1
+        view = view[mask]
+    if tiers:
+        view = view[view["budget_level_encoded"].astype(int).isin(tiers)]
+    view = view[(view["temp_avg_yearly"] >= lo) & (view["temp_avg_yearly"] <= hi)]
+
+    st.caption(f"{len(view):,} of {len(df):,} destinations match")
+    if view.empty:
+        st.info("Nothing matches those filters. Widen the range or clear a filter.")
+        return
+
+    map_tab, table_tab = st.tabs(["Map", "Table"])
+    with map_tab:
+        with guard("map"):
+            st.map(view.rename(columns={"latitude": "lat", "longitude": "lon"}),
+                   size=30, color="#2563EB")
+    with table_tab:
+        cols = ["city", "country", "temp_avg_yearly", "budget_level_encoded"]
+        cols += [c for c in ("name", "iata") if c in view.columns]
+        cols += TASTE_KEYS
+        table = view[[c for c in cols if c in view.columns]].copy()
+        table["budget_level_encoded"] = (table["budget_level_encoded"].astype(int)
+                                         .map(BUDGET_LABEL))
+        table = table.rename(columns={"temp_avg_yearly": "avg °C",
+                                      "budget_level_encoded": "budget",
+                                      "name": "airport", "iata": "code"})
+        st.dataframe(table, hide_index=True)
 
 
 # --------------------------------------------------------------------------- #
@@ -2895,36 +2268,26 @@ def render_charts(frame: pd.DataFrame, answers: dict) -> None:
 # --------------------------------------------------------------------------- #
 
 def main() -> None:
-    params = st.query_params
-    view = params.get("view", "home")
-    if isinstance(view, (list, tuple)):        # some contexts hand back a list
-        view = view[0] if view else "home"
-    view = str(view).strip().lower()
-    if view not in ("home", "planner"):
-        view = "home"
-
     html(THEME_CSS)
+    html(brand())
 
     df = report = airports = None
-    with guard("startup") as failure:
+    with guard("startup") as failed:
         df, report = load_catalogue()
         airports = airport_index(fingerprint(df))
-    if failure or df is None:
-        st.error("TripWise could not start: the destination catalogue failed to load. "
-                 "Check that tripwise_data.csv sits beside app.py.", icon="⚠️")
+    if failed or df is None:
+        st.error("TripWise could not start: the destination catalogue failed to "
+                 "load. Check that tripwise_data.csv sits beside app.py.",
+                 icon="⚠️")
         return
 
-    # The splash paints over the page rendering beneath it in this same run, then
-    # fades itself out — no blank frame, no blocking sleep, no second rerun. It
-    # plays only on a bare first load; every link carries a query param.
-    if len(params) == 0 and not st.session_state.get("seen_splash", False):
-        st.session_state["seen_splash"] = True
-        html(build_splash())
-
-    if view == "planner":
-        page_planner(df, report, airports)
-    else:
-        page_home(df, report, airports)
+    home, planner, explore = st.tabs(["  Home  ", "  AI Planner  ", "  Explore  "])
+    with home:
+        tab_home(df, report, airports)
+    with planner:
+        tab_planner(df, airports)
+    with explore:
+        tab_explore(df, airports)
 
 
 if __name__ == "__main__":
