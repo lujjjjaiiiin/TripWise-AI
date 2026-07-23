@@ -139,7 +139,10 @@ CSV_NAME = "tripwise_data.csv"
 # across a hot reload, so an instance built by a previous version of a class can
 # survive into new code that expects fields it does not have. Any change to a
 # cached return type must bump this.
-CACHE_VERSION = "3.1.0"
+CACHE_VERSION = "4.0.0"
+
+# Shown in the app so the running build can be identified from a screenshot.
+BUILD = "4.0.0"
 
 # ==========================================================================
 # ERROR HANDLING — Logging and failure containment.
@@ -2267,6 +2270,42 @@ def tab_explore(df: pd.DataFrame, airports: AirportIndex) -> None:
 # entry
 # --------------------------------------------------------------------------- #
 
+
+def diagnostics() -> None:
+    """A self-test the user can run in their own browser.
+
+    Tab switching and button clicks are handled by Streamlit's own JavaScript.
+    When they do nothing, the cause is in the browser — a stale cached bundle, a
+    dropped websocket, or scripts being blocked — none of which is visible from
+    the server. This makes the answer checkable in one click.
+    """
+    with st.expander("Having trouble? Run a quick check"):
+        st.caption(f"Build {BUILD}")
+
+        st.session_state.setdefault("_clicks", 0)
+        if st.button("Click me", key="_selftest"):
+            st.session_state["_clicks"] += 1
+
+        clicks = st.session_state["_clicks"]
+        if clicks:
+            st.success(f"Working — registered {clicks} click(s). "
+                       "Buttons and tabs are fine in this browser.")
+        else:
+            st.info("Press the button. The number should go up.")
+
+        st.markdown(
+            "**If the number never changes**, the page is not talking to the "
+            "server. In order of likelihood:\n\n"
+            "1. You are seeing a cached copy — reload with **Ctrl+Shift+R** "
+            "(**Cmd+Shift+R** on a Mac).\n"
+            "2. The connection dropped — reload the page.\n"
+            "3. An extension or strict privacy setting is blocking scripts — "
+            "try a private window or another browser.\n\n"
+            f"If it still fails, note the build number above ({BUILD}) "
+            "so the running version can be confirmed."
+        )
+
+
 def main() -> None:
     html(THEME_CSS)
     html(brand())
@@ -2280,6 +2319,8 @@ def main() -> None:
                  "load. Check that tripwise_data.csv sits beside app.py.",
                  icon="⚠️")
         return
+
+    diagnostics()
 
     home, planner, explore = st.tabs(["  Home  ", "  AI Planner  ", "  Explore  "])
     with home:
