@@ -139,10 +139,10 @@ CSV_NAME = "tripwise_data.csv"
 # across a hot reload, so an instance built by a previous version of a class can
 # survive into new code that expects fields it does not have. Any change to a
 # cached return type must bump this.
-CACHE_VERSION = "5.1.0"
+CACHE_VERSION = "5.2.0"
 
 # Shown in the app so the running build can be identified from a screenshot.
-BUILD = "5.1.0"
+BUILD = "5.2.0"
 
 # ==========================================================================
 # ERROR HANDLING — Logging and failure containment.
@@ -1254,7 +1254,7 @@ THEME_CSS = """
   background-attachment:fixed;
 }
 #MainMenu, footer{ visibility:hidden; }
-.block-container{ max-width:1180px; padding-top:1.5rem; padding-bottom:6rem; }
+.block-container{ max-width:1180px; padding-top:2rem; padding-bottom:3rem; }
 
 html, body, .stApp, [class*="css"]{
   font-family:'Inter',system-ui,-apple-system,sans-serif;
@@ -1278,7 +1278,7 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
 .tw-display{
   font-family:'Outfit',sans-serif; font-weight:800;
   letter-spacing:-.04em; line-height:1.02; color:var(--text);
-  font-size:clamp(2.5rem,6vw,4.6rem); margin:1rem 0 1.2rem;
+  font-size:clamp(2.6rem,6.2vw,4.8rem); margin:1.2rem 0 1.3rem;
 }
 .tw-grad{
   background:linear-gradient(96deg,var(--sky) 0%,var(--blue) 60%,var(--deep) 100%);
@@ -1308,14 +1308,36 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
 /* ======================================================================
    BRAND + HERO
    ==================================================================== */
-.tw-brand{ display:flex; align-items:center; gap:.65rem; margin-bottom:.3rem; }
+/* ---- header band: brand above the nav strip, read as one unit ---------- */
+.tw-header{
+  display:flex; align-items:baseline; justify-content:space-between;
+  flex-wrap:wrap; gap:.6rem; padding:.2rem 0 .9rem;
+}
+.tw-header__tag{
+  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.66rem;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--text-3);
+}
+.tw-brand{ display:flex; align-items:center; gap:.65rem; }
 .tw-brand svg{ width:30px; height:30px; }
 .tw-brand b{
   font-family:'Outfit',sans-serif; font-weight:800; font-size:1.24rem;
   letter-spacing:-.025em; color:var(--text);
 }
 
-.tw-hero{ position:relative; padding:1.2rem 0 .4rem; }
+.tw-badge{
+  display:inline-block; padding:.42rem 1rem; border-radius:99px;
+  background:rgba(14,165,233,.12); border:1px solid rgba(14,165,233,.22);
+  color:var(--blue); font-weight:600; font-size:.82rem; letter-spacing:.01em;
+}
+.tw-cta{
+  display:inline-block; margin-top:2rem; padding:.85rem 1.6rem; border-radius:99px;
+  background:linear-gradient(96deg,var(--sky),var(--blue)); color:#fff;
+  font-weight:600; font-size:.96rem;
+  box-shadow:0 12px 30px rgba(37,99,235,.32), 0 0 20px rgba(14,165,233,.2);
+}
+.tw-cta b{ font-weight:700; }
+
+.tw-hero{ position:relative; padding:1.6rem 0 .6rem; }
 .tw-hero__inner{ max-width:720px; }
 .tw-hero__plane{
   position:absolute; right:-1%; top:0; width:min(42%,420px);
@@ -1509,24 +1531,24 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
    TABS — the navigation, dressed as a glowing pill bar
    ==================================================================== */
 .stTabs [data-baseweb="tab-list"]{
-  gap:.3rem; border-bottom:none; padding:.4rem; margin-bottom:1.5rem;
-  background:rgba(255,255,255,.68);
-  backdrop-filter:blur(18px) saturate(1.5);
-  -webkit-backdrop-filter:blur(18px) saturate(1.5);
-  border:1px solid rgba(255,255,255,.82);
-  border-radius:99px; box-shadow:var(--sh-card); width:fit-content;
+  gap:.2rem; padding:0 0 0; margin:0 0 2.4rem;
+  background:transparent; width:100%;
+  border-bottom:1px solid rgba(30,58,138,.14);
 }
 .stTabs [data-baseweb="tab"]{
-  font-family:'Inter',sans-serif; font-weight:600; font-size:.93rem;
-  color:var(--text-3); padding:.6rem 1.5rem; border-radius:99px;
-  transition:color .24s var(--ease), background .24s var(--ease);
+  position:relative; font-family:'Inter',sans-serif; font-weight:600;
+  font-size:.95rem; color:var(--text-3); padding:.75rem 1.15rem;
+  border-radius:10px 10px 0 0; background:transparent;
+  transition:color .24s var(--ease);
 }
-.stTabs [data-baseweb="tab"]:hover{ color:var(--text); background:rgba(9,16,32,.05); }
-.stTabs [aria-selected="true"]{
-  color:#fff !important;
-  background:linear-gradient(96deg,var(--sky),var(--blue));
-  box-shadow:0 8px 22px rgba(37,99,235,.3), 0 0 20px rgba(14,165,233,.22);
+.stTabs [data-baseweb="tab"]:hover{ color:var(--blue); background:transparent; }
+.stTabs [data-baseweb="tab"]::after{
+  content:""; position:absolute; left:1.15rem; right:1.15rem; bottom:-1px;
+  height:2px; border-radius:2px; background:linear-gradient(90deg,var(--sky),var(--blue));
+  transform:scaleX(0); transform-origin:center; transition:transform .28s var(--ease);
 }
+.stTabs [aria-selected="true"]{ color:var(--blue) !important; background:transparent; }
+.stTabs [aria-selected="true"]::after{ transform:scaleX(1); }
 .stTabs [data-baseweb="tab-highlight"], .stTabs [data-baseweb="tab-border"]{ display:none; }
 .stTabs [data-baseweb="tab-panel"]{ padding-top:.5rem; }
 
@@ -1618,6 +1640,26 @@ div[role="radiogroup"] label:hover{ border-color:var(--sky); }
 [data-testid="stAlert"] p{ color:var(--text-2) !important; }
 
 hr, [data-testid="stDivider"] hr{ border-color:var(--line) !important; }
+
+/* ======================================================================
+   FOOTER
+   ==================================================================== */
+.tw-footer{
+  margin-top:5rem; padding:2.4rem 0 .6rem;
+  border-top:1px solid rgba(30,58,138,.14);
+  display:grid; gap:.7rem;
+}
+.tw-footer__brand{
+  font-family:'Outfit',sans-serif; font-weight:800; font-size:1.05rem;
+  color:var(--text); letter-spacing:-.02em;
+}
+.tw-footer__note{
+  color:var(--text-3); font-size:.84rem; line-height:1.7; max-width:560px;
+}
+.tw-footer__meta{
+  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.7rem;
+  color:var(--text-3); letter-spacing:.06em;
+}
 
 /* ======================================================================
    MOTION
@@ -1936,8 +1978,14 @@ def _e(value) -> str:
     return escape(str(value), quote=True)
 
 
-def brand() -> str:
+def header() -> str:
+    """The site header: mark, wordmark and a one-line positioning statement.
+
+    The navigation itself is the tab strip Streamlit renders directly beneath
+    this, styled to read as one continuous header band.
+    """
     return """
+<div class="tw-header">
 <div class="tw-brand">
 <svg viewBox="0 0 24 24" fill="none" stroke="url(#bg1)" stroke-width="1.8"
 stroke-linecap="round" stroke-linejoin="round">
@@ -1947,6 +1995,21 @@ stroke-linecap="round" stroke-linejoin="round">
 <path d="M2 13.4 21 4l-4.6 16.2-4.1-6.1z"/><path d="m12.3 14.1-3.4 6.9-1-5"/>
 </svg>
 <b>TripWise <span class="tw-grad">AI</span></b>
+</div>
+<div class="tw-header__tag">Intelligent destination matching</div>
+</div>"""
+
+
+def footer() -> str:
+    """Closes the page the way a product site would."""
+    return """
+<div class="tw-footer">
+<div class="tw-footer__brand">TripWise <span class="tw-grad">AI</span></div>
+<div class="tw-footer__note">Destination matching, cost estimates and climate
+guidance from a curated travel catalogue. Figures are planning estimates —
+confirm prices and seasons before booking.</div>
+<div class="tw-footer__meta">&copy; 2026 TripWise AI &nbsp;&middot;&nbsp;
+hello@tripwise.ai</div>
 </div>"""
 
 
@@ -1983,12 +2046,13 @@ fill="url(#planeBody)"/>
 </svg>
 </div>
 <div class="tw-hero__inner">
-<span class="tw-eyebrow tw-rise d1">Intelligent travel planning</span>
+<span class="tw-badge tw-rise d1">&#10024; AI-powered travel planning</span>
 <h1 class="tw-display tw-rise d2">Plan smarter with<br/><span class="tw-grad">TripWise AI</span></h1>
 <p class="tw-lede tw-rise d3">Tell us how you like to travel and TripWise ranks
 real destinations against your answers &mdash; with the cost, the climate, the
 right season and the nearest airport worked out before you commit to anything.</p>
-<div class="tw-stats tw-rise d4">{cells}</div>
+<div class="tw-cta tw-rise d4">Open the <b>AI Planner</b> tab to begin &nbsp;&rarr;</div>
+<div class="tw-stats tw-rise d5">{cells}</div>
 </div>
 </div>"""
 
@@ -2521,7 +2585,6 @@ def tab_home(df: pd.DataFrame, report, airports: AirportIndex) -> None:
     with right:
         html(data_promise())
 
-    diagnostics()
 
 
 def planner_form() -> tuple[dict, bool]:
@@ -2757,48 +2820,6 @@ def tab_explore(df: pd.DataFrame, airports: AirportIndex) -> None:
 # --------------------------------------------------------------------------- #
 
 
-def version_bar() -> None:
-    """Show the running build and a one-click interaction test, unhidden.
-
-    Which version is actually live has been ambiguous more than once, and a
-    hidden expander is easy to miss. This sits at the top of the page so the
-    build number and whether clicking works can both be read at a glance.
-    """
-    left, right = st.columns([3, 1], vertical_alignment="center")
-    with left:
-        st.caption(f"Build {BUILD}")
-    with right:
-        st.session_state.setdefault("_clicks", 0)
-        if st.button(f"Self-test: {st.session_state['_clicks']}", key="_selftest",
-                     help="Press this. The number must go up. If it does not, "
-                          "the page is not reaching the server — reload with "
-                          "Ctrl+Shift+R."):
-            st.session_state["_clicks"] += 1
-            st.rerun()
-
-
-def diagnostics() -> None:
-    """A self-test the user can run in their own browser.
-
-    Tab switching and button clicks are handled by Streamlit's own JavaScript.
-    When they do nothing, the cause is in the browser — a stale cached bundle, a
-    dropped websocket, or scripts being blocked — none of which is visible from
-    the server. This makes the answer checkable in one click.
-    """
-    with st.expander("Having trouble?"):
-        st.markdown(
-            "**If the number never changes**, the page is not talking to the "
-            "server. In order of likelihood:\n\n"
-            "1. You are seeing a cached copy — reload with **Ctrl+Shift+R** "
-            "(**Cmd+Shift+R** on a Mac).\n"
-            "2. The connection dropped — reload the page.\n"
-            "3. An extension or strict privacy setting is blocking scripts — "
-            "try a private window or another browser.\n\n"
-            f"If it still fails, note the build number above ({BUILD}) "
-            "so the running version can be confirmed."
-        )
-
-
 def main() -> None:
     html(THEME_CSS)
 
@@ -2810,8 +2831,7 @@ def main() -> None:
         st.session_state["seen_splash"] = True
         html(build_splash())
 
-    html(brand())
-    version_bar()
+    html(header())
 
     df = report = airports = None
     with guard("startup") as failed:
@@ -2823,13 +2843,15 @@ def main() -> None:
                  icon="⚠️")
         return
 
-    home, planner, explore = st.tabs(["  Home  ", "  AI Planner  ", "  Explore  "])
+    home, planner, explore = st.tabs(["Home", "AI Planner", "Explore"])
     with home:
         tab_home(df, report, airports)
     with planner:
         tab_planner(df, airports)
     with explore:
         tab_explore(df, airports)
+
+    html(footer())
 
 
 if __name__ == "__main__":
