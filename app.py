@@ -139,10 +139,10 @@ CSV_NAME = "tripwise_data.csv"
 # across a hot reload, so an instance built by a previous version of a class can
 # survive into new code that expects fields it does not have. Any change to a
 # cached return type must bump this.
-CACHE_VERSION = "4.2.0"
+CACHE_VERSION = "4.3.0"
 
 # Shown in the app so the running build can be identified from a screenshot.
-BUILD = "4.2.0"
+BUILD = "4.3.0"
 
 # ==========================================================================
 # ERROR HANDLING — Logging and failure containment.
@@ -1210,7 +1210,7 @@ def validate_catalogue(df: pd.DataFrame) -> str:
 
 FONTS = (
     "https://fonts.googleapis.com/css2?"
-    "family=Plus+Jakarta+Sans:wght@500;600;700;800&"
+    "family=Outfit:wght@400;500;600;700;800&"
     "family=Inter:wght@400;500;600&"
     "family=JetBrains+Mono:wght@400;500&display=swap"
 )
@@ -1225,8 +1225,8 @@ THEME_CSS = """
   --slate-2:#8B9AAC;
   --sky:#0EA5E9;
   --blue:#2563EB;
-  --line:rgba(10,18,32,.09);
-  --card:rgba(255,255,255,.78);
+  --line:rgba(30,58,138,.13);
+  --card:rgba(255,255,255,.62);
   --r-xl:30px; --r-lg:24px; --r-md:16px; --r-sm:10px;
   --sh-1:0 1px 2px rgba(10,18,32,.04), 0 6px 20px rgba(10,18,32,.06);
   --sh-2:0 2px 8px rgba(10,18,32,.05), 0 26px 56px rgba(37,99,235,.15);
@@ -1237,9 +1237,9 @@ THEME_CSS = """
 /* ---- page surface ---------------------------------------------------- */
 .stApp{
   background:
-    radial-gradient(900px 520px at 6% -8%, rgba(14,165,233,.13), transparent 60%),
-    radial-gradient(760px 480px at 96% 0%, rgba(37,99,235,.11), transparent 58%),
-    linear-gradient(180deg,#FBFDFF 0%,#F2F6FB 55%,#EBF1F8 100%);
+    radial-gradient(900px 520px at 6% -8%, rgba(255,255,255,.55), transparent 62%),
+    radial-gradient(760px 480px at 96% 0%, rgba(255,255,255,.4), transparent 58%),
+    linear-gradient(180deg,#DCEFFC 0%,#C9E6FA 55%,#BFE0F8 100%);
   background-attachment:fixed;
 }
 #MainMenu, footer{ visibility:hidden; }
@@ -1253,7 +1253,7 @@ html, body, .stApp, [class*="css"]{
 
 /* ---- type ------------------------------------------------------------ */
 .tw-display{
-  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;
+  font-family:'Outfit',sans-serif; font-weight:800;
   letter-spacing:-.042em; line-height:1.01; color:var(--ink);
   font-size:clamp(2.6rem,6.4vw,4.9rem); margin:1rem 0 1.3rem;
 }
@@ -1280,21 +1280,21 @@ html, body, .stApp, [class*="css"]{
   content:""; width:26px; height:1px;
   background:linear-gradient(90deg,var(--sky),transparent);
 }
-.tw-lede{ color:var(--slate); font-size:clamp(1rem,1.5vw,1.16rem);
+.tw-lede{ color:#3F5069; font-size:clamp(1rem,1.5vw,1.16rem);
   line-height:1.72; max-width:600px; }
 .tw-h2{
-  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;
+  font-family:'Outfit',sans-serif; font-weight:800;
   font-size:clamp(1.7rem,3.4vw,2.6rem); letter-spacing:-.032em;
   margin:.55rem 0 .6rem; color:var(--ink); line-height:1.08;
 }
-.tw-sub{ color:var(--slate); font-size:.98rem; line-height:1.65; margin:0 0 .4rem; }
+.tw-sub{ color:#3F5069; font-size:.98rem; line-height:1.65; margin:0 0 .4rem; }
 .tw-mono{ font-family:'JetBrains Mono',ui-monospace,monospace; }
 
 /* ---- brand row ------------------------------------------------------- */
 .tw-brand{ display:flex; align-items:center; gap:.6rem; margin-bottom:.2rem; }
 .tw-brand svg{ width:30px; height:30px; }
 .tw-brand b{
-  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1.24rem;
+  font-family:'Outfit',sans-serif; font-weight:800; font-size:1.24rem;
   letter-spacing:-.025em;
 }
 
@@ -1312,10 +1312,10 @@ html, body, .stApp, [class*="css"]{
 
 /* ---- cards ----------------------------------------------------------- */
 .tw-card{
-  background:var(--card);
+  background:linear-gradient(160deg, rgba(255,255,255,.82), rgba(219,234,254,.58));
   backdrop-filter:blur(16px) saturate(1.35);
   -webkit-backdrop-filter:blur(16px) saturate(1.35);
-  border:1px solid rgba(255,255,255,.86);
+  border:1px solid rgba(255,255,255,.75);
   border-radius:var(--r-lg); box-shadow:var(--sh-1);
   transition:transform .34s var(--ease), box-shadow .34s var(--ease);
   height:100%; overflow:hidden;
@@ -1336,7 +1336,7 @@ html, body, .stApp, [class*="css"]{
 .tw-feat__icon svg{ width:34px; height:34px; fill:none; stroke:#fff;
   stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
 .tw-feat h3{
-  font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:1.14rem;
+  font-family:'Outfit',sans-serif; font-weight:700; font-size:1.14rem;
   margin:0 0 .45rem; letter-spacing:-.015em; color:var(--ink);
 }
 .tw-feat p{ color:var(--slate); font-size:.92rem; line-height:1.65; margin:0; }
@@ -1350,7 +1350,7 @@ html, body, .stApp, [class*="css"]{
 }
 .tw-dest__place{ position:absolute; left:16px; bottom:12px; right:90px; }
 .tw-dest__place h3{
-  font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; color:#fff;
+  font-family:'Outfit',sans-serif; font-weight:800; color:#fff;
   font-size:1.26rem; letter-spacing:-.02em; margin:0; line-height:1.15;
   text-shadow:0 2px 12px rgba(0,0,0,.42);
 }
@@ -1400,7 +1400,7 @@ html, body, .stApp, [class*="css"]{
 .tw-insight__dot svg{ width:18px; height:18px; stroke:var(--blue); fill:none;
   stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
 .tw-insight h4{
-  font-family:'Plus Jakarta Sans',sans-serif; font-size:.95rem; font-weight:700;
+  font-family:'Outfit',sans-serif; font-size:.95rem; font-weight:700;
   margin:0 0 .3rem; color:var(--ink);
 }
 .tw-insight p{ margin:0; font-size:.89rem; line-height:1.65; color:var(--slate); }
@@ -1425,10 +1425,10 @@ html, body, .stApp, [class*="css"]{
 /* the tab strip is the navigation, so it is dressed as a glass pill bar */
 .stTabs [data-baseweb="tab-list"]{
   gap:.3rem; border-bottom:none; padding:.4rem; margin-bottom:1.4rem;
-  background:rgba(255,255,255,.7);
+  background:rgba(255,255,255,.66);
   backdrop-filter:blur(18px) saturate(1.5);
   -webkit-backdrop-filter:blur(18px) saturate(1.5);
-  border:1px solid rgba(255,255,255,.9);
+  border:1px solid rgba(255,255,255,.8);
   border-radius:99px; box-shadow:var(--sh-1); width:fit-content;
 }
 .stTabs [data-baseweb="tab"]{
@@ -1461,11 +1461,11 @@ html, body, .stApp, [class*="css"]{
   font-size:.64rem !important; color:var(--slate-2) !important;
 }
 div[data-baseweb="select"] > div{
-  background:rgba(255,255,255,.9) !important; border-radius:var(--r-sm) !important;
+  background:rgba(255,255,255,.92) !important; border-radius:var(--r-sm) !important;
   border:1px solid var(--line) !important; min-height:2.8rem !important;
 }
 div[role="radiogroup"] label{
-  background:rgba(255,255,255,.85); border:1px solid var(--line);
+  background:rgba(255,255,255,.88); border:1px solid var(--line);
   border-radius:99px; padding:.38rem .9rem !important; margin:0 .4rem 0 0 !important;
 }
 [data-testid="stMetricValue"]{
@@ -1473,7 +1473,7 @@ div[role="radiogroup"] label{
 }
 [data-testid="stExpander"] details{
   border:1px solid var(--line); border-radius:var(--r-md);
-  background:rgba(255,255,255,.65);
+  background:rgba(255,255,255,.72);
 }
 
 .stTabs [data-baseweb="tab-panel"]{ padding-top:.6rem; }
@@ -1940,6 +1940,280 @@ of inventing one.</p>
 </div>"""
 
 # ==========================================================================
+# OPENING ANIMATION — Generate the TripWise boarding splash as one self-contained HTML string.
+# ==========================================================================
+
+SPL_W, SPL_H = 1200, 620
+WIN_W, WIN_H = 300, 430
+WIN_Y = 78
+WIN_X = [72, 450, 828]
+
+# glass opening, relative to each window's top-left
+GX, GY, GW, GH = 40, 46, 220, 326
+GRX, GRY = 62, 50
+
+CLOUD_LAYERS = [
+    # id, baseFrequency, octaves, seed, matrix slope, matrix offset, opacity,
+    # mask id, drift seconds, drift px
+    ("cA", 0.009, 5, 11, -1.9, 1.18, 0.85, "mDeep", 26, 16),
+    ("cB", 0.017, 6, 5, -2.5, 1.45, 1.00, "mDeck", 19, 26),
+    ("cC", 0.034, 5, 29, -3.0, 1.72, 0.90, "mLow", 13, 38),
+    ("cD", 0.013, 4, 41, -2.6, 1.30, 0.28, "mHigh", 34, 12),
+]
+
+
+def cloud_filters() -> str:
+    out = []
+    for cid, freq, octv, seed, slope, off, *_ in CLOUD_LAYERS:
+        out.append(
+            f'<filter id="{cid}" x="0" y="0" width="100%" height="100%">'
+            f'<feTurbulence type="fractalNoise" baseFrequency="{freq}" '
+            f'numOctaves="{octv}" seed="{seed}" stitchTiles="stitch"/>'
+            f'<feColorMatrix type="matrix" values="'
+            f'0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  {slope} 0 0 0 {off}"/>'
+            f"</filter>"
+        )
+    return "".join(out)
+
+
+def deck_masks() -> str:
+    """Vertical ramps that place each cloud layer relative to the horizon."""
+    ramps = {
+        "mDeep": [(0.40, 0), (0.66, 1), (1.0, 1)],
+        "mDeck": [(0.44, 0), (0.70, 1), (1.0, 1)],
+        "mLow": [(0.58, 0), (0.84, 1), (1.0, 1)],
+        "mHigh": [(0.0, 1), (0.30, 0), (1.0, 0)],
+    }
+    out = []
+    for name, stops in ramps.items():
+        s = "".join(
+            f'<stop offset="{p * 100:.0f}%" stop-color="#fff" stop-opacity="{v}"/>'
+            for p, v in stops
+        )
+        out.append(
+            f'<linearGradient id="{name}g" x1="0" y1="0" x2="0" y2="1">{s}</linearGradient>'
+            f'<mask id="{name}" maskUnits="userSpaceOnUse" x="-40" y="0" '
+            f'width="{GW + 80}" height="{GH}">'
+            f'<rect x="-40" y="0" width="{GW + 80}" height="{GH}" fill="url(#{name}g)"/>'
+            f"</mask>"
+        )
+    return "".join(out)
+
+
+def window_svg(i: int, x: int) -> str:
+    """One window: moulded surround, recessed well, glass, sky, shade."""
+    gid = f"glass{i}"
+    seed_shift = i * 60
+    delay = 1.0 + i * 0.12
+
+    clouds = []
+    for n, (cid, freq, octv, seed, slope, off, op, mask, dur, dist) in enumerate(CLOUD_LAYERS):
+        # a per-window filter so each window shows a different piece of sky
+        wid = f"{cid}_{i}"
+        clouds.append(
+            f'<g class="tw-drift" style="animation-duration:{dur + i * 2}s;'
+            f"animation-delay:-{n * 3 + i}s;--dx:{dist}px\">"
+            f'<rect x="{GX - 40}" y="{GY}" width="{GW + 80}" height="{GH}" '
+            f'filter="url(#{wid})" mask="url(#{mask})" opacity="{op}" '
+            f'transform="translate(0,0)"/>'
+            f"</g>"
+        )
+
+    return f"""
+  <g transform="translate({x},{WIN_Y})">
+    <rect x="0" y="0" width="{WIN_W}" height="{WIN_H}" rx="96" ry="78" fill="url(#bezel)"
+          filter="url(#winShadow)"/>
+    <rect x="0" y="0" width="{WIN_W}" height="{WIN_H}" rx="96" ry="78" fill="none"
+          stroke="#aab3bd" stroke-width="1.1" opacity=".5"/>
+    <rect x="24" y="24" width="{WIN_W - 48}" height="{WIN_H - 48}" rx="76" ry="60" fill="url(#well)"/>
+    <rect x="32" y="34" width="{WIN_W - 64}" height="{WIN_H - 68}" rx="68" ry="54"
+          fill="#5c6672" opacity=".5"/>
+
+    <clipPath id="{gid}">
+      <rect x="{GX}" y="{GY}" width="{GW}" height="{GH}" rx="{GRX}" ry="{GRY}"/>
+    </clipPath>
+
+    <g clip-path="url(#{gid})">
+      <rect x="{GX}" y="{GY}" width="{GW}" height="{GH}" fill="url(#sky)"/>
+      <g transform="translate({GX},{GY})">{''.join(clouds)}</g>
+      <ellipse cx="{GX + GW * 0.74}" cy="{GY + GH * 0.34}" rx="{GW * 0.7}" ry="{GH * 0.42}"
+               fill="url(#sun)" opacity=".55"/>
+
+      <!-- shade: starts closed, glides up out of the opening -->
+      <g class="tw-shade" style="animation-delay:{delay}s">
+        <rect x="{GX - 4}" y="{GY - 2}" width="{GW + 8}" height="{GH + 4}" fill="url(#shade)"/>
+        <rect x="{GX - 4}" y="{GY + GH - 40}" width="{GW + 8}" height="42" fill="url(#lipG)"/>
+        <rect x="{GX + GW / 2 - 30}" y="{GY + GH - 26}" width="60" height="9" rx="4.5"
+              fill="url(#gripG)"/>
+      </g>
+
+      <!-- glass depth + reflection, always above the shade -->
+      <rect x="{GX}" y="{GY}" width="{GW}" height="26" fill="#33404f" opacity=".34"/>
+      <rect x="{GX}" y="{GY}" width="13" height="{GH}" fill="#33404f" opacity=".2"/>
+      <rect x="{GX + GW - 13}" y="{GY}" width="13" height="{GH}" fill="#33404f" opacity=".2"/>
+      <path d="M{GX} {GY + 250} L{GX + 150} {GY} L{GX + 210} {GY} L{GX} {GY + GH} Z"
+            fill="#fff" opacity=".08"/>
+    </g>
+
+    <path d="M{GX + 18} {GY + 6} C{GX + 60} {GY - 26} {GX + GW - 60} {GY - 26} {GX + GW - 18} {GY + 6}
+             C{GX + GW - 60} {GY - 12} {GX + 60} {GY - 12} {GX + 18} {GY + 6} Z" fill="url(#lipHi)"/>
+  </g>"""
+
+
+def build_splash() -> str:
+    windows = "".join(window_svg(i, x) for i, x in enumerate(WIN_X))
+
+    # per-window copies of each cloud filter, re-seeded so no two windows match
+    per_window = []
+    for i in range(3):
+        for cid, freq, octv, seed, slope, off, *_ in CLOUD_LAYERS:
+            per_window.append(
+                f'<filter id="{cid}_{i}" x="0" y="0" width="100%" height="100%">'
+                f'<feTurbulence type="fractalNoise" baseFrequency="{freq}" '
+                f'numOctaves="{octv}" seed="{seed + i * 60}" stitchTiles="stitch"/>'
+                f'<feColorMatrix type="matrix" values="'
+                f'0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  {slope} 0 0 0 {off}"/>'
+                f"</filter>"
+            )
+
+    return _flatten(f"""
+<style>
+.tw-splash, .tw-splash *{{
+  /* Decorative only. This is declared with !important on the overlay and every
+     descendant so a click always reaches the page beneath, even if the fade
+     animation never runs. An overlay that could swallow clicks was the most
+     likely cause of an earlier fault, and this makes that impossible. */
+  pointer-events:none !important;
+}}
+.tw-splash{{
+  position:fixed; inset:0; z-index:99998; display:grid; place-items:center;
+  background:linear-gradient(180deg,#DCEFFC 0%,#C9E6FA 45%,#BFE0F8 100%);
+  animation:twSplashOut .9s ease 4.4s forwards;
+}}
+@keyframes twSplashOut{{ to{{ opacity:0; visibility:hidden; display:none; }} }}
+.tw-splash .tw-scene{{
+  width:min(96vw,1240px); aspect-ratio:{SPL_W}/{SPL_H};
+  animation:twSceneIn 1.2s cubic-bezier(.2,.7,.3,1) both;
+}}
+@keyframes twSceneIn{{ from{{ opacity:0; transform:scale(1.05); }} to{{ opacity:1; transform:none; }} }}
+.tw-splash .tw-scene svg{{
+  width:100%; height:100%; display:block;
+  filter:drop-shadow(0 30px 64px rgba(66,80,96,.22));
+}}
+.tw-splash .tw-shade{{
+  transform:translateY(0);
+  animation:twShadeUp 2.2s cubic-bezier(.72,0,.18,1) forwards;
+}}
+@keyframes twShadeUp{{ to{{ transform:translateY(-{GH + 60}px); }} }}
+.tw-splash .tw-drift{{
+  animation-name:twDrift; animation-timing-function:ease-in-out;
+  animation-iteration-count:infinite; animation-direction:alternate;
+}}
+@keyframes twDrift{{
+  from{{ transform:translateX(calc(var(--dx) * -1)); }}
+  to{{ transform:translateX(var(--dx)); }}
+}}
+.tw-splash .tw-mark{{
+  position:absolute; left:0; right:0; bottom:7%; text-align:center; opacity:0;
+  animation:twMarkIn 1s cubic-bezier(.2,.7,.3,1) 2.8s both;
+}}
+.tw-splash .tw-mark .t{{
+  font-family:'Plus Jakarta Sans','Outfit',sans-serif; font-weight:800;
+  font-size:clamp(1.5rem,3.6vw,2.45rem); letter-spacing:-.02em;
+  background:linear-gradient(96deg,#0EA5E9,#2563EB);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#2563EB;
+  filter:drop-shadow(0 0 22px rgba(14,165,233,.45));
+}}
+.tw-splash .tw-mark .s{{
+  font-family:'Inter',sans-serif; margin-top:.5rem; color:#5A6B7E; font-weight:500;
+  font-size:clamp(.62rem,1.35vw,.8rem); letter-spacing:.34em; text-transform:uppercase;
+}}
+@keyframes twMarkIn{{ from{{ opacity:0; transform:translateY(12px); }} to{{ opacity:1; transform:none; }} }}
+@media (prefers-reduced-motion:reduce){{
+  .tw-splash .tw-shade{{ animation-duration:.01s; }}
+  .tw-splash .tw-drift{{ animation:none; }}
+  .tw-splash{{ animation:twSplashOut .5s linear 1.8s forwards; }}
+}}
+</style>
+<div class="tw-splash" aria-hidden="true">
+<div class="tw-scene">
+<svg viewBox="0 0 {SPL_W} {SPL_H}" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="bezel" x1=".25" y1="0" x2=".75" y2="1">
+<stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#f4f6f8"/>
+<stop offset="1" stop-color="#dbe1e7"/>
+</linearGradient>
+<linearGradient id="cabin" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#f1f4f7"/><stop offset=".42" stop-color="#e3e9ef"/>
+<stop offset="1" stop-color="#ced6df"/>
+</linearGradient>
+<radialGradient id="vign" cx="50%" cy="42%" r="72%">
+<stop offset="55%" stop-color="#000" stop-opacity="0"/>
+<stop offset="100%" stop-color="#48535f" stop-opacity=".16"/>
+</radialGradient>
+<filter id="winShadow" x="-25%" y="-25%" width="150%" height="150%">
+<feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#54626f" flood-opacity=".33"/>
+</filter>
+<linearGradient id="well" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#6f7883"/><stop offset=".28" stop-color="#98a1ab"/>
+<stop offset=".75" stop-color="#c9d0d8"/><stop offset="1" stop-color="#eef1f4"/>
+</linearGradient>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#1a4a8c"/><stop offset=".34" stop-color="#4886c4"/>
+<stop offset=".56" stop-color="#9ec8e8"/><stop offset=".72" stop-color="#d9eaf6"/>
+<stop offset="1" stop-color="#c2d9ec"/>
+</linearGradient>
+<radialGradient id="sun">
+<stop offset="0" stop-color="#fff6dc" stop-opacity=".85"/>
+<stop offset="55%" stop-color="#ffe9b8" stop-opacity=".22"/>
+<stop offset="100%" stop-color="#ffe9b8" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#d9dee4"/><stop offset=".08" stop-color="#f2f4f7"/>
+<stop offset=".5" stop-color="#fafbfc"/><stop offset=".92" stop-color="#eceff3"/>
+<stop offset="1" stop-color="#d3d9e0"/>
+</linearGradient>
+<linearGradient id="lipG" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#d3d9e0"/><stop offset="1" stop-color="#b3bbc5"/>
+</linearGradient>
+<linearGradient id="gripG" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#98a0aa"/><stop offset="1" stop-color="#727a85"/>
+</linearGradient>
+<linearGradient id="lipHi" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#ffffff" stop-opacity=".92"/>
+<stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+</linearGradient>
+{deck_masks()}
+{''.join(per_window)}
+</defs>
+<rect width="{SPL_W}" height="{SPL_H}" fill="url(#cabin)"/>
+<rect x="0" y="{SPL_H*0.055:.0f}" width="{SPL_W}" height="2" fill="#c3cbd4" opacity=".55"/>
+<rect x="0" y="{SPL_H*0.055+3:.0f}" width="{SPL_W}" height="1" fill="#ffffff" opacity=".9"/>
+<rect x="0" y="{SPL_H*0.905:.0f}" width="{SPL_W}" height="2" fill="#c3cbd4" opacity=".5"/>
+<rect x="0" y="{SPL_H*0.905+3:.0f}" width="{SPL_W}" height="1" fill="#ffffff" opacity=".85"/>
+{windows}
+<rect width="{SPL_W}" height="{SPL_H}" fill="url(#vign)" pointer-events="none"/>
+</svg>
+</div>
+<div class="tw-mark">
+<div class="t">TripWise AI</div>
+<div class="s">Plan smarter &middot; Travel further</div>
+</div>
+</div>
+""")
+
+
+def _flatten(markup: str) -> str:
+    """Strip leading indentation from every line.
+
+    Streamlit renders this through its Markdown parser, which treats any line
+    indented four spaces or more as a code block and would print the markup as
+    text instead of rendering it.
+    """
+    return "\n".join(line.lstrip() for line in markup.splitlines() if line.strip())
+
+# ==========================================================================
 # APPLICATION — TripWise AI — an AI travel platform.
 # ==========================================================================
 
@@ -2392,6 +2666,15 @@ def diagnostics() -> None:
 
 def main() -> None:
     html(THEME_CSS)
+
+    # The opening animation paints over the page that renders beneath it in this
+    # same run, then removes itself. It is decorative and declared
+    # pointer-events:none throughout, so it cannot intercept a click even if the
+    # animation never runs. Shown once per session.
+    if not st.session_state.get("seen_splash", False):
+        st.session_state["seen_splash"] = True
+        html(build_splash())
+
     html(brand())
     version_bar()
 
