@@ -139,10 +139,10 @@ CSV_NAME = "tripwise_data.csv"
 # across a hot reload, so an instance built by a previous version of a class can
 # survive into new code that expects fields it does not have. Any change to a
 # cached return type must bump this.
-CACHE_VERSION = "5.0.0"
+CACHE_VERSION = "5.1.0"
 
 # Shown in the app so the running build can be identified from a screenshot.
-BUILD = "5.0.0"
+BUILD = "5.1.0"
 
 # ==========================================================================
 # ERROR HANDLING — Logging and failure containment.
@@ -1205,7 +1205,7 @@ def validate_catalogue(df: pd.DataFrame) -> str:
     return ""
 
 # ==========================================================================
-# STYLING — Visual styling — dark navy travel-tech dashboard.
+# STYLING — Visual styling — the original light blue TripWise identity.
 # ==========================================================================
 
 FONTS = (
@@ -1223,27 +1223,21 @@ THEME_CSS = """
    TOKENS
    ==================================================================== */
 :root{
-  --navy-900:#060B16;
-  --navy-800:#0A1222;
-  --navy-700:#0E1A2E;
-  --navy-600:#13233C;
-  --navy-500:#1A2E4C;
+  --text:#0F172A;
+  --text-2:#3F5069;
+  --text-3:#64748B;
 
-  --text:#E9F0FA;
-  --text-2:#A7B8D0;
-  --text-3:#6F84A3;
+  --cyan:#0EA5E9;
+  --sky:#0EA5E9;
+  --blue:#2563EB;
+  --deep:#1E3A8A;
 
-  --cyan:#22D3EE;
-  --sky:#38BDF8;
-  --blue:#3B82F6;
-  --deep:#2563EB;
+  --line:rgba(30,58,138,.13);
+  --line-2:rgba(30,58,138,.22);
 
-  --line:rgba(120,160,220,.14);
-  --line-2:rgba(120,160,220,.24);
-
-  --glow-soft:0 0 24px rgba(34,211,238,.18);
-  --sh-card:0 1px 2px rgba(0,0,0,.3), 0 18px 44px rgba(0,0,0,.42);
-  --sh-lift:0 28px 68px rgba(0,0,0,.55), 0 0 40px rgba(56,189,248,.12);
+  --glow-soft:0 0 22px rgba(14,165,233,.2);
+  --sh-card:0 1px 2px rgba(9,16,32,.04), 0 10px 30px rgba(37,99,235,.1);
+  --sh-lift:0 26px 60px rgba(37,99,235,.2);
 
   --r-xl:28px; --r-lg:22px; --r-md:14px; --r-sm:10px;
   --ease:cubic-bezier(.22,.75,.28,1);
@@ -1254,10 +1248,9 @@ THEME_CSS = """
    ==================================================================== */
 .stApp{
   background:
-    radial-gradient(900px 520px at 8% -6%,  rgba(34,211,238,.10), transparent 60%),
-    radial-gradient(820px 500px at 94% 2%,  rgba(59,130,246,.13), transparent 58%),
-    radial-gradient(700px 620px at 50% 112%, rgba(56,189,248,.07), transparent 62%),
-    linear-gradient(180deg,#060B16 0%,#0A1222 45%,#0C1526 100%);
+    radial-gradient(900px 520px at 6% -8%, rgba(255,255,255,.55), transparent 62%),
+    radial-gradient(760px 480px at 96% 0%, rgba(255,255,255,.4), transparent 58%),
+    linear-gradient(180deg,#DCEFFC 0%,#C9E6FA 55%,#BFE0F8 100%);
   background-attachment:fixed;
 }
 #MainMenu, footer{ visibility:hidden; }
@@ -1267,8 +1260,8 @@ html, body, .stApp, [class*="css"]{
   font-family:'Inter',system-ui,-apple-system,sans-serif;
   color:var(--text); -webkit-font-smoothing:antialiased;
 }
-::selection{ background:rgba(34,211,238,.3); }
-:focus-visible{ outline:2px solid var(--cyan); outline-offset:3px; border-radius:8px; }
+::selection{ background:rgba(14,165,233,.22); }
+:focus-visible{ outline:2px solid var(--blue); outline-offset:3px; border-radius:8px; }
 
 /* Streamlit writes body text in its own colour; pull it onto the dark ground */
 .stMarkdown, .stMarkdown p, .stMarkdown li, .stCaption,
@@ -1288,19 +1281,19 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
   font-size:clamp(2.5rem,6vw,4.6rem); margin:1rem 0 1.2rem;
 }
 .tw-grad{
-  background:linear-gradient(100deg,var(--cyan) 0%,var(--sky) 45%,var(--blue) 100%);
+  background:linear-gradient(96deg,var(--sky) 0%,var(--blue) 60%,var(--deep) 100%);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:var(--sky);
-  filter:drop-shadow(0 0 28px rgba(34,211,238,.35));
+  filter:drop-shadow(0 0 24px rgba(14,165,233,.34));
 }
 .tw-eyebrow{
   font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.66rem;
-  letter-spacing:.26em; text-transform:uppercase; color:var(--cyan);
+  letter-spacing:.26em; text-transform:uppercase; color:var(--blue);
   display:inline-flex; align-items:center; gap:.6rem;
 }
 .tw-eyebrow::before{
   content:""; width:26px; height:1px;
-  background:linear-gradient(90deg,var(--cyan),transparent);
+  background:linear-gradient(90deg,var(--sky),transparent);
 }
 .tw-lede{ color:var(--text-2); font-size:clamp(1rem,1.5vw,1.14rem);
   line-height:1.72; max-width:580px; }
@@ -1316,8 +1309,7 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
    BRAND + HERO
    ==================================================================== */
 .tw-brand{ display:flex; align-items:center; gap:.65rem; margin-bottom:.3rem; }
-.tw-brand svg{ width:30px; height:30px;
-  filter:drop-shadow(0 0 12px rgba(34,211,238,.5)); }
+.tw-brand svg{ width:30px; height:30px; }
 .tw-brand b{
   font-family:'Outfit',sans-serif; font-weight:800; font-size:1.24rem;
   letter-spacing:-.025em; color:var(--text);
@@ -1344,7 +1336,7 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
   display:block; font-family:'JetBrains Mono',ui-monospace,monospace;
   font-weight:500; font-size:clamp(1.35rem,2.8vw,1.9rem);
   letter-spacing:-.03em;
-  background:linear-gradient(100deg,var(--cyan),var(--sky));
+  background:linear-gradient(96deg,var(--sky),var(--blue));
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent;
 }
@@ -1355,14 +1347,14 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
   gap:.8rem; margin:1.6rem 0 .4rem;
 }
 .tw-metric{
-  background:linear-gradient(158deg, rgba(26,46,76,.7), rgba(14,26,46,.82));
-  border:1px solid var(--line); border-radius:var(--r-md);
+  background:linear-gradient(160deg, rgba(255,255,255,.88), rgba(219,234,254,.62));
+  border:1px solid rgba(255,255,255,.8); border-radius:var(--r-md);
   padding:1.05rem 1.15rem; box-shadow:var(--sh-card);
 }
 .tw-metric b{
   display:block; font-family:'JetBrains Mono',ui-monospace,monospace;
   font-weight:500; font-size:1.55rem; letter-spacing:-.03em; line-height:1.1;
-  background:linear-gradient(100deg,var(--cyan),var(--sky));
+  background:linear-gradient(96deg,var(--sky),var(--blue));
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent;
 }
@@ -1376,10 +1368,10 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
    ==================================================================== */
 .tw-card{
   position:relative;
-  background:linear-gradient(158deg, rgba(26,46,76,.78) 0%, rgba(14,26,46,.86) 100%);
-  backdrop-filter:blur(14px) saturate(1.2);
-  -webkit-backdrop-filter:blur(14px) saturate(1.2);
-  border:1px solid var(--line);
+  background:linear-gradient(160deg, rgba(255,255,255,.85), rgba(219,234,254,.6));
+  backdrop-filter:blur(16px) saturate(1.35);
+  -webkit-backdrop-filter:blur(16px) saturate(1.35);
+  border:1px solid rgba(255,255,255,.75);
   border-radius:var(--r-lg); box-shadow:var(--sh-card);
   transition:transform .34s var(--ease), box-shadow .34s var(--ease),
              border-color .34s var(--ease);
@@ -1387,24 +1379,22 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
 }
 .tw-card::before{
   content:""; position:absolute; inset:0 0 auto; height:1px;
-  background:linear-gradient(90deg,transparent,rgba(56,189,248,.55),transparent);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.98),transparent);
 }
 .tw-card:hover{
   transform:translateY(-6px); box-shadow:var(--sh-lift);
-  border-color:rgba(56,189,248,.34);
+  border-color:rgba(14,165,233,.4);
 }
 
 .tw-feat{ padding:1.8rem 1.5rem; }
 .tw-feat__icon{
   width:64px; height:64px; border-radius:20px; display:grid; place-items:center;
-  background:linear-gradient(140deg, rgba(34,211,238,.2), rgba(59,130,246,.28));
-  border:1px solid rgba(56,189,248,.34);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.1), 0 0 26px rgba(34,211,238,.14);
+  background:linear-gradient(140deg, var(--sky), var(--blue));
+  box-shadow:0 14px 30px rgba(14,165,233,.32);
   margin-bottom:1.1rem;
 }
-.tw-feat__icon svg{ width:30px; height:30px; fill:none; stroke:var(--cyan);
-  stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round;
-  filter:drop-shadow(0 0 8px rgba(34,211,238,.5)); }
+.tw-feat__icon svg{ width:30px; height:30px; fill:none; stroke:#fff;
+  stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
 .tw-feat h3{
   font-family:'Outfit',sans-serif; font-weight:700; font-size:1.1rem;
   margin:0 0 .45rem; letter-spacing:-.02em; color:var(--text);
@@ -1418,7 +1408,7 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
 .tw-dest__art svg{ width:100%; height:100%; display:block; }
 .tw-dest__scrim{
   position:absolute; inset:auto 0 0 0; height:72%;
-  background:linear-gradient(180deg,transparent,rgba(6,11,22,.9));
+  background:linear-gradient(180deg,transparent,rgba(6,12,24,.7));
 }
 .tw-dest__place{ position:absolute; left:16px; bottom:12px; right:92px; }
 .tw-dest__place h3{
@@ -1429,10 +1419,10 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
 .tw-dest__place span{ color:rgba(233,240,250,.78); font-size:.78rem; }
 .tw-dest__match{
   position:absolute; right:12px; top:12px; padding:.34rem .64rem; border-radius:99px;
-  background:rgba(10,18,34,.82); border:1px solid rgba(56,189,248,.4);
+  background:rgba(255,255,255,.93); border:1px solid rgba(255,255,255,.9);
   backdrop-filter:blur(8px);
   font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.72rem;
-  color:var(--cyan); box-shadow:0 0 18px rgba(34,211,238,.22);
+  color:var(--blue); box-shadow:0 4px 14px rgba(0,0,0,.16);
 }
 .tw-dest__body{ padding:1.05rem 1.2rem 1.25rem; display:grid; gap:.85rem; }
 
@@ -1445,17 +1435,17 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
 .tw-facts b{ font-size:.9rem; font-weight:600; color:var(--text); }
 
 .tw-why{
-  border-left:2px solid var(--cyan); padding:.1rem 0 .1rem .8rem;
+  border-left:2px solid var(--sky); padding:.1rem 0 .1rem .8rem;
   color:var(--text-2); font-size:.86rem; line-height:1.58;
 }
 .tw-chips{ display:flex; flex-wrap:wrap; gap:.34rem; }
 .tw-chip{
   padding:.24rem .6rem; border-radius:99px; font-size:.7rem; font-weight:500;
-  background:rgba(34,211,238,.12); color:var(--cyan);
-  border:1px solid rgba(34,211,238,.24);
+  background:rgba(14,165,233,.11); color:#0369A1;
+  border:1px solid rgba(14,165,233,.2);
 }
 .tw-chip--muted{
-  background:rgba(120,160,220,.09); color:var(--text-3);
+  background:rgba(9,16,32,.05); color:var(--text-3);
   border-color:var(--line);
 }
 
@@ -1474,11 +1464,10 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
 .tw-insight__dot{
   width:38px; height:38px; border-radius:12px; flex:0 0 auto; display:grid;
   place-items:center;
-  background:linear-gradient(140deg, rgba(34,211,238,.18), rgba(59,130,246,.24));
-  border:1px solid rgba(56,189,248,.32);
-  box-shadow:0 0 20px rgba(34,211,238,.16);
+  background:linear-gradient(140deg, rgba(14,165,233,.16), rgba(37,99,235,.16));
+  border:1px solid rgba(37,99,235,.16);
 }
-.tw-insight__dot svg{ width:18px; height:18px; stroke:var(--cyan); fill:none;
+.tw-insight__dot svg{ width:18px; height:18px; stroke:var(--blue); fill:none;
   stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
 .tw-insight h4{
   font-family:'Outfit',sans-serif; font-size:.94rem; font-weight:700;
@@ -1496,26 +1485,24 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
              filter .24s var(--ease), border-color .24s var(--ease);
 }
 .stButton>button[kind="primary"], .stFormSubmitButton>button{
-  background:linear-gradient(100deg,var(--cyan) 0%,var(--sky) 48%,var(--blue) 100%);
-  color:#04121F !important; border:none;
-  box-shadow:0 10px 26px rgba(37,99,235,.34), 0 0 22px rgba(34,211,238,.26),
-             inset 0 1px 0 rgba(255,255,255,.28);
+  background:linear-gradient(96deg,var(--sky),var(--blue));
+  color:#fff !important; border:none;
+  box-shadow:0 10px 26px rgba(37,99,235,.32), 0 0 18px rgba(14,165,233,.2);
 }
 .stButton>button[kind="primary"]:hover, .stFormSubmitButton>button:hover{
-  transform:translateY(-2px); filter:brightness(1.06);
-  box-shadow:0 16px 36px rgba(37,99,235,.42), 0 0 34px rgba(34,211,238,.42),
-             inset 0 1px 0 rgba(255,255,255,.34);
+  transform:translateY(-2px); filter:brightness(1.04);
+  box-shadow:0 16px 36px rgba(37,99,235,.42), 0 0 28px rgba(14,165,233,.32);
 }
 .stButton>button[kind="primary"]:active, .stFormSubmitButton>button:active{
   transform:translateY(0); filter:brightness(.97);
 }
 .stButton>button[kind="secondary"]{
-  background:rgba(26,46,76,.6); color:var(--text) !important;
-  border:1px solid var(--line-2); box-shadow:0 6px 18px rgba(0,0,0,.3);
+  background:rgba(255,255,255,.86); color:var(--text) !important;
+  border:1px solid var(--line-2); box-shadow:var(--sh-card);
 }
 .stButton>button[kind="secondary"]:hover{
-  border-color:rgba(56,189,248,.55); color:var(--cyan) !important;
-  transform:translateY(-2px); box-shadow:0 10px 26px rgba(0,0,0,.36), var(--glow-soft);
+  border-color:var(--sky); color:var(--blue) !important;
+  transform:translateY(-2px); box-shadow:var(--sh-lift), var(--glow-soft);
 }
 
 /* ======================================================================
@@ -1523,10 +1510,10 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
    ==================================================================== */
 .stTabs [data-baseweb="tab-list"]{
   gap:.3rem; border-bottom:none; padding:.4rem; margin-bottom:1.5rem;
-  background:rgba(14,26,46,.72);
-  backdrop-filter:blur(16px) saturate(1.3);
-  -webkit-backdrop-filter:blur(16px) saturate(1.3);
-  border:1px solid var(--line);
+  background:rgba(255,255,255,.68);
+  backdrop-filter:blur(18px) saturate(1.5);
+  -webkit-backdrop-filter:blur(18px) saturate(1.5);
+  border:1px solid rgba(255,255,255,.82);
   border-radius:99px; box-shadow:var(--sh-card); width:fit-content;
 }
 .stTabs [data-baseweb="tab"]{
@@ -1534,11 +1521,11 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
   color:var(--text-3); padding:.6rem 1.5rem; border-radius:99px;
   transition:color .24s var(--ease), background .24s var(--ease);
 }
-.stTabs [data-baseweb="tab"]:hover{ color:var(--text); background:rgba(56,189,248,.1); }
+.stTabs [data-baseweb="tab"]:hover{ color:var(--text); background:rgba(9,16,32,.05); }
 .stTabs [aria-selected="true"]{
-  color:#04121F !important;
-  background:linear-gradient(100deg,var(--cyan),var(--sky));
-  box-shadow:0 8px 22px rgba(34,211,238,.3), 0 0 26px rgba(34,211,238,.24);
+  color:#fff !important;
+  background:linear-gradient(96deg,var(--sky),var(--blue));
+  box-shadow:0 8px 22px rgba(37,99,235,.3), 0 0 20px rgba(14,165,233,.22);
 }
 .stTabs [data-baseweb="tab-highlight"], .stTabs [data-baseweb="tab-border"]{ display:none; }
 .stTabs [data-baseweb="tab-panel"]{ padding-top:.5rem; }
@@ -1554,21 +1541,21 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
 }
 [data-testid="stThumbValue"]{
   font-family:'JetBrains Mono',ui-monospace,monospace !important;
-  font-size:.7rem !important; color:#04121F !important;
-  background:var(--cyan) !important; padding:.08rem .44rem !important;
-  border-radius:7px !important; box-shadow:0 0 14px rgba(34,211,238,.45) !important;
+  font-size:.7rem !important; color:#fff !important;
+  background:var(--blue) !important; padding:.08rem .44rem !important;
+  border-radius:7px !important;
 }
 [data-testid="stTickBarMin"], [data-testid="stTickBarMax"]{
   font-family:'JetBrains Mono',ui-monospace,monospace !important;
   font-size:.62rem !important; color:var(--text-3) !important;
 }
 [data-testid="stSlider"] [role="slider"]{
-  box-shadow:0 0 0 3px rgba(34,211,238,.22), 0 0 16px rgba(34,211,238,.4) !important;
+  box-shadow:0 2px 10px rgba(37,99,235,.34) !important;
 }
 
 div[data-baseweb="select"] > div,
 .stNumberInput input, .stTextInput input, .stNumberInput [data-baseweb="input"]{
-  background:rgba(14,26,46,.86) !important;
+  background:rgba(255,255,255,.92) !important;
   border:1px solid var(--line-2) !important;
   border-radius:var(--r-sm) !important;
   color:var(--text) !important;
@@ -1576,48 +1563,48 @@ div[data-baseweb="select"] > div,
 }
 div[data-baseweb="select"] > div:hover,
 .stNumberInput input:hover, .stTextInput input:hover{
-  border-color:rgba(56,189,248,.5) !important;
+  border-color:var(--sky) !important;
 }
 div[data-baseweb="select"] svg{ fill:var(--text-2) !important; }
 div[data-baseweb="select"] [data-baseweb="tag"]{
-  background:rgba(34,211,238,.16) !important;
-  border:1px solid rgba(34,211,238,.3) !important;
-  color:var(--cyan) !important;
+  background:rgba(14,165,233,.14) !important;
+  border:1px solid rgba(14,165,233,.26) !important;
+  color:#0369A1 !important;
 }
 
 /* Dropdown menus mount in a portal at the document root, outside .stApp, so
    they keep a white background unless targeted directly. */
 [data-baseweb="popover"] [role="listbox"],
 [data-baseweb="popover"] ul, [data-baseweb="menu"], [data-baseweb="menu"] ul{
-  background:#0E1A2E !important; border:1px solid var(--line-2) !important;
-  box-shadow:0 20px 48px rgba(0,0,0,.6) !important;
+  background:#FFFFFF !important; border:1px solid var(--line-2) !important;
+  box-shadow:0 18px 44px rgba(30,58,138,.16) !important;
 }
 [data-baseweb="menu"] li, [role="option"], [data-baseweb="menu"] li div{
   color:var(--text) !important;
 }
 [data-baseweb="menu"] li:hover, [role="option"]:hover{
-  background:rgba(56,189,248,.16) !important; color:var(--cyan) !important;
+  background:rgba(14,165,233,.12) !important; color:var(--blue) !important;
 }
 
 div[role="radiogroup"] label{
-  background:rgba(26,46,76,.55); border:1px solid var(--line-2);
+  background:rgba(255,255,255,.88); border:1px solid var(--line-2);
   border-radius:99px; padding:.4rem .95rem !important; margin:0 .4rem 0 0 !important;
   transition:all .22s var(--ease);
 }
-div[role="radiogroup"] label:hover{ border-color:rgba(56,189,248,.5); }
+div[role="radiogroup"] label:hover{ border-color:var(--sky); }
 
 /* ======================================================================
    DATA SURFACES
    ==================================================================== */
 [data-testid="stMetricValue"]{
   font-family:'JetBrains Mono',ui-monospace,monospace; font-weight:500;
-  color:var(--cyan);
+  color:var(--blue);
 }
 [data-testid="stMetricLabel"] p{ color:var(--text-3) !important; }
 
 [data-testid="stExpander"] details{
   border:1px solid var(--line); border-radius:var(--r-md);
-  background:rgba(14,26,46,.7);
+  background:rgba(255,255,255,.72);
 }
 [data-testid="stExpander"] summary{ color:var(--text-2) !important; }
 
@@ -1625,7 +1612,7 @@ div[role="radiogroup"] label:hover{ border-color:rgba(56,189,248,.5); }
   border:1px solid var(--line); border-radius:var(--r-md); overflow:hidden;
 }
 [data-testid="stAlert"]{
-  background:rgba(14,26,46,.85) !important; border:1px solid var(--line-2) !important;
+  background:rgba(255,255,255,.85) !important; border:1px solid var(--line-2) !important;
   border-radius:var(--r-md) !important; color:var(--text) !important;
 }
 [data-testid="stAlert"] p{ color:var(--text-2) !important; }
@@ -2245,15 +2232,14 @@ def build_splash() -> str:
     return _flatten(f"""
 <style>
 .tw-splash, .tw-splash *{{
-  /* Decorative only. This is declared with !important on the overlay and every
-     descendant so a click always reaches the page beneath, even if the fade
-     animation never runs. An overlay that could swallow clicks was the most
-     likely cause of an earlier fault, and this makes that impossible. */
+  /* Decorative only, declared with !important on the overlay and every
+     descendant so a click always reaches the page beneath even if the fade
+     animation never runs. */
   pointer-events:none !important;
 }}
 .tw-splash{{
   position:fixed; inset:0; z-index:99998; display:grid; place-items:center;
-  background:linear-gradient(180deg,#060B16 0%,#0A1222 50%,#0C1526 100%);
+  background:linear-gradient(180deg,#DCEFFC 0%,#C9E6FA 45%,#BFE0F8 100%);
   animation:twSplashOut .9s ease 4.4s forwards;
 }}
 @keyframes twSplashOut{{ to{{ opacity:0; visibility:hidden; display:none; }} }}
@@ -2264,7 +2250,7 @@ def build_splash() -> str:
 @keyframes twSceneIn{{ from{{ opacity:0; transform:scale(1.05); }} to{{ opacity:1; transform:none; }} }}
 .tw-splash .tw-scene svg{{
   width:100%; height:100%; display:block;
-  filter:drop-shadow(0 30px 64px rgba(0,0,0,.6));
+  filter:drop-shadow(0 30px 64px rgba(66,80,96,.22));
 }}
 .tw-splash .tw-shade{{
   transform:translateY(0);
@@ -2286,13 +2272,13 @@ def build_splash() -> str:
 .tw-splash .tw-mark .t{{
   font-family:'Plus Jakarta Sans','Outfit',sans-serif; font-weight:800;
   font-size:clamp(1.5rem,3.6vw,2.45rem); letter-spacing:-.02em;
-  background:linear-gradient(100deg,#22D3EE,#38BDF8);
+  background:linear-gradient(96deg,#0EA5E9,#2563EB);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:#2563EB;
-  filter:drop-shadow(0 0 26px rgba(34,211,238,.55));
+  filter:drop-shadow(0 0 22px rgba(14,165,233,.45));
 }}
 .tw-splash .tw-mark .s{{
-  font-family:'Inter',sans-serif; margin-top:.5rem; color:#A7B8D0; font-weight:500;
+  font-family:'Inter',sans-serif; margin-top:.5rem; color:#5A6B7E; font-weight:500;
   font-size:clamp(.62rem,1.35vw,.8rem); letter-spacing:.34em; text-transform:uppercase;
 }}
 @keyframes twMarkIn{{ from{{ opacity:0; transform:translateY(12px); }} to{{ opacity:1; transform:none; }} }}
@@ -2307,23 +2293,23 @@ def build_splash() -> str:
 <svg viewBox="0 0 {SPL_W} {SPL_H}" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <linearGradient id="bezel" x1=".25" y1="0" x2=".75" y2="1">
-<stop offset="0" stop-color="#3B4E6E"/><stop offset=".5" stop-color="#2C3C58"/>
-<stop offset="1" stop-color="#1E2B42"/>
+<stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#f4f6f8"/>
+<stop offset="1" stop-color="#dbe1e7"/>
 </linearGradient>
 <linearGradient id="cabin" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#1B2942"/><stop offset=".42" stop-color="#141F33"/>
-<stop offset="1" stop-color="#0D1626"/>
+<stop offset="0" stop-color="#f1f4f7"/><stop offset=".42" stop-color="#e3e9ef"/>
+<stop offset="1" stop-color="#ced6df"/>
 </linearGradient>
 <radialGradient id="vign" cx="50%" cy="42%" r="72%">
 <stop offset="55%" stop-color="#000" stop-opacity="0"/>
-<stop offset="100%" stop-color="#02060E" stop-opacity=".55"/>
+<stop offset="100%" stop-color="#48535f" stop-opacity=".16"/>
 </radialGradient>
 <filter id="winShadow" x="-25%" y="-25%" width="150%" height="150%">
-<feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#02060E" flood-opacity=".6"/>
+<feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#54626f" flood-opacity=".33"/>
 </filter>
 <linearGradient id="well" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#0E1728"/><stop offset=".28" stop-color="#1A2640"/>
-<stop offset=".75" stop-color="#2A3A56"/><stop offset="1" stop-color="#3A4D6E"/>
+<stop offset="0" stop-color="#6f7883"/><stop offset=".28" stop-color="#98a1ab"/>
+<stop offset=".75" stop-color="#c9d0d8"/><stop offset="1" stop-color="#eef1f4"/>
 </linearGradient>
 <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#1a4a8c"/><stop offset=".34" stop-color="#4886c4"/>
@@ -2336,15 +2322,15 @@ def build_splash() -> str:
 <stop offset="100%" stop-color="#ffe9b8" stop-opacity="0"/>
 </radialGradient>
 <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0" stop-color="#1C2942"/><stop offset=".08" stop-color="#2B3B58"/>
-<stop offset=".5" stop-color="#334566"/><stop offset=".92" stop-color="#2A3A56"/>
-<stop offset="1" stop-color="#1A2740"/>
+<stop offset="0" stop-color="#d9dee4"/><stop offset=".08" stop-color="#f2f4f7"/>
+<stop offset=".5" stop-color="#fafbfc"/><stop offset=".92" stop-color="#eceff3"/>
+<stop offset="1" stop-color="#d3d9e0"/>
 </linearGradient>
 <linearGradient id="lipG" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#22314C"/><stop offset="1" stop-color="#16223A"/>
+<stop offset="0" stop-color="#d3d9e0"/><stop offset="1" stop-color="#b3bbc5"/>
 </linearGradient>
 <linearGradient id="gripG" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#48daf0"/><stop offset="1" stop-color="#2b8fb8"/>
+<stop offset="0" stop-color="#98a0aa"/><stop offset="1" stop-color="#727a85"/>
 </linearGradient>
 <linearGradient id="lipHi" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#ffffff" stop-opacity=".92"/>
@@ -2354,10 +2340,10 @@ def build_splash() -> str:
 {''.join(per_window)}
 </defs>
 <rect width="{SPL_W}" height="{SPL_H}" fill="url(#cabin)"/>
-<rect x="0" y="{SPL_H*0.055:.0f}" width="{SPL_W}" height="2" fill="#22D3EE" opacity=".18"/>
-<rect x="0" y="{SPL_H*0.055+3:.0f}" width="{SPL_W}" height="1" fill="#3B4E6E" opacity=".5"/>
-<rect x="0" y="{SPL_H*0.905:.0f}" width="{SPL_W}" height="2" fill="#22D3EE" opacity=".14"/>
-<rect x="0" y="{SPL_H*0.905+3:.0f}" width="{SPL_W}" height="1" fill="#3B4E6E" opacity=".45"/>
+<rect x="0" y="{SPL_H*0.055:.0f}" width="{SPL_W}" height="2" fill="#c3cbd4" opacity=".55"/>
+<rect x="0" y="{SPL_H*0.055+3:.0f}" width="{SPL_W}" height="1" fill="#ffffff" opacity=".9"/>
+<rect x="0" y="{SPL_H*0.905:.0f}" width="{SPL_W}" height="2" fill="#c3cbd4" opacity=".5"/>
+<rect x="0" y="{SPL_H*0.905+3:.0f}" width="{SPL_W}" height="1" fill="#ffffff" opacity=".85"/>
 {windows}
 <rect width="{SPL_W}" height="{SPL_H}" fill="url(#vign)" pointer-events="none"/>
 </svg>
@@ -2684,15 +2670,15 @@ def render_charts(frame: pd.DataFrame, answers: dict) -> None:
     import plotly.express as px
 
     html(heading("Comparison", "Your shortlist side by side"))
-    axis = dict(showgrid=True, gridcolor="rgba(120,160,220,.12)", zeroline=False,
-                tickfont=dict(color="#6F84A3", size=12),
-                title_font=dict(color="#6F84A3", size=12))
+    axis = dict(showgrid=True, gridcolor="rgba(30,58,138,.1)", zeroline=False,
+                tickfont=dict(color="#3F5069", size=12),
+                title_font=dict(color="#3F5069", size=12))
     layout = dict(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                  font=dict(family="Inter, sans-serif", color="#E9F0FA", size=13),
+                  font=dict(family="Inter, sans-serif", color="#0F172A", size=13),
                   margin=dict(t=10, b=10, l=10, r=10), height=320, showlegend=False,
-                  hoverlabel=dict(bgcolor="#0E1A2E", bordercolor="#22D3EE",
-                                  font=dict(color="#E9F0FA")))
-    scale = ["#1E3A8A", "#38BDF8", "#22D3EE"]
+                  hoverlabel=dict(bgcolor="#FFFFFF", bordercolor="#0EA5E9",
+                                  font=dict(color="#0F172A")))
+    scale = ["#BAE6FD", "#0EA5E9", "#2563EB"]
 
     left, right = st.columns(2, gap="medium")
     with left:
@@ -2752,7 +2738,7 @@ def tab_explore(df: pd.DataFrame, airports: AirportIndex) -> None:
     with map_tab:
         with guard("map"):
             st.map(view.rename(columns={"latitude": "lat", "longitude": "lon"}),
-                   size=30, color="#22D3EE")
+                   size=30, color="#2563EB")
     with table_tab:
         cols = ["city", "country", "temp_avg_yearly", "budget_level_encoded"]
         cols += [c for c in ("name", "iata") if c in view.columns]
