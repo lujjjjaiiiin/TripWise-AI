@@ -139,10 +139,10 @@ CSV_NAME = "tripwise_data.csv"
 # across a hot reload, so an instance built by a previous version of a class can
 # survive into new code that expects fields it does not have. Any change to a
 # cached return type must bump this.
-CACHE_VERSION = "6.0.0"
+CACHE_VERSION = "6.1.0"
 
 # Shown in the app so the running build can be identified from a screenshot.
-BUILD = "6.0.0"
+BUILD = "6.1.0"
 
 # ==========================================================================
 # TRANSLATION — Interface translation.
@@ -328,6 +328,10 @@ STRINGS: dict[str, dict[str, str]] = {
                   "ar": "{a} من {b} وجهة مطابقة"},
     "exp.empty": {"en": "Nothing matches those filters. Widen the range or clear a filter.",
                   "ar": "لا نتائج بهذه الفلاتر. وسّع النطاق أو أزِل أحدها."},
+    "exp.zoom": {"en": "Zoom to", "ar": "تكبير إلى"},
+    "exp.world": {"en": "Whole world", "ar": "العالم كله"},
+    "exp.maphint": {"en": "Hover a marker to see its city.",
+                    "ar": "مرّر المؤشر فوق أي علامة لعرض المدينة."},
     "exp.table": {"en": "See the data behind the map", "ar": "عرض البيانات"},
     "exp.col.city": {"en": "city", "ar": "المدينة"},
     "exp.col.country": {"en": "country", "ar": "الدولة"},
@@ -1954,7 +1958,17 @@ hr, [data-testid="stDivider"] hr{ border-color:var(--line) !important; }
   70%{ opacity:0; transform:scale(1.35); }
   100%{ opacity:0; transform:scale(1.35); }
 }
-.tw-map__pin{ animation:twDrop .7s var(--ease) both; transform-origin:center; }
+.tw-map__pin{
+  animation:twDrop .7s var(--ease) both; transform-origin:center;
+  cursor:pointer; transition:transform .2s var(--ease);
+}
+.tw-map__pin:hover{ transform:scale(1.22); }
+
+/* Labels are hidden until hover. Pan and zoom would need JavaScript, which
+   st.markdown does not run, so reading a marker happens on hover instead and
+   the zoom level is chosen with a Streamlit control. */
+.tw-map__label--hover{ opacity:0; transition:opacity .2s var(--ease); }
+.tw-map__pin:hover .tw-map__label--hover{ opacity:1; }
 @keyframes twDrop{ from{ opacity:0; transform:translateY(-10px); } to{ opacity:1; transform:none; } }
 .tw-map__route{ animation:twFlow 22s linear infinite; }
 @keyframes twFlow{ to{ stroke-dashoffset:-300; } }
@@ -2879,6 +2893,34 @@ def project(lat: float, lon: float) -> tuple[float, float]:
     return x, y
 
 
+# Bounding boxes used to zoom the viewBox. Panning and zooming normally need
+# JavaScript, which st.markdown will not execute; driving the viewBox from a
+# Streamlit control gets the same result through a path that always works.
+FOCUS: dict[str, tuple[float, float, float, float]] = {
+    # key: (lat_north, lat_south, lon_west, lon_east)
+    "region_africa": (38.0, -36.0, -20.0, 53.0),
+    "region_asia": (56.0, -11.0, 40.0, 148.0),
+    "region_europe": (71.0, 34.0, -12.0, 45.0),
+    "region_middle_east": (43.0, 11.0, 24.0, 66.0),
+    "region_north_america": (72.0, 7.0, -170.0, -52.0),
+    "region_oceania": (0.0, -48.0, 110.0, 180.0),
+    "region_south_america": (14.0, -56.0, -82.0, -34.0),
+}
+
+
+def _viewbox(focus: str | None) -> str:
+    """The visible window, widened slightly so pins never touch the edge."""
+    box = FOCUS.get(focus or "")
+    if not box:
+        return f"0 0 {MAP_W:.0f} {MAP_H:.0f}"
+    north, south, west, east = box
+    x0, y0 = project(north, west)
+    x1, y1 = project(south, east)
+    pad_x, pad_y = (x1 - x0) * 0.06, (y1 - y0) * 0.08
+    return (f"{x0 - pad_x:.0f} {y0 - pad_y:.0f} "
+            f"{(x1 - x0) + pad_x * 2:.0f} {(y1 - y0) + pad_y * 2:.0f}")
+
+
 def _graticule() -> str:
     """Faint meridians and parallels — reads as a chart, not a picture."""
     lines = []
@@ -2913,12 +2955,16 @@ def _route(points: list[tuple[float, float]]) -> str:
     return d
 
 
-def world_map(points: list[dict], height: int = 420, routed: bool = False) -> str:
+def world_map(points: list[dict], height: int = 420, routed: bool = False,
+              focus: str | None = None) -> str:
     """Render destinations on the map.
 
     `points` are dicts with lat, lon, label and an optional `rank` used to size
     and light the marker. `routed` links them in order, which suits a shortlist
-    but not the full catalogue.
+    but not the full catalogue. `focus` zooms to a region.
+
+    Every marker carries a label that appears on hover, so the map can be read
+    without the JavaScript that pan-and-zoom would require.
     """
     uid = hashlib.sha256(
         "|".join(str(p.get("label", "")) for p in points).encode("utf-8")
@@ -2946,8 +2992,10 @@ def world_map(points: list[dict], height: int = 420, routed: bool = False) -> st
             f'fill="url(#halo{uid})" class="tw-map__halo"/>'
             f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r + 3:.1f}" fill="#FFFFFF" opacity=".9"/>'
             f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="url(#pin{uid})"/>'
-            + (f'<text x="{x:.1f}" y="{y - r - 12:.1f}" text-anchor="middle" '
-               f'class="tw-map__label">{escape(label)}</text>' if top and label else "")
+            + (f'<text x="{x:.1f}" y="{y - r - 11:.1f}" text-anchor="middle" '
+               f'class="tw-map__label{"" if top else " tw-map__label--hover"}">'
+               f'{escape(label)}</text>' if label else "")
+            + f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r + 12:.1f}" fill="transparent"/>'
             + "</g>"
         )
 
@@ -2964,7 +3012,7 @@ def world_map(points: list[dict], height: int = 420, routed: bool = False) -> st
 
     return f"""
 <div class="tw-map" style="--map-h:{height}px">
-<svg viewBox="0 0 {MAP_W:.0f} {MAP_H:.0f}" xmlns="http://www.w3.org/2000/svg"
+<svg viewBox="{_viewbox(focus)}" xmlns="http://www.w3.org/2000/svg"
 preserveAspectRatio="xMidYMid slice">
 <defs>
 <linearGradient id="sea{uid}" x1="0" y1="0" x2="0" y2="1">
@@ -3683,11 +3731,23 @@ def tab_explore(df: pd.DataFrame, airports: AirportIndex) -> None:
         st.info(t("exp.empty"))
         return
 
+    # Zoom is a Streamlit control rather than a mouse gesture: pan-and-zoom
+    # needs JavaScript, which st.markdown does not execute, and a select that
+    # always works beats a gesture that sometimes does not.
+    zoom, hint = st.columns([1, 2], vertical_alignment="center")
+    with zoom:
+        focus = st.selectbox(
+            t("exp.zoom"), [None] + REGION_COLS,
+            format_func=lambda c: t("exp.world") if c is None else t(f"region.{c}"),
+            key="map_focus")
+    with hint:
+        st.caption(t("exp.maphint"))
+
     with guard("map"):
         html(world_map([
             {"lat": r["latitude"], "lon": r["longitude"], "label": r["city"], "rank": i}
-            for i, (_, r) in enumerate(view.head(80).iterrows())
-        ], height=430))
+            for i, (_, r) in enumerate(view.head(120).iterrows())
+        ], height=440, focus=focus))
 
     with st.expander(t("exp.table")):
         cols = ["city", "country", "temp_avg_yearly", "budget_level_encoded"]
