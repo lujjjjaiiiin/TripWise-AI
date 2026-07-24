@@ -139,10 +139,10 @@ CSV_NAME = "tripwise_data.csv"
 # across a hot reload, so an instance built by a previous version of a class can
 # survive into new code that expects fields it does not have. Any change to a
 # cached return type must bump this.
-CACHE_VERSION = "4.3.0"
+CACHE_VERSION = "5.0.0"
 
 # Shown in the app so the running build can be identified from a screenshot.
-BUILD = "4.3.0"
+BUILD = "5.0.0"
 
 # ==========================================================================
 # ERROR HANDLING — Logging and failure containment.
@@ -1205,7 +1205,7 @@ def validate_catalogue(df: pd.DataFrame) -> str:
     return ""
 
 # ==========================================================================
-# STYLING — Visual styling.
+# STYLING — Visual styling — dark navy travel-tech dashboard.
 # ==========================================================================
 
 FONTS = (
@@ -1219,266 +1219,422 @@ THEME_CSS = """
 <style>
 @import url('__FONTS__');
 
+/* ======================================================================
+   TOKENS
+   ==================================================================== */
 :root{
-  --ink:#0A1220;
-  --slate:#5A6B80;
-  --slate-2:#8B9AAC;
-  --sky:#0EA5E9;
-  --blue:#2563EB;
-  --line:rgba(30,58,138,.13);
-  --card:rgba(255,255,255,.62);
-  --r-xl:30px; --r-lg:24px; --r-md:16px; --r-sm:10px;
-  --sh-1:0 1px 2px rgba(10,18,32,.04), 0 6px 20px rgba(10,18,32,.06);
-  --sh-2:0 2px 8px rgba(10,18,32,.05), 0 26px 56px rgba(37,99,235,.15);
-  --sh-3:0 34px 76px rgba(37,99,235,.2);
+  --navy-900:#060B16;
+  --navy-800:#0A1222;
+  --navy-700:#0E1A2E;
+  --navy-600:#13233C;
+  --navy-500:#1A2E4C;
+
+  --text:#E9F0FA;
+  --text-2:#A7B8D0;
+  --text-3:#6F84A3;
+
+  --cyan:#22D3EE;
+  --sky:#38BDF8;
+  --blue:#3B82F6;
+  --deep:#2563EB;
+
+  --line:rgba(120,160,220,.14);
+  --line-2:rgba(120,160,220,.24);
+
+  --glow-soft:0 0 24px rgba(34,211,238,.18);
+  --sh-card:0 1px 2px rgba(0,0,0,.3), 0 18px 44px rgba(0,0,0,.42);
+  --sh-lift:0 28px 68px rgba(0,0,0,.55), 0 0 40px rgba(56,189,248,.12);
+
+  --r-xl:28px; --r-lg:22px; --r-md:14px; --r-sm:10px;
   --ease:cubic-bezier(.22,.75,.28,1);
 }
 
-/* ---- page surface ---------------------------------------------------- */
+/* ======================================================================
+   PAGE
+   ==================================================================== */
 .stApp{
   background:
-    radial-gradient(900px 520px at 6% -8%, rgba(255,255,255,.55), transparent 62%),
-    radial-gradient(760px 480px at 96% 0%, rgba(255,255,255,.4), transparent 58%),
-    linear-gradient(180deg,#DCEFFC 0%,#C9E6FA 55%,#BFE0F8 100%);
+    radial-gradient(900px 520px at 8% -6%,  rgba(34,211,238,.10), transparent 60%),
+    radial-gradient(820px 500px at 94% 2%,  rgba(59,130,246,.13), transparent 58%),
+    radial-gradient(700px 620px at 50% 112%, rgba(56,189,248,.07), transparent 62%),
+    linear-gradient(180deg,#060B16 0%,#0A1222 45%,#0C1526 100%);
   background-attachment:fixed;
 }
 #MainMenu, footer{ visibility:hidden; }
-.block-container{ max-width:1160px; padding-top:1.6rem; padding-bottom:6rem; }
+.block-container{ max-width:1180px; padding-top:1.5rem; padding-bottom:6rem; }
 
 html, body, .stApp, [class*="css"]{
   font-family:'Inter',system-ui,-apple-system,sans-serif;
-  color:var(--ink); -webkit-font-smoothing:antialiased;
+  color:var(--text); -webkit-font-smoothing:antialiased;
 }
-::selection{ background:rgba(14,165,233,.2); }
+::selection{ background:rgba(34,211,238,.3); }
+:focus-visible{ outline:2px solid var(--cyan); outline-offset:3px; border-radius:8px; }
 
-/* ---- type ------------------------------------------------------------ */
+/* Streamlit writes body text in its own colour; pull it onto the dark ground */
+.stMarkdown, .stMarkdown p, .stMarkdown li, .stCaption,
+[data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p,
+[data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] li{
+  color:var(--text-2);
+}
+.stMarkdown strong, [data-testid="stMarkdownContainer"] strong{ color:var(--text); }
+h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
+
+/* ======================================================================
+   TYPE
+   ==================================================================== */
 .tw-display{
   font-family:'Outfit',sans-serif; font-weight:800;
-  letter-spacing:-.042em; line-height:1.01; color:var(--ink);
-  font-size:clamp(2.6rem,6.4vw,4.9rem); margin:1rem 0 1.3rem;
+  letter-spacing:-.04em; line-height:1.02; color:var(--text);
+  font-size:clamp(2.5rem,6vw,4.6rem); margin:1rem 0 1.2rem;
 }
-.tw-hero{ position:relative; padding:1.4rem 0 .5rem; }
-.tw-hero__inner{ max-width:760px; }
+.tw-grad{
+  background:linear-gradient(100deg,var(--cyan) 0%,var(--sky) 45%,var(--blue) 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:var(--sky);
+  filter:drop-shadow(0 0 28px rgba(34,211,238,.35));
+}
+.tw-eyebrow{
+  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.66rem;
+  letter-spacing:.26em; text-transform:uppercase; color:var(--cyan);
+  display:inline-flex; align-items:center; gap:.6rem;
+}
+.tw-eyebrow::before{
+  content:""; width:26px; height:1px;
+  background:linear-gradient(90deg,var(--cyan),transparent);
+}
+.tw-lede{ color:var(--text-2); font-size:clamp(1rem,1.5vw,1.14rem);
+  line-height:1.72; max-width:580px; }
+.tw-h2{
+  font-family:'Outfit',sans-serif; font-weight:700;
+  font-size:clamp(1.6rem,3.2vw,2.4rem); letter-spacing:-.03em;
+  margin:.5rem 0 .55rem; color:var(--text); line-height:1.1;
+}
+.tw-sub{ color:var(--text-3); font-size:.96rem; line-height:1.6; margin:0; }
+.tw-mono{ font-family:'JetBrains Mono',ui-monospace,monospace; }
+
+/* ======================================================================
+   BRAND + HERO
+   ==================================================================== */
+.tw-brand{ display:flex; align-items:center; gap:.65rem; margin-bottom:.3rem; }
+.tw-brand svg{ width:30px; height:30px;
+  filter:drop-shadow(0 0 12px rgba(34,211,238,.5)); }
+.tw-brand b{
+  font-family:'Outfit',sans-serif; font-weight:800; font-size:1.24rem;
+  letter-spacing:-.025em; color:var(--text);
+}
+
+.tw-hero{ position:relative; padding:1.2rem 0 .4rem; }
+.tw-hero__inner{ max-width:720px; }
 .tw-hero__plane{
-  position:absolute; right:-1%; top:2%; width:min(42%,430px);
+  position:absolute; right:-1%; top:0; width:min(42%,420px);
   pointer-events:none; animation:twFloat 8s ease-in-out infinite;
 }
 .tw-hero__plane svg{ width:100%; height:auto; overflow:visible; }
 @keyframes twFloat{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-14px) } }
 @media (max-width:920px){ .tw-hero__plane{ display:none } }
-.tw-grad{
-  background:linear-gradient(96deg,var(--sky),var(--blue));
-  -webkit-background-clip:text; background-clip:text;
-  -webkit-text-fill-color:transparent; color:var(--blue);
-}
-.tw-eyebrow{
-  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.68rem;
-  letter-spacing:.24em; text-transform:uppercase; color:var(--blue);
-  display:inline-flex; align-items:center; gap:.6rem;
-}
-.tw-eyebrow::before{
-  content:""; width:26px; height:1px;
-  background:linear-gradient(90deg,var(--sky),transparent);
-}
-.tw-lede{ color:#3F5069; font-size:clamp(1rem,1.5vw,1.16rem);
-  line-height:1.72; max-width:600px; }
-.tw-h2{
-  font-family:'Outfit',sans-serif; font-weight:800;
-  font-size:clamp(1.7rem,3.4vw,2.6rem); letter-spacing:-.032em;
-  margin:.55rem 0 .6rem; color:var(--ink); line-height:1.08;
-}
-.tw-sub{ color:#3F5069; font-size:.98rem; line-height:1.65; margin:0 0 .4rem; }
-.tw-mono{ font-family:'JetBrains Mono',ui-monospace,monospace; }
 
-/* ---- brand row ------------------------------------------------------- */
-.tw-brand{ display:flex; align-items:center; gap:.6rem; margin-bottom:.2rem; }
-.tw-brand svg{ width:30px; height:30px; }
-.tw-brand b{
-  font-family:'Outfit',sans-serif; font-weight:800; font-size:1.24rem;
-  letter-spacing:-.025em;
-}
-
-/* ---- stats ----------------------------------------------------------- */
+/* ======================================================================
+   METRICS
+   ==================================================================== */
 .tw-stats{
-  display:flex; gap:clamp(1.4rem,4vw,3rem); flex-wrap:wrap;
-  padding:1.4rem 0 .2rem; border-top:1px solid var(--line); margin-top:1.8rem;
+  display:flex; gap:clamp(1.2rem,3.5vw,2.6rem); flex-wrap:wrap;
+  padding:1.5rem 0 .3rem; border-top:1px solid var(--line); margin-top:1.8rem;
 }
 .tw-stat b{
   display:block; font-family:'JetBrains Mono',ui-monospace,monospace;
-  font-weight:500; font-size:clamp(1.3rem,2.6vw,1.75rem);
-  letter-spacing:-.03em; color:var(--ink);
+  font-weight:500; font-size:clamp(1.35rem,2.8vw,1.9rem);
+  letter-spacing:-.03em;
+  background:linear-gradient(100deg,var(--cyan),var(--sky));
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent;
 }
-.tw-stat span{ font-size:.76rem; color:var(--slate); }
+.tw-stat span{ font-size:.74rem; color:var(--text-3); letter-spacing:.05em; }
 
-/* ---- cards ----------------------------------------------------------- */
+.tw-metrics{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:.8rem; margin:1.6rem 0 .4rem;
+}
+.tw-metric{
+  background:linear-gradient(158deg, rgba(26,46,76,.7), rgba(14,26,46,.82));
+  border:1px solid var(--line); border-radius:var(--r-md);
+  padding:1.05rem 1.15rem; box-shadow:var(--sh-card);
+}
+.tw-metric b{
+  display:block; font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-weight:500; font-size:1.55rem; letter-spacing:-.03em; line-height:1.1;
+  background:linear-gradient(100deg,var(--cyan),var(--sky));
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.tw-metric span{
+  display:block; margin-top:.3rem; font-size:.7rem; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--text-3);
+}
+
+/* ======================================================================
+   CARDS
+   ==================================================================== */
 .tw-card{
-  background:linear-gradient(160deg, rgba(255,255,255,.82), rgba(219,234,254,.58));
-  backdrop-filter:blur(16px) saturate(1.35);
-  -webkit-backdrop-filter:blur(16px) saturate(1.35);
-  border:1px solid rgba(255,255,255,.75);
-  border-radius:var(--r-lg); box-shadow:var(--sh-1);
-  transition:transform .34s var(--ease), box-shadow .34s var(--ease);
+  position:relative;
+  background:linear-gradient(158deg, rgba(26,46,76,.78) 0%, rgba(14,26,46,.86) 100%);
+  backdrop-filter:blur(14px) saturate(1.2);
+  -webkit-backdrop-filter:blur(14px) saturate(1.2);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg); box-shadow:var(--sh-card);
+  transition:transform .34s var(--ease), box-shadow .34s var(--ease),
+             border-color .34s var(--ease);
   height:100%; overflow:hidden;
 }
 .tw-card::before{
   content:""; position:absolute; inset:0 0 auto; height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.98),transparent);
+  background:linear-gradient(90deg,transparent,rgba(56,189,248,.55),transparent);
 }
-.tw-card{ position:relative; }
-.tw-card:hover{ transform:translateY(-6px); box-shadow:var(--sh-3); }
+.tw-card:hover{
+  transform:translateY(-6px); box-shadow:var(--sh-lift);
+  border-color:rgba(56,189,248,.34);
+}
 
-.tw-feat{ padding:1.9rem 1.6rem; }
+.tw-feat{ padding:1.8rem 1.5rem; }
 .tw-feat__icon{
-  width:72px; height:72px; border-radius:22px; display:grid; place-items:center;
-  background:linear-gradient(140deg,var(--sky),var(--blue));
-  box-shadow:0 12px 26px rgba(14,165,233,.3); margin-bottom:1rem;
+  width:64px; height:64px; border-radius:20px; display:grid; place-items:center;
+  background:linear-gradient(140deg, rgba(34,211,238,.2), rgba(59,130,246,.28));
+  border:1px solid rgba(56,189,248,.34);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1), 0 0 26px rgba(34,211,238,.14);
+  margin-bottom:1.1rem;
 }
-.tw-feat__icon svg{ width:34px; height:34px; fill:none; stroke:#fff;
-  stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.tw-feat__icon svg{ width:30px; height:30px; fill:none; stroke:var(--cyan);
+  stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round;
+  filter:drop-shadow(0 0 8px rgba(34,211,238,.5)); }
 .tw-feat h3{
-  font-family:'Outfit',sans-serif; font-weight:700; font-size:1.14rem;
-  margin:0 0 .45rem; letter-spacing:-.015em; color:var(--ink);
+  font-family:'Outfit',sans-serif; font-weight:700; font-size:1.1rem;
+  margin:0 0 .45rem; letter-spacing:-.02em; color:var(--text);
 }
-.tw-feat p{ color:var(--slate); font-size:.92rem; line-height:1.65; margin:0; }
+.tw-feat p{ color:var(--text-2); font-size:.91rem; line-height:1.62; margin:0; }
 
-/* ---- destination card ------------------------------------------------ */
-.tw-dest__art{ position:relative; height:172px; overflow:hidden; }
+/* ======================================================================
+   DESTINATION CARD
+   ==================================================================== */
+.tw-dest__art{ position:relative; height:168px; overflow:hidden; }
 .tw-dest__art svg{ width:100%; height:100%; display:block; }
 .tw-dest__scrim{
-  position:absolute; inset:auto 0 0 0; height:66%;
-  background:linear-gradient(180deg,transparent,rgba(6,12,24,.7));
+  position:absolute; inset:auto 0 0 0; height:72%;
+  background:linear-gradient(180deg,transparent,rgba(6,11,22,.9));
 }
-.tw-dest__place{ position:absolute; left:16px; bottom:12px; right:90px; }
+.tw-dest__place{ position:absolute; left:16px; bottom:12px; right:92px; }
 .tw-dest__place h3{
   font-family:'Outfit',sans-serif; font-weight:800; color:#fff;
-  font-size:1.26rem; letter-spacing:-.02em; margin:0; line-height:1.15;
-  text-shadow:0 2px 12px rgba(0,0,0,.42);
+  font-size:1.24rem; letter-spacing:-.025em; margin:0; line-height:1.15;
+  text-shadow:0 2px 14px rgba(0,0,0,.6);
 }
-.tw-dest__place span{ color:rgba(255,255,255,.88); font-size:.8rem; }
+.tw-dest__place span{ color:rgba(233,240,250,.78); font-size:.78rem; }
 .tw-dest__match{
-  position:absolute; right:12px; top:12px; padding:.36rem .62rem; border-radius:99px;
-  background:rgba(255,255,255,.93);
-  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.74rem;
-  color:var(--blue); box-shadow:0 4px 14px rgba(0,0,0,.18);
+  position:absolute; right:12px; top:12px; padding:.34rem .64rem; border-radius:99px;
+  background:rgba(10,18,34,.82); border:1px solid rgba(56,189,248,.4);
+  backdrop-filter:blur(8px);
+  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.72rem;
+  color:var(--cyan); box-shadow:0 0 18px rgba(34,211,238,.22);
 }
-.tw-dest__body{ padding:1.1rem 1.25rem 1.3rem; display:grid; gap:.9rem; }
+.tw-dest__body{ padding:1.05rem 1.2rem 1.25rem; display:grid; gap:.85rem; }
 
 .tw-facts{ display:grid; grid-template-columns:repeat(3,1fr); gap:.4rem; }
 .tw-facts span{
   display:block; font-family:'JetBrains Mono',ui-monospace,monospace;
-  font-size:.58rem; letter-spacing:.13em; text-transform:uppercase;
-  color:var(--slate-2); margin-bottom:.15rem;
+  font-size:.56rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--text-3); margin-bottom:.18rem;
 }
-.tw-facts b{ font-size:.92rem; font-weight:600; color:var(--ink); }
+.tw-facts b{ font-size:.9rem; font-weight:600; color:var(--text); }
 
 .tw-why{
-  border-left:2px solid var(--sky); padding:.1rem 0 .1rem .8rem;
-  color:var(--slate); font-size:.88rem; line-height:1.6;
+  border-left:2px solid var(--cyan); padding:.1rem 0 .1rem .8rem;
+  color:var(--text-2); font-size:.86rem; line-height:1.58;
 }
-.tw-chips{ display:flex; flex-wrap:wrap; gap:.35rem; }
+.tw-chips{ display:flex; flex-wrap:wrap; gap:.34rem; }
 .tw-chip{
-  padding:.26rem .62rem; border-radius:99px; font-size:.72rem; font-weight:500;
-  background:rgba(14,165,233,.11); color:#0369A1;
+  padding:.24rem .6rem; border-radius:99px; font-size:.7rem; font-weight:500;
+  background:rgba(34,211,238,.12); color:var(--cyan);
+  border:1px solid rgba(34,211,238,.24);
 }
-.tw-chip--muted{ background:rgba(10,18,32,.05); color:var(--slate); }
+.tw-chip--muted{
+  background:rgba(120,160,220,.09); color:var(--text-3);
+  border-color:var(--line);
+}
 
-.tw-meta{ border-top:1px solid var(--line); padding-top:.8rem; display:grid; gap:.45rem; }
+.tw-meta{ border-top:1px solid var(--line); padding-top:.75rem; display:grid; gap:.42rem; }
 .tw-meta__row{ display:flex; gap:.55rem; align-items:flex-start;
-  font-size:.84rem; color:var(--slate); line-height:1.5; }
+  font-size:.82rem; color:var(--text-2); line-height:1.5; }
 .tw-meta__row svg{ width:14px; height:14px; flex:0 0 auto; margin-top:3px;
   stroke:var(--sky); fill:none; stroke-width:1.9;
   stroke-linecap:round; stroke-linejoin:round; }
-.tw-meta__row b{ color:var(--ink); font-weight:600; }
+.tw-meta__row b{ color:var(--text); font-weight:600; }
 
-/* ---- insight --------------------------------------------------------- */
-.tw-insight{ padding:1.3rem 1.4rem; display:flex; gap:1rem; align-items:flex-start; }
+/* ======================================================================
+   INSIGHT
+   ==================================================================== */
+.tw-insight{ padding:1.25rem 1.35rem; display:flex; gap:.95rem; align-items:flex-start; }
 .tw-insight__dot{
   width:38px; height:38px; border-radius:12px; flex:0 0 auto; display:grid;
-  place-items:center; background:linear-gradient(140deg,rgba(14,165,233,.16),rgba(37,99,235,.16));
-  border:1px solid rgba(37,99,235,.16);
+  place-items:center;
+  background:linear-gradient(140deg, rgba(34,211,238,.18), rgba(59,130,246,.24));
+  border:1px solid rgba(56,189,248,.32);
+  box-shadow:0 0 20px rgba(34,211,238,.16);
 }
-.tw-insight__dot svg{ width:18px; height:18px; stroke:var(--blue); fill:none;
+.tw-insight__dot svg{ width:18px; height:18px; stroke:var(--cyan); fill:none;
   stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
 .tw-insight h4{
-  font-family:'Outfit',sans-serif; font-size:.95rem; font-weight:700;
-  margin:0 0 .3rem; color:var(--ink);
+  font-family:'Outfit',sans-serif; font-size:.94rem; font-weight:700;
+  margin:0 0 .28rem; color:var(--text);
 }
-.tw-insight p{ margin:0; font-size:.89rem; line-height:1.65; color:var(--slate); }
+.tw-insight p{ margin:0; font-size:.87rem; line-height:1.62; color:var(--text-2); }
 
-/* ---- Streamlit widgets, styled in place ------------------------------ */
+/* ======================================================================
+   BUTTONS — gradient, rounded, with a restrained cyan glow
+   ==================================================================== */
 .stButton>button, .stFormSubmitButton>button, .stDownloadButton>button{
   font-family:'Inter',sans-serif; font-weight:600; font-size:.94rem;
-  border-radius:99px; padding:.66rem 1.5rem; border:1px solid var(--line);
-  transition:transform .22s var(--ease), box-shadow .22s var(--ease);
+  border-radius:99px; padding:.7rem 1.7rem;
+  transition:transform .24s var(--ease), box-shadow .24s var(--ease),
+             filter .24s var(--ease), border-color .24s var(--ease);
 }
 .stButton>button[kind="primary"], .stFormSubmitButton>button{
-  background:linear-gradient(96deg,var(--sky),var(--blue));
-  color:#fff; border:none; box-shadow:0 10px 24px rgba(37,99,235,.3);
+  background:linear-gradient(100deg,var(--cyan) 0%,var(--sky) 48%,var(--blue) 100%);
+  color:#04121F !important; border:none;
+  box-shadow:0 10px 26px rgba(37,99,235,.34), 0 0 22px rgba(34,211,238,.26),
+             inset 0 1px 0 rgba(255,255,255,.28);
 }
 .stButton>button[kind="primary"]:hover, .stFormSubmitButton>button:hover{
-  transform:translateY(-2px); box-shadow:0 16px 34px rgba(37,99,235,.4);
+  transform:translateY(-2px); filter:brightness(1.06);
+  box-shadow:0 16px 36px rgba(37,99,235,.42), 0 0 34px rgba(34,211,238,.42),
+             inset 0 1px 0 rgba(255,255,255,.34);
 }
-.stButton>button[kind="secondary"]{ background:rgba(255,255,255,.85); color:var(--ink); }
-.stButton>button[kind="secondary"]:hover{ border-color:var(--sky); color:var(--blue); }
+.stButton>button[kind="primary"]:active, .stFormSubmitButton>button:active{
+  transform:translateY(0); filter:brightness(.97);
+}
+.stButton>button[kind="secondary"]{
+  background:rgba(26,46,76,.6); color:var(--text) !important;
+  border:1px solid var(--line-2); box-shadow:0 6px 18px rgba(0,0,0,.3);
+}
+.stButton>button[kind="secondary"]:hover{
+  border-color:rgba(56,189,248,.55); color:var(--cyan) !important;
+  transform:translateY(-2px); box-shadow:0 10px 26px rgba(0,0,0,.36), var(--glow-soft);
+}
 
-/* tabs carry the navigation, so they get a little more presence */
-/* the tab strip is the navigation, so it is dressed as a glass pill bar */
+/* ======================================================================
+   TABS — the navigation, dressed as a glowing pill bar
+   ==================================================================== */
 .stTabs [data-baseweb="tab-list"]{
-  gap:.3rem; border-bottom:none; padding:.4rem; margin-bottom:1.4rem;
-  background:rgba(255,255,255,.66);
-  backdrop-filter:blur(18px) saturate(1.5);
-  -webkit-backdrop-filter:blur(18px) saturate(1.5);
-  border:1px solid rgba(255,255,255,.8);
-  border-radius:99px; box-shadow:var(--sh-1); width:fit-content;
+  gap:.3rem; border-bottom:none; padding:.4rem; margin-bottom:1.5rem;
+  background:rgba(14,26,46,.72);
+  backdrop-filter:blur(16px) saturate(1.3);
+  -webkit-backdrop-filter:blur(16px) saturate(1.3);
+  border:1px solid var(--line);
+  border-radius:99px; box-shadow:var(--sh-card); width:fit-content;
 }
 .stTabs [data-baseweb="tab"]{
-  font-family:'Inter',sans-serif; font-weight:600; font-size:.95rem;
-  color:var(--slate); padding:.62rem 1.5rem; border-radius:99px;
+  font-family:'Inter',sans-serif; font-weight:600; font-size:.93rem;
+  color:var(--text-3); padding:.6rem 1.5rem; border-radius:99px;
   transition:color .24s var(--ease), background .24s var(--ease);
 }
-.stTabs [data-baseweb="tab"]:hover{ color:var(--ink); background:rgba(10,18,32,.05); }
+.stTabs [data-baseweb="tab"]:hover{ color:var(--text); background:rgba(56,189,248,.1); }
 .stTabs [aria-selected="true"]{
-  color:#fff !important;
-  background:linear-gradient(96deg,var(--sky),var(--blue));
-  box-shadow:0 8px 20px rgba(37,99,235,.3);
+  color:#04121F !important;
+  background:linear-gradient(100deg,var(--cyan),var(--sky));
+  box-shadow:0 8px 22px rgba(34,211,238,.3), 0 0 26px rgba(34,211,238,.24);
 }
-.stTabs [data-baseweb="tab-highlight"], .stTabs [data-baseweb="tab-border"]{
-  display:none;
-}
+.stTabs [data-baseweb="tab-highlight"], .stTabs [data-baseweb="tab-border"]{ display:none; }
+.stTabs [data-baseweb="tab-panel"]{ padding-top:.5rem; }
 
+/* ======================================================================
+   FORM CONTROLS
+   ==================================================================== */
 [data-testid="stSlider"] label, .stSelectbox label, .stRadio label,
-.stCheckbox label, .stNumberInput label, .stMultiSelect label{
-  font-size:.86rem !important; font-weight:600 !important; color:var(--ink) !important;
+.stCheckbox label, .stNumberInput label, .stMultiSelect label,
+.stTextInput label, [data-testid="stWidgetLabel"] p{
+  font-size:.85rem !important; font-weight:600 !important;
+  color:var(--text-2) !important;
 }
 [data-testid="stThumbValue"]{
   font-family:'JetBrains Mono',ui-monospace,monospace !important;
-  font-size:.72rem !important; color:#fff !important;
-  background:var(--blue) !important; padding:.08rem .42rem !important;
-  border-radius:7px !important;
+  font-size:.7rem !important; color:#04121F !important;
+  background:var(--cyan) !important; padding:.08rem .44rem !important;
+  border-radius:7px !important; box-shadow:0 0 14px rgba(34,211,238,.45) !important;
 }
 [data-testid="stTickBarMin"], [data-testid="stTickBarMax"]{
   font-family:'JetBrains Mono',ui-monospace,monospace !important;
-  font-size:.64rem !important; color:var(--slate-2) !important;
+  font-size:.62rem !important; color:var(--text-3) !important;
 }
-div[data-baseweb="select"] > div{
-  background:rgba(255,255,255,.92) !important; border-radius:var(--r-sm) !important;
-  border:1px solid var(--line) !important; min-height:2.8rem !important;
+[data-testid="stSlider"] [role="slider"]{
+  box-shadow:0 0 0 3px rgba(34,211,238,.22), 0 0 16px rgba(34,211,238,.4) !important;
 }
+
+div[data-baseweb="select"] > div,
+.stNumberInput input, .stTextInput input, .stNumberInput [data-baseweb="input"]{
+  background:rgba(14,26,46,.86) !important;
+  border:1px solid var(--line-2) !important;
+  border-radius:var(--r-sm) !important;
+  color:var(--text) !important;
+  min-height:2.8rem !important;
+}
+div[data-baseweb="select"] > div:hover,
+.stNumberInput input:hover, .stTextInput input:hover{
+  border-color:rgba(56,189,248,.5) !important;
+}
+div[data-baseweb="select"] svg{ fill:var(--text-2) !important; }
+div[data-baseweb="select"] [data-baseweb="tag"]{
+  background:rgba(34,211,238,.16) !important;
+  border:1px solid rgba(34,211,238,.3) !important;
+  color:var(--cyan) !important;
+}
+
+/* Dropdown menus mount in a portal at the document root, outside .stApp, so
+   they keep a white background unless targeted directly. */
+[data-baseweb="popover"] [role="listbox"],
+[data-baseweb="popover"] ul, [data-baseweb="menu"], [data-baseweb="menu"] ul{
+  background:#0E1A2E !important; border:1px solid var(--line-2) !important;
+  box-shadow:0 20px 48px rgba(0,0,0,.6) !important;
+}
+[data-baseweb="menu"] li, [role="option"], [data-baseweb="menu"] li div{
+  color:var(--text) !important;
+}
+[data-baseweb="menu"] li:hover, [role="option"]:hover{
+  background:rgba(56,189,248,.16) !important; color:var(--cyan) !important;
+}
+
 div[role="radiogroup"] label{
-  background:rgba(255,255,255,.88); border:1px solid var(--line);
-  border-radius:99px; padding:.38rem .9rem !important; margin:0 .4rem 0 0 !important;
+  background:rgba(26,46,76,.55); border:1px solid var(--line-2);
+  border-radius:99px; padding:.4rem .95rem !important; margin:0 .4rem 0 0 !important;
+  transition:all .22s var(--ease);
 }
+div[role="radiogroup"] label:hover{ border-color:rgba(56,189,248,.5); }
+
+/* ======================================================================
+   DATA SURFACES
+   ==================================================================== */
 [data-testid="stMetricValue"]{
   font-family:'JetBrains Mono',ui-monospace,monospace; font-weight:500;
+  color:var(--cyan);
 }
+[data-testid="stMetricLabel"] p{ color:var(--text-3) !important; }
+
 [data-testid="stExpander"] details{
   border:1px solid var(--line); border-radius:var(--r-md);
-  background:rgba(255,255,255,.72);
+  background:rgba(14,26,46,.7);
 }
+[data-testid="stExpander"] summary{ color:var(--text-2) !important; }
 
-.stTabs [data-baseweb="tab-panel"]{ padding-top:.6rem; }
+[data-testid="stDataFrame"]{
+  border:1px solid var(--line); border-radius:var(--r-md); overflow:hidden;
+}
+[data-testid="stAlert"]{
+  background:rgba(14,26,46,.85) !important; border:1px solid var(--line-2) !important;
+  border-radius:var(--r-md) !important; color:var(--text) !important;
+}
+[data-testid="stAlert"] p{ color:var(--text-2) !important; }
 
-/* ---- entrance -------------------------------------------------------- */
+hr, [data-testid="stDivider"] hr{ border-color:var(--line) !important; }
+
+/* ======================================================================
+   MOTION
+   ==================================================================== */
 .tw-rise{ animation:twRise .7s var(--ease) both; }
 @keyframes twRise{ from{ opacity:0; transform:translateY(18px); } to{ opacity:1; transform:none; } }
 .d1{animation-delay:.05s}.d2{animation-delay:.13s}.d3{animation-delay:.21s}
@@ -1487,6 +1643,7 @@ div[role="radiogroup"] label{
 @media (max-width:640px){
   .tw-facts{ grid-template-columns:repeat(2,1fr); }
   .tw-dest__place{ right:80px; }
+  .stTabs [data-baseweb="tab"]{ padding:.55rem 1rem; font-size:.85rem; }
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
@@ -1849,6 +2006,15 @@ right season and the nearest airport worked out before you commit to anything.</
 </div>"""
 
 
+def metrics(items: list[tuple[str, str]]) -> str:
+    """A row of headline figures — the shape of an answer, before its detail."""
+    cells = "".join(
+        f'<div class="tw-metric"><b>{_e(value)}</b><span>{_e(label)}</span></div>'
+        for value, label in items
+    )
+    return f'<div class="tw-metrics tw-rise">{cells}</div>'
+
+
 def heading(eyebrow: str, title: str, sub: str = "") -> str:
     tail = f'<p class="tw-sub">{_e(sub)}</p>' if sub else ""
     return (f'<div class="tw-rise" style="margin:3rem 0 1.6rem;max-width:660px">'
@@ -2087,7 +2253,7 @@ def build_splash() -> str:
 }}
 .tw-splash{{
   position:fixed; inset:0; z-index:99998; display:grid; place-items:center;
-  background:linear-gradient(180deg,#DCEFFC 0%,#C9E6FA 45%,#BFE0F8 100%);
+  background:linear-gradient(180deg,#060B16 0%,#0A1222 50%,#0C1526 100%);
   animation:twSplashOut .9s ease 4.4s forwards;
 }}
 @keyframes twSplashOut{{ to{{ opacity:0; visibility:hidden; display:none; }} }}
@@ -2098,7 +2264,7 @@ def build_splash() -> str:
 @keyframes twSceneIn{{ from{{ opacity:0; transform:scale(1.05); }} to{{ opacity:1; transform:none; }} }}
 .tw-splash .tw-scene svg{{
   width:100%; height:100%; display:block;
-  filter:drop-shadow(0 30px 64px rgba(66,80,96,.22));
+  filter:drop-shadow(0 30px 64px rgba(0,0,0,.6));
 }}
 .tw-splash .tw-shade{{
   transform:translateY(0);
@@ -2120,13 +2286,13 @@ def build_splash() -> str:
 .tw-splash .tw-mark .t{{
   font-family:'Plus Jakarta Sans','Outfit',sans-serif; font-weight:800;
   font-size:clamp(1.5rem,3.6vw,2.45rem); letter-spacing:-.02em;
-  background:linear-gradient(96deg,#0EA5E9,#2563EB);
+  background:linear-gradient(100deg,#22D3EE,#38BDF8);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:#2563EB;
-  filter:drop-shadow(0 0 22px rgba(14,165,233,.45));
+  filter:drop-shadow(0 0 26px rgba(34,211,238,.55));
 }}
 .tw-splash .tw-mark .s{{
-  font-family:'Inter',sans-serif; margin-top:.5rem; color:#5A6B7E; font-weight:500;
+  font-family:'Inter',sans-serif; margin-top:.5rem; color:#A7B8D0; font-weight:500;
   font-size:clamp(.62rem,1.35vw,.8rem); letter-spacing:.34em; text-transform:uppercase;
 }}
 @keyframes twMarkIn{{ from{{ opacity:0; transform:translateY(12px); }} to{{ opacity:1; transform:none; }} }}
@@ -2141,23 +2307,23 @@ def build_splash() -> str:
 <svg viewBox="0 0 {SPL_W} {SPL_H}" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <linearGradient id="bezel" x1=".25" y1="0" x2=".75" y2="1">
-<stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#f4f6f8"/>
-<stop offset="1" stop-color="#dbe1e7"/>
+<stop offset="0" stop-color="#3B4E6E"/><stop offset=".5" stop-color="#2C3C58"/>
+<stop offset="1" stop-color="#1E2B42"/>
 </linearGradient>
 <linearGradient id="cabin" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#f1f4f7"/><stop offset=".42" stop-color="#e3e9ef"/>
-<stop offset="1" stop-color="#ced6df"/>
+<stop offset="0" stop-color="#1B2942"/><stop offset=".42" stop-color="#141F33"/>
+<stop offset="1" stop-color="#0D1626"/>
 </linearGradient>
 <radialGradient id="vign" cx="50%" cy="42%" r="72%">
 <stop offset="55%" stop-color="#000" stop-opacity="0"/>
-<stop offset="100%" stop-color="#48535f" stop-opacity=".16"/>
+<stop offset="100%" stop-color="#02060E" stop-opacity=".55"/>
 </radialGradient>
 <filter id="winShadow" x="-25%" y="-25%" width="150%" height="150%">
-<feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#54626f" flood-opacity=".33"/>
+<feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#02060E" flood-opacity=".6"/>
 </filter>
 <linearGradient id="well" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#6f7883"/><stop offset=".28" stop-color="#98a1ab"/>
-<stop offset=".75" stop-color="#c9d0d8"/><stop offset="1" stop-color="#eef1f4"/>
+<stop offset="0" stop-color="#0E1728"/><stop offset=".28" stop-color="#1A2640"/>
+<stop offset=".75" stop-color="#2A3A56"/><stop offset="1" stop-color="#3A4D6E"/>
 </linearGradient>
 <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#1a4a8c"/><stop offset=".34" stop-color="#4886c4"/>
@@ -2170,15 +2336,15 @@ def build_splash() -> str:
 <stop offset="100%" stop-color="#ffe9b8" stop-opacity="0"/>
 </radialGradient>
 <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0" stop-color="#d9dee4"/><stop offset=".08" stop-color="#f2f4f7"/>
-<stop offset=".5" stop-color="#fafbfc"/><stop offset=".92" stop-color="#eceff3"/>
-<stop offset="1" stop-color="#d3d9e0"/>
+<stop offset="0" stop-color="#1C2942"/><stop offset=".08" stop-color="#2B3B58"/>
+<stop offset=".5" stop-color="#334566"/><stop offset=".92" stop-color="#2A3A56"/>
+<stop offset="1" stop-color="#1A2740"/>
 </linearGradient>
 <linearGradient id="lipG" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#d3d9e0"/><stop offset="1" stop-color="#b3bbc5"/>
+<stop offset="0" stop-color="#22314C"/><stop offset="1" stop-color="#16223A"/>
 </linearGradient>
 <linearGradient id="gripG" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#98a0aa"/><stop offset="1" stop-color="#727a85"/>
+<stop offset="0" stop-color="#48daf0"/><stop offset="1" stop-color="#2b8fb8"/>
 </linearGradient>
 <linearGradient id="lipHi" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#ffffff" stop-opacity=".92"/>
@@ -2188,10 +2354,10 @@ def build_splash() -> str:
 {''.join(per_window)}
 </defs>
 <rect width="{SPL_W}" height="{SPL_H}" fill="url(#cabin)"/>
-<rect x="0" y="{SPL_H*0.055:.0f}" width="{SPL_W}" height="2" fill="#c3cbd4" opacity=".55"/>
-<rect x="0" y="{SPL_H*0.055+3:.0f}" width="{SPL_W}" height="1" fill="#ffffff" opacity=".9"/>
-<rect x="0" y="{SPL_H*0.905:.0f}" width="{SPL_W}" height="2" fill="#c3cbd4" opacity=".5"/>
-<rect x="0" y="{SPL_H*0.905+3:.0f}" width="{SPL_W}" height="1" fill="#ffffff" opacity=".85"/>
+<rect x="0" y="{SPL_H*0.055:.0f}" width="{SPL_W}" height="2" fill="#22D3EE" opacity=".18"/>
+<rect x="0" y="{SPL_H*0.055+3:.0f}" width="{SPL_W}" height="1" fill="#3B4E6E" opacity=".5"/>
+<rect x="0" y="{SPL_H*0.905:.0f}" width="{SPL_W}" height="2" fill="#22D3EE" opacity=".14"/>
+<rect x="0" y="{SPL_H*0.905+3:.0f}" width="{SPL_W}" height="1" fill="#3B4E6E" opacity=".45"/>
 {windows}
 <rect width="{SPL_W}" height="{SPL_H}" fill="url(#vign)" pointer-events="none"/>
 </svg>
@@ -2341,62 +2507,33 @@ def data_notice(report, airports: AirportIndex, df: pd.DataFrame) -> None:
 # --------------------------------------------------------------------------- #
 
 def tab_home(df: pd.DataFrame, report, airports: AirportIndex) -> None:
+    """The landing view.
+
+    Deliberately short. Three claims, a metrics strip and a route into the
+    planner — a dashboard earns trust by showing signal, not by explaining
+    itself at length.
+    """
     html(hero(catalogue_stats(df)))
     data_notice(report, airports, df)
 
-    html(heading("How it works", "Three steps to a shortlist you trust",
-                    "Describe how you travel and the ranking does the narrowing."))
+    html(heading("How it works", "Three steps to a shortlist you trust"))
     for col, (ic, title, body) in zip(st.columns(3, gap="medium"), [
         ("compass", "Describe your trip",
-         "Nine travel dimensions, a budget tier and a climate target. About a minute."),
+         "Nine travel dimensions, a budget tier and a climate target."),
         ("sparkle", "See a ranked shortlist",
-         "Destinations ordered by how closely they match, each explaining its reasoning."),
+         "Ranked by fit, spread across distinct destination profiles."),
         ("wallet", "Plan around real numbers",
-         "Daily spend, best season, nearest airport and local tips before you commit."),
+         "Cost, season and nearest airport before you commit."),
     ]):
         with col:
             html(feature(ic, title, body))
 
-    html(heading("Capabilities", "Everything you need to travel smarter"))
-    features = [
-        ("globe", "Global catalogue",
-         "Destinations across every inhabited region, each carrying climate, "
-         "budget and accommodation data."),
-        ("wallet", "Costs before booking",
-         "Per-day estimates from budget tier and accommodation standard, scaled "
-         "to your party and trip length."),
-        ("sun", "Season guidance",
-         "The months worth travelling in, inferred from latitude and climate."),
-        ("plane", "Nearest airport, always",
-         "Every destination resolves to a gateway airport — by direct match "
-         "where one exists, by distance otherwise."),
-        ("layers", "Genuinely different options",
-         "Results spread across distinct destination profiles, so a shortlist "
-         "offers real alternatives."),
-        ("shield", "Honest about gaps",
-         "When a detail is missing from the catalogue TripWise says so rather "
-         "than inventing a plausible answer."),
-    ]
-    for start in (0, 3):
-        for col, (ic, title, body) in zip(st.columns(3, gap="medium"),
-                                          features[start:start + 3]):
-            with col:
-                html(feature(ic, title, body))
-
-    html(heading("About", "Advanced recommendation technology, quietly",
-                    "You should not need to understand the machinery to trust "
-                    "the result."))
+    html(heading("Why it is trusted", "Advanced recommendation technology"))
     left, right = st.columns(2, gap="medium")
     with left:
         html(about())
     with right:
         html(data_promise())
-
-    html(heading("Contact", "Bring TripWise to your travellers"))
-    st.markdown(
-        "Agencies, airlines and tourism boards can run TripWise against their "
-        "own catalogue — your destinations, your inventory, your branding. "
-        "Reach us at **hello@tripwise.ai**.")
 
     diagnostics()
 
@@ -2496,10 +2633,20 @@ def tab_planner(df: pd.DataFrame, airports: AirportIndex) -> None:
 
 def render_results(result, prefs: dict, answers: dict, airports: AirportIndex) -> None:
     frame = result.frame
+
+    # headline numbers first — the shape of the answer before the detail
+    costs = [daily_cost(r) for _, r in frame.iterrows()]
+    nights, people = answers["nights"], answers["travellers"]
+    html(metrics([
+        (f"{frame['match'].max():.0f}%", "Best match"),
+        (f"${min(costs) * nights * people:,}", "From, per trip"),
+        (f"{len(result.profiles)}", "Distinct profiles"),
+        (f"{frame['temp_avg_yearly'].mean():.0f}°C", "Average climate"),
+    ]))
+
     html(heading("Your matches", "Where you should go",
-                    f"Ranked from {result.considered:,} destinations. Estimates "
-                    f"assume {answers['travellers']} traveller(s) over "
-                    f"{answers['nights']} nights."))
+                    f"Ranked from {result.considered:,} destinations for "
+                    f"{people} traveller(s) over {nights} nights."))
 
     rows = list(frame.iterrows())
     for start in range(0, len(rows), 3):
@@ -2537,13 +2684,15 @@ def render_charts(frame: pd.DataFrame, answers: dict) -> None:
     import plotly.express as px
 
     html(heading("Comparison", "Your shortlist side by side"))
-    axis = dict(showgrid=True, gridcolor="rgba(10,18,32,.07)", zeroline=False,
-                tickfont=dict(color="#5A6B80", size=12),
-                title_font=dict(color="#5A6B80", size=12))
+    axis = dict(showgrid=True, gridcolor="rgba(120,160,220,.12)", zeroline=False,
+                tickfont=dict(color="#6F84A3", size=12),
+                title_font=dict(color="#6F84A3", size=12))
     layout = dict(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                  font=dict(family="Inter, sans-serif", color="#0A1220", size=13),
-                  margin=dict(t=10, b=10, l=10, r=10), height=320, showlegend=False)
-    scale = ["#BAE6FD", "#0EA5E9", "#2563EB"]
+                  font=dict(family="Inter, sans-serif", color="#E9F0FA", size=13),
+                  margin=dict(t=10, b=10, l=10, r=10), height=320, showlegend=False,
+                  hoverlabel=dict(bgcolor="#0E1A2E", bordercolor="#22D3EE",
+                                  font=dict(color="#E9F0FA")))
+    scale = ["#1E3A8A", "#38BDF8", "#22D3EE"]
 
     left, right = st.columns(2, gap="medium")
     with left:
@@ -2603,7 +2752,7 @@ def tab_explore(df: pd.DataFrame, airports: AirportIndex) -> None:
     with map_tab:
         with guard("map"):
             st.map(view.rename(columns={"latitude": "lat", "longitude": "lon"}),
-                   size=30, color="#2563EB")
+                   size=30, color="#22D3EE")
     with table_tab:
         cols = ["city", "country", "temp_avg_yearly", "budget_level_encoded"]
         cols += [c for c in ("name", "iata") if c in view.columns]
