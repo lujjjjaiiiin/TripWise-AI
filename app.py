@@ -139,10 +139,275 @@ CSV_NAME = "tripwise_data.csv"
 # across a hot reload, so an instance built by a previous version of a class can
 # survive into new code that expects fields it does not have. Any change to a
 # cached return type must bump this.
-CACHE_VERSION = "5.2.0"
+CACHE_VERSION = "6.0.0"
 
 # Shown in the app so the running build can be identified from a screenshot.
-BUILD = "5.2.0"
+BUILD = "6.0.0"
+
+# ==========================================================================
+# TRANSLATION — Interface translation.
+# ==========================================================================
+
+LANGUAGES = {"en": "English", "ar": "العربية"}
+DEFAULT = "en"
+
+_current = DEFAULT
+
+
+def set_language(code: str) -> None:
+    global _current
+    _current = code if code in LANGUAGES else DEFAULT
+
+
+def language() -> str:
+    return _current
+
+
+def is_rtl() -> bool:
+    return _current == "ar"
+
+
+STRINGS: dict[str, dict[str, str]] = {
+    # ---- navigation -------------------------------------------------------
+    "nav.home": {"en": "Home", "ar": "الرئيسية"},
+    "nav.planner": {"en": "AI Planner", "ar": "المخطِّط الذكي"},
+    "nav.explore": {"en": "Explore", "ar": "استكشاف"},
+    "nav.section": {"en": "Section", "ar": "القسم"},
+    "nav.language": {"en": "Language", "ar": "اللغة"},
+
+    # ---- hero -------------------------------------------------------------
+    "hero.badge": {"en": "✦ AI-powered travel planning",
+                   "ar": "✦ تخطيط رحلات بالذكاء الاصطناعي"},
+    "hero.title_1": {"en": "Plan smarter with", "ar": "خطّط بذكاء مع"},
+    "hero.lede": {
+        "en": "Describe how you like to travel. TripWise ranks real destinations "
+              "against your answers — with cost, climate, season and the nearest "
+              "airport already worked out.",
+        "ar": "صِف طريقتك في السفر، ويرتّب TripWise وجهات حقيقية حسب إجاباتك — "
+              "مع التكلفة والمناخ وأفضل موسم وأقرب مطار، محسوبة مسبقًا.",
+    },
+    "hero.cta": {"en": "Start planning  →", "ar": "ابدأ التخطيط  ←"},
+    "hero.tagline": {"en": "Intelligent destination matching",
+                     "ar": "مطابقة ذكية للوجهات"},
+
+    # ---- home stats -------------------------------------------------------
+    "stat.destinations": {"en": "Destinations ranked", "ar": "وجهة مُرتَّبة"},
+    "stat.countries": {"en": "Countries covered", "ar": "دولة"},
+    "stat.regions": {"en": "World regions", "ar": "منطقة عالمية"},
+    "stat.dimensions": {"en": "Travel dimensions", "ar": "معيار سفر"},
+
+    # ---- home cards -------------------------------------------------------
+    "home.c1.title": {"en": "Tell it how you travel", "ar": "أخبِرنا كيف تسافر"},
+    "home.c1.body": {"en": "Nine preferences. About a minute.",
+                     "ar": "تسعة تفضيلات، في دقيقة تقريبًا."},
+    "home.c2.title": {"en": "Get a ranked shortlist", "ar": "احصل على قائمة مرتّبة"},
+    "home.c2.body": {"en": "Real destinations, scored against your answers.",
+                     "ar": "وجهات حقيقية، مُقيَّمة حسب إجاباتك."},
+    "home.c3.title": {"en": "See the whole picture", "ar": "شاهد الصورة كاملة"},
+    "home.c3.body": {"en": "Cost, season and nearest airport for each.",
+                     "ar": "التكلفة والموسم وأقرب مطار لكل وجهة."},
+
+    # ---- planner ----------------------------------------------------------
+    "plan.eyebrow": {"en": "AI Planner", "ar": "المخطِّط الذكي"},
+    "plan.title": {"en": "Tell us how you travel", "ar": "أخبِرنا كيف تسافر"},
+    "plan.sub": {"en": "1 means indifferent, 5 means it would shape the whole trip.",
+                 "ar": "١ يعني لا يهمّك، و٥ يعني أنه يشكّل الرحلة كلها."},
+    "plan.group.tastes": {"en": "What you care about", "ar": "ما الذي يهمّك"},
+    "plan.group.budget": {"en": "Budget and climate", "ar": "الميزانية والمناخ"},
+    "plan.group.where": {"en": "Where and how long", "ar": "الوجهة والمدة"},
+    "plan.budget": {"en": "Low Budget", "ar": "ميزانية محدودة"},
+    "plan.temp": {"en": "Preferred average temperature (°C)",
+                  "ar": "متوسط الحرارة المفضّل (°م)"},
+    "plan.stars": {"en": "Minimum accommodation standard",
+                   "ar": "أدنى مستوى للإقامة"},
+    "plan.region": {"en": "Preferred region", "ar": "المنطقة المفضّلة"},
+    "plan.anywhere": {"en": "Anywhere", "ar": "أي مكان"},
+    "plan.nights": {"en": "Nights", "ar": "عدد الليالي"},
+    "plan.travellers": {"en": "Travellers", "ar": "عدد المسافرين"},
+    "plan.airport": {"en": "Prefer destinations with a nearby airport",
+                     "ar": "أفضّل وجهات قريبة من مطار"},
+    "plan.submit": {"en": "Find my destinations  →", "ar": "اعرض وجهاتي  ←"},
+    "plan.hint": {"en": "Set your preferences above, then press the button.",
+                  "ar": "اضبط تفضيلاتك بالأعلى ثم اضغط الزر."},
+
+    # ---- tastes -----------------------------------------------------------
+    "taste.culture": {"en": "Culture", "ar": "الثقافة"},
+    "taste.adventure": {"en": "Adventure", "ar": "المغامرة"},
+    "taste.nature": {"en": "Nature", "ar": "الطبيعة"},
+    "taste.beaches": {"en": "Beaches", "ar": "الشواطئ"},
+    "taste.nightlife": {"en": "Nightlife", "ar": "الحياة الليلية"},
+    "taste.cuisine": {"en": "Food", "ar": "الطعام"},
+    "taste.wellness": {"en": "Wellness", "ar": "الاسترخاء"},
+    "taste.urban": {"en": "City life", "ar": "حياة المدن"},
+    "taste.seclusion": {"en": "Quiet", "ar": "الهدوء"},
+    "taste.balanced": {"en": "Balanced", "ar": "متوازن"},
+
+    "hint.culture": {"en": "Museums, old towns, landmarks",
+                     "ar": "المتاحف والمدن القديمة والمعالم"},
+    "hint.adventure": {"en": "Hiking, diving, adrenaline",
+                       "ar": "المشي والغوص والإثارة"},
+    "hint.nature": {"en": "Parks, mountains, wildlife",
+                    "ar": "الحدائق والجبال والحياة البرية"},
+    "hint.beaches": {"en": "Coastline and swimming", "ar": "السواحل والسباحة"},
+    "hint.nightlife": {"en": "Bars, music, late nights",
+                       "ar": "المقاهي والموسيقى والسهر"},
+    "hint.cuisine": {"en": "Restaurants and street food",
+                     "ar": "المطاعم وأكل الشوارع"},
+    "hint.wellness": {"en": "Spas, retreats, slow days",
+                      "ar": "المنتجعات والاسترخاء"},
+    "hint.urban": {"en": "Design, shopping, skylines",
+                   "ar": "التصميم والتسوّق وناطحات السحاب"},
+    "hint.seclusion": {"en": "Few crowds, room to breathe",
+                       "ar": "ازدحام أقل ومساحة أوسع"},
+
+    # ---- regions ----------------------------------------------------------
+    "region.region_africa": {"en": "Africa", "ar": "أفريقيا"},
+    "region.region_asia": {"en": "Asia", "ar": "آسيا"},
+    "region.region_europe": {"en": "Europe", "ar": "أوروبا"},
+    "region.region_middle_east": {"en": "Middle East", "ar": "الشرق الأوسط"},
+    "region.region_north_america": {"en": "North America", "ar": "أمريكا الشمالية"},
+    "region.region_oceania": {"en": "Oceania", "ar": "أوقيانوسيا"},
+    "region.region_south_america": {"en": "South America", "ar": "أمريكا الجنوبية"},
+
+    # ---- budget tiers -----------------------------------------------------
+    "budget.1": {"en": "Budget", "ar": "اقتصادية"},
+    "budget.2": {"en": "Mid-range", "ar": "متوسطة"},
+    "budget.3": {"en": "Luxury", "ar": "فاخرة"},
+
+    # ---- results ----------------------------------------------------------
+    "res.eyebrow": {"en": "Your matches", "ar": "نتائجك"},
+    "res.title": {"en": "Where you should go", "ar": "إلى أين تذهب"},
+    "res.sub": {"en": "Ranked from {n} destinations for {p} traveller(s) over {k} nights.",
+                "ar": "مرتّبة من {n} وجهة، لـ{p} مسافر خلال {k} ليالٍ."},
+    "res.metric.match": {"en": "Best match", "ar": "أعلى تطابق"},
+    "res.metric.from": {"en": "From, per trip", "ar": "تبدأ من، للرحلة"},
+    "res.metric.profiles": {"en": "Distinct profiles", "ar": "أنماط مختلفة"},
+    "res.metric.climate": {"en": "Average climate", "ar": "متوسط المناخ"},
+    "res.none": {"en": "No destinations matched. Try widening the region or climate.",
+                 "ar": "لا توجد نتائج مطابقة. جرّب توسيع المنطقة أو المناخ."},
+    "res.error": {"en": "Something went wrong while ranking. Adjust a preference and try again.",
+                  "ar": "حدث خطأ أثناء الترتيب. عدّل أحد التفضيلات وحاول مجددًا."},
+
+    # ---- destination card -------------------------------------------------
+    "card.match": {"en": "match", "ar": "تطابق"},
+    "card.budget": {"en": "Budget", "ar": "الميزانية"},
+    "card.perday": {"en": "Per day", "ar": "لليوم"},
+    "card.climate": {"en": "Climate", "ar": "المناخ"},
+    "card.airport": {"en": "Nearest airport", "ar": "أقرب مطار"},
+    "card.season": {"en": "Best season", "ar": "أفضل موسم"},
+    "card.weather": {"en": "Weather", "ar": "الطقس"},
+    "card.stay": {"en": "Suggested stay", "ar": "إقامة مقترحة"},
+    "card.nearby": {"en": "Nearby", "ar": "معالم قريبة"},
+    "card.tip": {"en": "Tip", "ar": "نصيحة"},
+    "card.noairport": {"en": "None recorded in the catalogue",
+                       "ar": "غير مُسجَّل في قاعدة البيانات"},
+
+    # ---- map, insights, charts -------------------------------------------
+    "map.eyebrow": {"en": "On the map", "ar": "على الخريطة"},
+    "map.title": {"en": "Your shortlist, plotted", "ar": "وجهاتك على الخريطة"},
+    "ins.eyebrow": {"en": "AI insights", "ar": "قراءات ذكية"},
+    "ins.title": {"en": "What your results say", "ar": "ماذا تقول نتائجك"},
+    "chart.eyebrow": {"en": "Comparison", "ar": "مقارنة"},
+    "chart.title": {"en": "Your shortlist side by side", "ar": "وجهاتك جنبًا إلى جنب"},
+    "chart.match": {"en": "Match strength", "ar": "قوة التطابق"},
+    "chart.cost": {"en": "Estimated trip cost", "ar": "التكلفة التقديرية"},
+    "chart.cost_sub": {"en": "{p} traveller(s), {k} nights, before flights",
+                       "ar": "{p} مسافر، {k} ليالٍ، قبل الطيران"},
+    "chart.matchpct": {"en": "Match %", "ar": "نسبة التطابق"},
+    "chart.usd": {"en": "US$", "ar": "دولار"},
+
+    # ---- explore ----------------------------------------------------------
+    "exp.eyebrow": {"en": "Explore", "ar": "استكشاف"},
+    "exp.title": {"en": "Browse the whole catalogue", "ar": "تصفّح كل الوجهات"},
+    "exp.region": {"en": "Region", "ar": "المنطقة"},
+    "exp.allregions": {"en": "All regions", "ar": "كل المناطق"},
+    "exp.budget": {"en": "Budget", "ar": "الميزانية"},
+    "exp.anybudget": {"en": "Any budget", "ar": "أي ميزانية"},
+    "exp.temp": {"en": "Average temperature (°C)", "ar": "متوسط الحرارة (°م)"},
+    "exp.count": {"en": "{a} of {b} destinations match",
+                  "ar": "{a} من {b} وجهة مطابقة"},
+    "exp.empty": {"en": "Nothing matches those filters. Widen the range or clear a filter.",
+                  "ar": "لا نتائج بهذه الفلاتر. وسّع النطاق أو أزِل أحدها."},
+    "exp.table": {"en": "See the data behind the map", "ar": "عرض البيانات"},
+    "exp.col.city": {"en": "city", "ar": "المدينة"},
+    "exp.col.country": {"en": "country", "ar": "الدولة"},
+    "exp.col.temp": {"en": "avg °C", "ar": "متوسط °م"},
+    "exp.col.budget": {"en": "budget", "ar": "الميزانية"},
+    "exp.col.airport": {"en": "airport", "ar": "المطار"},
+    "exp.col.code": {"en": "code", "ar": "الرمز"},
+
+    # ---- footer -----------------------------------------------------------
+    "foot.note": {
+        "en": "Destination matching, cost estimates and climate guidance from a "
+              "curated travel catalogue. Figures are planning estimates — confirm "
+              "prices and seasons before booking.",
+        "ar": "مطابقة الوجهات وتقديرات التكلفة وإرشادات المناخ من قاعدة بيانات "
+              "سياحية منسّقة. الأرقام تقديرية للتخطيط — تأكّد من الأسعار والمواسم "
+              "قبل الحجز.",
+    },
+
+    # ---- seasons (engine phrases) ----------------------------------------
+    "season.tropics": {"en": "December to March, outside the rains",
+                       "ar": "من ديسمبر إلى مارس، خارج موسم الأمطار"},
+    "season.hot_north": {"en": "November to March", "ar": "من نوفمبر إلى مارس"},
+    "season.hot_south": {"en": "May to September", "ar": "من مايو إلى سبتمبر"},
+    "season.cold": {"en": "June to August, or December for snow",
+                    "ar": "من يونيو إلى أغسطس، أو ديسمبر للثلوج"},
+    "season.mild_north": {"en": "April to June and September to October",
+                          "ar": "من أبريل إلى يونيو ومن سبتمبر إلى أكتوبر"},
+    "season.mild_south": {"en": "October to December and March to May",
+                          "ar": "من أكتوبر إلى ديسمبر ومن مارس إلى مايو"},
+    "season.year": {"en": "Year-round", "ar": "طوال السنة"},
+
+    # ---- climate (engine phrases) ----------------------------------------
+    "clim.hot": {"en": "Hot year-round, averaging {t}°C",
+                 "ar": "حار طوال السنة، بمتوسط {t}°م"},
+    "clim.warm": {"en": "Warm and settled, around {t}°C",
+                  "ar": "دافئ ومستقر، حوالي {t}°م"},
+    "clim.mild": {"en": "Mild, averaging {t}°C", "ar": "معتدل، بمتوسط {t}°م"},
+    "clim.cool": {"en": "Cool, around {t}°C — pack layers",
+                  "ar": "بارد نسبيًا، حوالي {t}°م — خذ ملابس دافئة"},
+    "clim.cold": {"en": "Cold, averaging {t}°C", "ar": "بارد، بمتوسط {t}°م"},
+    "clim.na": {"en": "Climate data unavailable", "ar": "بيانات المناخ غير متوفرة"},
+
+    # ---- tips (engine phrases) -------------------------------------------
+    "tip.hot": {"en": "Plan outdoor time early morning or after sunset — midday heat is punishing.",
+                "ar": "اجعل الأنشطة الخارجية صباحًا أو بعد الغروب — حرّ الظهيرة شديد."},
+    "tip.cold": {"en": "Daylight is short in winter; book the outdoor activities first.",
+                 "ar": "النهار قصير شتاءً؛ احجز الأنشطة الخارجية أولًا."},
+    "tip.quiet": {"en": "Getting around is easier with your own transport — arrange it before arrival.",
+                  "ar": "التنقّل أسهل بسيارة خاصة — رتّبها قبل الوصول."},
+    "tip.night": {"en": "Stay central: the saving on taxis usually beats the cheaper outer hotels.",
+                  "ar": "أقم في المركز: ما توفّره من أجرة النقل يفوق فرق سعر الفنادق البعيدة."},
+    "tip.culture": {"en": "Buy museum passes online — the queues are the real cost, not the ticket.",
+                    "ar": "احجز تذاكر المتاحف عبر الإنترنت — الطوابير أغلى من التذكرة."},
+    "tip.flight": {"en": "Flights into {code} are cheapest midweek; avoid Friday and Sunday departures.",
+                   "ar": "الرحلات إلى {code} أرخص منتصف الأسبوع؛ تجنّب الجمعة والأحد."},
+    "tip.default": {"en": "Book accommodation before flights — availability moves faster than airfare.",
+                    "ar": "احجز الإقامة قبل الطيران — التوفّر ينفد أسرع من تغيّر الأسعار."},
+
+    # ---- data notices -----------------------------------------------------
+    "note.demo": {"en": "Running on the built-in demo catalogue.",
+                  "ar": "يعمل على قاعدة البيانات التجريبية المدمجة."},
+    "note.coverage": {"en": "{rows} destinations. {direct} carry a matched airport; "
+                            "the rest resolve to the nearest of {total} known airports.",
+                      "ar": "{rows} وجهة. {direct} منها لها مطار مطابق، والبقية تُربَط "
+                            "بأقرب مطار من أصل {total}."},
+}
+
+
+def t(key: str, **fields) -> str:
+    """The phrase for the active language, formatted with `fields`."""
+    entry = STRINGS.get(key)
+    if not entry:
+        return key
+    text = entry.get(_current) or entry.get(DEFAULT, key)
+    if fields:
+        try:
+            return text.format(**fields)
+        except (KeyError, IndexError, ValueError):
+            return text
+    return text
 
 # ==========================================================================
 # ERROR HANDLING — Logging and failure containment.
@@ -662,10 +927,10 @@ def catalogue_stats(df: pd.DataFrame) -> list[tuple[str, str]]:
     countries = df["country"].nunique() if "country" in df else 0
     regions = sum(1 for c in REGION_COLS if c in df.columns and df[c].sum() > 0)
     return [
-        (f"{cities:,}", "Destinations ranked"),
-        (f"{countries:,}", "Countries covered"),
-        (f"{regions}", "World regions"),
-        ("9", "Travel dimensions"),
+        (f"{cities:,}", t("stat.destinations")),
+        (f"{countries:,}", t("stat.countries")),
+        (f"{regions}", t("stat.regions")),
+        ("9", t("stat.dimensions")),
     ]
 
 # ==========================================================================
@@ -897,9 +1162,9 @@ def recommend(df: pd.DataFrame, bundle: ModelBundle, prefs: dict,
 # ==========================================================================
 
 def region_of(row) -> str | None:
-    for col, label in REGIONS:
+    for col, _ in REGIONS:
         if to_float(row.get(col, 0)) == 1:
-            return label
+            return t(f"region.{col}")
     return None
 
 
@@ -919,41 +1184,42 @@ def trip_cost(row, nights: int, travellers: int) -> int:
     return daily_cost(row) * max(1, nights) * max(1, travellers)
 
 
-@safe("Climate data unavailable", "climate_summary")
+@safe("", "climate_summary")
 def climate_summary(row) -> str:
-    t = to_float(row.get("temp_avg_yearly", 20), 20.0)
-    if t >= 28:
-        return f"Hot year-round, averaging {t:.0f}°C"
-    if t >= 22:
-        return f"Warm and settled, around {t:.0f}°C"
-    if t >= 15:
-        return f"Mild, averaging {t:.0f}°C"
-    if t >= 8:
-        return f"Cool, around {t:.0f}°C — pack layers"
-    return f"Cold, averaging {t:.0f}°C"
+    temp = to_float(row.get("temp_avg_yearly", 20), 20.0)
+    value = f"{temp:.0f}"
+    if temp >= 28:
+        return t("clim.hot", t=value)
+    if temp >= 22:
+        return t("clim.warm", t=value)
+    if temp >= 15:
+        return t("clim.mild", t=value)
+    if temp >= 8:
+        return t("clim.cool", t=value)
+    return t("clim.cold", t=value)
 
 
-@safe("Year-round", "best_season")
+@safe("", "best_season")
 def best_season(row) -> str:
     """Infer a sensible window from latitude and average temperature."""
     lat = to_float(row.get("latitude", 0), 0.0)
-    t = to_float(row.get("temp_avg_yearly", 20), 20.0)
+    temp = to_float(row.get("temp_avg_yearly", 20), 20.0)
     north = lat >= 0
     if abs(lat) < 15:                       # tropics: the dry months matter, not heat
-        return "December to March, outside the rains"
-    if t >= 26:                             # hot climates are best off-peak
-        return "November to March" if north else "May to September"
-    if t <= 8:                              # cold climates: either peak summer or snow season
-        return "June to August, or December for snow"
-    return "April to June and September to October" if north else \
-           "October to December and March to May"
+        return t("season.tropics")
+    if temp >= 26:                          # hot climates are best off-peak
+        return t("season.hot_north") if north else t("season.hot_south")
+    if temp <= 8:                           # cold climates: peak summer or snow
+        return t("season.cold")
+    return t("season.mild_north") if north else t("season.mild_south")
 
 
-@safe(["Balanced"], "trip_style")
+@safe([], "trip_style")
 def trip_style(row) -> list[str]:
     tastes = tastes_of(row)
     ranked = sorted(tastes.items(), key=lambda kv: -kv[1])
-    return [TASTE_LABEL[k] for k, v in ranked[:3] if v >= 3.5] or ["Balanced"]
+    return ([t(f"taste.{k}") for k, v in ranked[:3] if v >= 3.5]
+            or [t("taste.balanced")])
 
 
 @safe("This destination matched your overall preferences.", "explain")
@@ -1000,27 +1266,27 @@ def attractions_of(row, limit: int = 3) -> list[str]:
     return out
 
 
-@safe("Book accommodation before flights.", "travel_tip")
+@safe("", "travel_tip")
 def travel_tip(row) -> str:
     """A short, situation-specific pointer built from the row's own numbers."""
     tastes = tastes_of(row)
-    t = to_float(row.get("temp_avg_yearly", 20), 20.0)
+    temp = to_float(row.get("temp_avg_yearly", 20), 20.0)
     tier = int(to_float(row.get("budget_level_encoded", 2), 2.0))
     code = clean(row.get("iata"))
 
-    if t >= 28:
-        return "Plan outdoor time early morning or after sunset — midday heat is punishing."
-    if t <= 8:
-        return "Daylight is short in winter; book the outdoor activities first."
+    if temp >= 28:
+        return t("tip.hot")
+    if temp <= 8:
+        return t("tip.cold")
     if tastes.get("seclusion", 3) >= 4:
-        return "Getting around is easier with your own transport — arrange it before arrival."
+        return t("tip.quiet")
     if tastes.get("nightlife", 3) >= 4 and tier <= 2:
-        return "Stay central: the saving on taxis usually beats the cheaper outer hotels."
+        return t("tip.night")
     if tastes.get("culture", 3) >= 4:
-        return "Buy museum passes online — the queues are the real cost, not the ticket."
+        return t("tip.culture")
     if code:
-        return f"Flights into {code} are cheapest midweek; avoid Friday and Sunday departures."
-    return "Book accommodation before flights — availability moves faster than airfare."
+        return t("tip.flight", code=code)
+    return t("tip.default")
 
 
 # --------------------------------------------------------------------------- #
@@ -1211,11 +1477,12 @@ def validate_catalogue(df: pd.DataFrame) -> str:
 FONTS = (
     "https://fonts.googleapis.com/css2?"
     "family=Outfit:wght@400;500;600;700;800&"
+    "family=Cairo:wght@400;500;600;700;800&"
     "family=Inter:wght@400;500;600&"
     "family=JetBrains+Mono:wght@400;500&display=swap"
 )
 
-THEME_CSS = """
+THEME_BASE = """
 <style>
 @import url('__FONTS__');
 
@@ -1596,17 +1863,35 @@ div[data-baseweb="select"] [data-baseweb="tag"]{
 
 /* Dropdown menus mount in a portal at the document root, outside .stApp, so
    they keep a white background unless targeted directly. */
-[data-baseweb="popover"] [role="listbox"],
-[data-baseweb="popover"] ul, [data-baseweb="menu"], [data-baseweb="menu"] ul{
-  background:#FFFFFF !important; border:1px solid var(--line-2) !important;
-  box-shadow:0 18px 44px rgba(30,58,138,.16) !important;
+/* Dropdown surfaces.
+   The menu mounts in a portal at the document root, outside .stApp, so it does
+   not inherit anything above and has to be styled from scratch — including the
+   option text, which otherwise inherits a colour that can land dark-on-dark. */
+[data-baseweb="popover"], [data-baseweb="popover"] > div,
+[data-baseweb="popover"] [role="listbox"], [data-baseweb="popover"] ul,
+[data-baseweb="menu"], [data-baseweb="menu"] ul{
+  background:linear-gradient(160deg,#123B6B,#0E2C52) !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  border-radius:var(--r-sm) !important;
+  box-shadow:0 20px 50px rgba(15,40,80,.4) !important;
 }
-[data-baseweb="menu"] li, [role="option"], [data-baseweb="menu"] li div{
+[data-baseweb="menu"] li, [role="option"],
+[data-baseweb="menu"] li div, [role="option"] div, [role="option"] span{
+  color:#FFFFFF !important; background:transparent !important;
+  font-weight:500 !important;
+}
+[data-baseweb="menu"] li:hover, [role="option"]:hover,
+[role="option"][aria-selected="true"]{
+  background:linear-gradient(96deg,var(--sky),var(--blue)) !important;
+}
+[data-baseweb="menu"] li:hover *, [role="option"]:hover *,
+[role="option"][aria-selected="true"] *{ color:#FFFFFF !important; }
+
+/* the closed control shows the current value — it must read clearly too */
+div[data-baseweb="select"] > div, div[data-baseweb="select"] > div *{
   color:var(--text) !important;
 }
-[data-baseweb="menu"] li:hover, [role="option"]:hover{
-  background:rgba(14,165,233,.12) !important; color:var(--blue) !important;
-}
+div[data-baseweb="select"] input{ color:var(--text) !important; }
 
 div[role="radiogroup"] label{
   background:rgba(255,255,255,.88); border:1px solid var(--line-2);
@@ -1625,21 +1910,54 @@ div[role="radiogroup"] label:hover{ border-color:var(--sky); }
 [data-testid="stMetricLabel"] p{ color:var(--text-3) !important; }
 
 [data-testid="stExpander"] details{
-  border:1px solid var(--line); border-radius:var(--r-md);
-  background:rgba(255,255,255,.72);
+  border:1px solid rgba(255,255,255,.7); border-radius:var(--r-lg);
+  background:linear-gradient(160deg, rgba(255,255,255,.78), rgba(219,234,254,.55));
+  backdrop-filter:blur(14px) saturate(1.3);
+  -webkit-backdrop-filter:blur(14px) saturate(1.3);
+  box-shadow:var(--sh-card);
 }
 [data-testid="stExpander"] summary{ color:var(--text-2) !important; }
 
 [data-testid="stDataFrame"]{
-  border:1px solid var(--line); border-radius:var(--r-md); overflow:hidden;
+  border:1px solid rgba(255,255,255,.7); border-radius:var(--r-lg);
+  overflow:hidden; box-shadow:var(--sh-card);
 }
+[data-testid="stDataFrame"] [data-testid="stTable"],
+[data-testid="stDataFrame"] div[role="grid"]{ background:transparent !important; }
 [data-testid="stAlert"]{
-  background:rgba(255,255,255,.85) !important; border:1px solid var(--line-2) !important;
-  border-radius:var(--r-md) !important; color:var(--text) !important;
+  background:linear-gradient(160deg, rgba(255,255,255,.82), rgba(219,234,254,.6)) !important;
+  border:1px solid rgba(255,255,255,.72) !important;
+  border-radius:var(--r-lg) !important; color:var(--text) !important;
+  box-shadow:var(--sh-card) !important;
 }
 [data-testid="stAlert"] p{ color:var(--text-2) !important; }
 
 hr, [data-testid="stDivider"] hr{ border-color:var(--line) !important; }
+
+/* ======================================================================
+   MAP
+   ==================================================================== */
+.tw-map{
+  position:relative; height:var(--map-h,420px); overflow:hidden;
+  border-radius:var(--r-lg); border:1px solid rgba(255,255,255,.75);
+  box-shadow:var(--sh-card); margin:.4rem 0 .6rem;
+}
+.tw-map svg{ width:100%; height:100%; display:block; }
+.tw-map__label{
+  font-family:'Inter',sans-serif; font-size:15px; font-weight:600;
+  fill:#0F172A; paint-order:stroke; stroke:#FFFFFF; stroke-width:4px;
+  stroke-linejoin:round;
+}
+.tw-map__halo{ animation:twPulse 3s ease-out infinite; transform-origin:center; }
+@keyframes twPulse{
+  0%{ opacity:.55; transform:scale(.55); }
+  70%{ opacity:0; transform:scale(1.35); }
+  100%{ opacity:0; transform:scale(1.35); }
+}
+.tw-map__pin{ animation:twDrop .7s var(--ease) both; transform-origin:center; }
+@keyframes twDrop{ from{ opacity:0; transform:translateY(-10px); } to{ opacity:1; transform:none; } }
+.tw-map__route{ animation:twFlow 22s linear infinite; }
+@keyframes twFlow{ to{ stroke-dashoffset:-300; } }
 
 /* ======================================================================
    FOOTER
@@ -1680,6 +1998,53 @@ hr, [data-testid="stDivider"] hr{ border-color:var(--line) !important; }
 }
 </style>
 """.replace("__FONTS__", FONTS)
+
+# Applied on top of BASE when Arabic is active. Direction is set on the app
+# container rather than <html>, which Streamlit owns, and the few components
+# that must stay left-to-right — numbers, charts, the map — are exempted.
+RTL = """
+<style>
+.stApp, .stApp *{ font-family:'Cairo','Inter',sans-serif !important; }
+.tw-mono, .tw-metric b, .tw-stat b, .tw-facts span, .tw-eyebrow,
+.tw-footer__meta, [data-testid="stThumbValue"],
+[data-testid="stTickBarMin"], [data-testid="stTickBarMax"]{
+  font-family:'JetBrains Mono',ui-monospace,monospace !important;
+}
+.stApp{ direction:rtl; }
+.block-container{ direction:rtl; text-align:right; }
+.tw-lede, .tw-sub, .tw-feat p, .tw-insight p, .tw-why, .tw-meta__row,
+.tw-footer__note, .stMarkdown p, .stMarkdown li{ text-align:right; }
+.tw-why{ border-left:none; border-right:2px solid var(--sky);
+  padding:.1rem .8rem .1rem 0; }
+.tw-eyebrow{ flex-direction:row-reverse; }
+.tw-eyebrow::before{ background:linear-gradient(270deg,var(--sky),transparent); }
+.tw-meta__row{ flex-direction:row-reverse; }
+.tw-insight{ flex-direction:row-reverse; }
+.tw-dest__place{ left:92px; right:16px; text-align:right; }
+.tw-dest__match{ left:12px; right:auto; }
+.tw-header{ flex-direction:row-reverse; }
+.tw-brand{ flex-direction:row-reverse; }
+.tw-facts{ direction:rtl; }
+
+/* these read wrong mirrored, so they keep their own direction */
+.tw-map, .js-plotly-plot, [data-testid="stDataFrame"],
+[data-testid="stSlider"], [data-testid="stSlider"] *{ direction:ltr; }
+[data-testid="stSlider"] label, .stSelectbox label, .stRadio label,
+.stCheckbox label, .stNumberInput label, .stMultiSelect label{
+  direction:rtl; text-align:right; display:block;
+}
+div[role="radiogroup"]{ flex-direction:row-reverse; }
+</style>
+"""
+
+
+def stylesheet(rtl: bool = False) -> str:
+    """The stylesheet for the active direction."""
+    return THEME_BASE + (RTL if rtl else "")
+
+
+# kept so existing imports of theme.CSS continue to resolve
+THEME_CSS = THEME_BASE
 
 # ==========================================================================
 # DESTINATION ARTWORK — Generative destination artwork.
@@ -1984,7 +2349,7 @@ def header() -> str:
     The navigation itself is the tab strip Streamlit renders directly beneath
     this, styled to read as one continuous header band.
     """
-    return """
+    return f"""
 <div class="tw-header">
 <div class="tw-brand">
 <svg viewBox="0 0 24 24" fill="none" stroke="url(#bg1)" stroke-width="1.8"
@@ -1996,18 +2361,16 @@ stroke-linecap="round" stroke-linejoin="round">
 </svg>
 <b>TripWise <span class="tw-grad">AI</span></b>
 </div>
-<div class="tw-header__tag">Intelligent destination matching</div>
+<div class="tw-header__tag">{t("hero.tagline")}</div>
 </div>"""
 
 
 def footer() -> str:
     """Closes the page the way a product site would."""
-    return """
+    return f"""
 <div class="tw-footer">
 <div class="tw-footer__brand">TripWise <span class="tw-grad">AI</span></div>
-<div class="tw-footer__note">Destination matching, cost estimates and climate
-guidance from a curated travel catalogue. Figures are planning estimates —
-confirm prices and seasons before booking.</div>
+<div class="tw-footer__note">{_e(t("foot.note"))}</div>
 <div class="tw-footer__meta">&copy; 2026 TripWise AI &nbsp;&middot;&nbsp;
 hello@tripwise.ai</div>
 </div>"""
@@ -2046,12 +2409,9 @@ fill="url(#planeBody)"/>
 </svg>
 </div>
 <div class="tw-hero__inner">
-<span class="tw-badge tw-rise d1">&#10024; AI-powered travel planning</span>
-<h1 class="tw-display tw-rise d2">Plan smarter with<br/><span class="tw-grad">TripWise AI</span></h1>
-<p class="tw-lede tw-rise d3">Tell us how you like to travel and TripWise ranks
-real destinations against your answers &mdash; with the cost, the climate, the
-right season and the nearest airport worked out before you commit to anything.</p>
-<div class="tw-cta tw-rise d4">Open the <b>AI Planner</b> tab to begin &nbsp;&rarr;</div>
+<span class="tw-badge tw-rise d1">{_e(t("hero.badge"))}</span>
+<h1 class="tw-display tw-rise d2">{_e(t("hero.title_1"))}<br/><span class="tw-grad">TripWise AI</span></h1>
+<p class="tw-lede tw-rise d3">{_e(t("hero.lede"))}</p>
 <div class="tw-stats tw-rise d5">{cells}</div>
 </div>
 </div>"""
@@ -2096,15 +2456,14 @@ def destination(d: dict) -> str:
     if d.get("region"):
         chips += f'<span class="tw-chip tw-chip--muted">{_e(d["region"])}</span>'
 
-    rows = [("plane", "Nearest airport",
-             d["airport"] or "None recorded in the catalogue"),
-            ("calendar", "Best season", d["season"]),
-            ("sun", "Weather", d["climate"])]
+    rows = [("plane", t("card.airport"), d["airport"] or t("card.noairport")),
+            ("calendar", t("card.season"), d["season"]),
+            ("sun", t("card.weather"), d["climate"])]
     if d.get("hotel"):
-        rows.append(("tag", "Suggested stay", d["hotel"]))
+        rows.append(("tag", t("card.stay"), d["hotel"]))
     if d.get("attractions"):
-        rows.append(("pin", "Nearby", ", ".join(d["attractions"])))
-    rows.append(("bulb", "Tip", d["tip"]))
+        rows.append(("pin", t("card.nearby"), ", ".join(d["attractions"])))
+    rows.append(("bulb", t("card.tip"), d["tip"]))
 
     meta = "".join(
         f'<div class="tw-meta__row">{icon(ic)}<div><b>{_e(label)}</b> &mdash; {_e(val)}</div></div>'
@@ -2116,14 +2475,14 @@ def destination(d: dict) -> str:
 <div class="tw-dest__art">
 {d['art']}
 <div class="tw-dest__scrim"></div>
-<div class="tw-dest__match">{_e(d['match'])}% match</div>
+<div class="tw-dest__match">{_e(d['match'])}% {_e(t("card.match"))}</div>
 <div class="tw-dest__place"><h3>{_e(d['city'])}</h3><span>{_e(d['country'])}</span></div>
 </div>
 <div class="tw-dest__body">
 <div class="tw-facts">
-<div><span>Budget</span><b>{_e(d['tier'])}</b></div>
-<div><span>Per day</span><b>${_e(d['daily'])}</b></div>
-<div><span>Climate</span><b>{_e(d['temp'])}&deg;C</b></div>
+<div><span>{_e(t("card.budget"))}</span><b>{_e(d['tier'])}</b></div>
+<div><span>{_e(t("card.perday"))}</span><b>${_e(d['daily'])}</b></div>
+<div><span>{_e(t("card.climate"))}</span><b>{_e(d['temp'])}&deg;</b></div>
 </div>
 <div class="tw-chips">{chips}</div>
 <div class="tw-why">{_e(d['why'])}</div>
@@ -2157,6 +2516,491 @@ of inventing one.</p>
 </div>"""
 
 # ==========================================================================
+# WORLD OUTLINE — Land outline for the destination map.
+# ==========================================================================
+
+WORLD_PATH = (
+    "M0.0,66.1 16.9,73.8 16.6,76.6 18.9,77.7 18.1,74.5 27.1,75.1 33.7,79.3 30.4,81.2 24.9,81.6 24"
+    ".8,85.9 23.5,86.8 13.4,83.9 12.6,82.0 5.5,81.8 3.7,80.3 4.4,78.7 0.4,79.7 1.9,81.8 0.0,83.6 "
+    "1200.0,83.7 1195.7,85.6 1191.4,85.3 1197.9,92.4 1197.4,95.4 1191.2,94.4 1178.9,98.3 1169.0,1"
+    "04.1 1167.8,106.1 1163.0,103.0 1154.3,106.5 1152.8,104.8 1149.6,106.7 1145.1,106.1 1140.1,11"
+    "3.3 1140.2,115.0 1144.0,116.0 1143.5,122.4 1140.4,122.6 1139.0,126.3 1140.4,128.2 1134.6,130"
+    ".4 1133.4,135.4 1128.4,136.5 1127.4,141.0 1122.6,145.1 1118.1,125.8 1119.7,119.7 1122.5,117."
+    "1 1122.7,115.1 1127.9,114.1 1139.6,104.0 1145.6,100.5 1148.2,94.3 1144.2,94.7 1142.2,98.3 11"
+    "33.7,103.1 1131.0,97.7 1122.4,99.2 1114.1,106.6 1116.8,109.3 1104.2,110.9 1104.5,107.7 1099."
+    "3,107.0 1095.2,109.2 1085.0,108.4 1074.0,109.8 1050.4,128.7 1055.7,129.3 1057.3,132.0 1060.5"
+    ",133.0 1062.7,130.8 1066.3,131.1 1071.2,135.9 1071.3,139.7 1068.7,144.1 1066.9,156.3 1060.7,"
+    "165.7 1049.6,178.5 1045.1,181.1 1043.0,181.2 1040.9,179.0 1033.2,184.9 1032.3,189.6 1025.1,1"
+    "94.5 1024.6,196.9 1027.8,199.6 1031.5,207.6 1031.6,212.7 1030.3,215.1 1021.6,218.1 1021.9,21"
+    "2.4 1020.4,207.9 1022.9,207.1 1020.6,203.4 1019.0,202.5 1017.6,203.7 1015.7,201.8 1017.4,199"
+    ".3 1017.7,195.4 1014.2,193.8 1003.5,198.3 1005.3,196.3 1004.6,194.6 1007.2,191.6 1005.5,189."
+    "3 996.7,196.8 993.5,197.0 991.8,199.0 993.5,202.0 996.3,202.7 996.4,204.7 999.0,206.0 1002.7"
+    ",202.8 1007.9,204.7 1008.4,207.0 1003.7,208.2 997.2,215.9 1000.8,218.3 1006.4,230.0 1006.3,2"
+    "33.3 1004.2,234.5 1007.0,238.2 1005.6,245.2 1003.8,245.6 995.5,261.4 986.3,269.2 982.5,269.7"
+    " 980.5,271.6 979.4,270.2 977.5,272.4 969.3,275.3 968.1,279.9 966.3,280.2 966.2,275.3 961.7,2"
+    "73.9 955.7,278.4 952.9,282.5 952.2,285.6 957.9,295.9 962.9,302.2 964.4,310.3 964.0,318.1 950"
+    ".5,331.5 949.3,328.7 950.3,325.7 947.8,323.3 945.0,322.6 941.9,315.8 939.0,313.8 936.1,313.8"
+    " 936.6,310.4 933.7,310.4 930.7,328.7 932.9,328.9 934.9,336.7 943.2,345.1 944.6,348.0 945.0,3"
+    "57.1 947.4,363.7 945.1,364.0 938.0,357.2 934.0,346.0 933.6,340.9 928.3,332.5 927.8,335.1 929"
+    ".2,319.1 923.9,294.9 917.9,300.3 914.0,298.8 915.1,293.4 914.4,289.3 911.8,284.2 912.2,282.6"
+    " 910.3,282.1 907.9,278.5 904.7,269.3 901.7,269.1 900.9,273.3 896.8,272.4 896.3,274.0 889.9,2"
+    "74.8 890.1,278.2 888.3,280.7 883.5,283.7 874.0,294.5 874.0,296.6 867.8,299.5 866.2,323.8 864"
+    ".5,324.0 863.0,327.4 864.0,328.8 860.9,330.1 858.5,334.3 855.3,330.2 849.5,313.3 848.1,305.1"
+    " 845.1,299.1 842.1,275.5 837.2,278.1 834.9,277.6 830.6,272.2 832.1,270.6 831.2,268.9 824.8,2"
+    "64.1 821.2,257.6 805.0,259.1 791.3,256.2 789.9,250.8 788.3,250.0 782.4,252.9 771.7,246.8 767"
+    ".0,236.8 765.3,237.5 763.1,236.0 761.9,237.8 759.9,237.6 762.7,247.6 767.2,252.0 767.0,255.3"
+    " 769.4,260.5 770.0,255.0 772.0,255.9 771.3,261.1 772.7,263.7 780.0,263.3 787.9,253.3 788.0,2"
+    "59.8 789.5,262.8 795.8,265.7 799.4,271.3 795.0,279.5 792.8,280.3 792.3,286.1 788.7,287.7 787"
+    ".6,290.8 784.2,291.8 784.2,293.6 774.6,297.3 773.9,300.8 765.2,304.7 762.3,307.8 752.1,310.9"
+    " 750.0,313.5 744.9,313.8 742.0,302.5 742.2,295.6 736.5,283.7 730.5,275.7 730.2,270.1 728.3,2"
+    "65.2 725.0,262.6 717.1,246.0 715.4,246.0 716.4,239.6 713.1,247.8 708.1,238.1 713.7,254.4 719"
+    ".0,264.2 718.4,267.8 722.9,272.6 724.9,287.5 728.0,290.2 730.9,299.3 744.4,314.9 744.3,316.7"
+    " 742.4,317.8 747.1,323.4 748.7,323.4 770.4,316.5 770.2,322.6 764.8,339.4 759.1,350.8 755.2,3"
+    "56.8 743.8,368.1 738.6,376.8 734.2,380.7 730.7,389.9 729.3,397.8 731.5,399.4 730.6,406.7 734"
+    ".9,416.7 735.9,434.0 731.5,442.9 724.7,446.7 716.0,456.4 715.7,459.5 718.5,466.5 718.2,475.4"
+    " 708.6,482.5 709.7,484.6 707.3,495.8 694.1,513.5 685.9,518.6 675.2,518.3 665.4,522.5 660.8,5"
+    "18.3 659.8,512.8 660.8,512.0 660.7,508.6 650.7,488.5 647.5,466.6 639.3,448.8 639.3,438.8 641"
+    ".7,428.9 645.5,422.3 645.6,416.5 642.9,409.7 644.1,407.0 639.7,391.5 629.3,374.2 632.6,355.8"
+    " 631.4,352.9 629.8,352.2 628.3,348.4 619.7,350.6 614.4,341.8 606.2,342.4 593.5,348.6 584.5,3"
+    "46.6 574.9,350.3 570.0,348.1 558.6,337.4 550.5,321.5 544.6,315.8 544.3,309.6 541.3,304.6 545"
+    ".1,298.4 546.2,289.7 545.7,281.0 543.1,277.0 543.4,273.1 545.8,269.6 546.7,265.0 549.7,261.5"
+    " 551.9,253.9 557.9,246.1 561.0,245.6 568.1,237.7 567.3,232.3 569.0,226.2 571.1,223.2 577.0,2"
+    "19.4 580.2,212.1 582.7,212.1 584.7,214.0 592.8,214.7 604.9,208.4 617.7,207.9 620.9,206.2 628"
+    ".1,206.9 631.7,205.1 634.0,205.7 633.9,207.9 636.8,206.3 637.0,207.1 635.3,209.3 636.5,212.4"
+    " 636.0,216.2 633.8,218.4 634.5,220.8 636.2,220.9 638.3,223.7 650.8,227.5 652.4,231.4 663.6,2"
+    "36.3 666.8,233.1 666.1,229.7 667.1,227.6 671.8,224.9 676.3,225.8 677.5,227.8 683.1,229.1 683"
+    ".9,230.5 688.3,230.5 696.4,233.6 703.3,230.6 705.6,231.2 706.5,233.3 707.3,231.9 712.6,233.2"
+    " 715.2,230.6 720.0,217.0 720.5,211.8 719.3,209.9 720.5,208.2 715.7,207.6 713.4,210.1 708.4,2"
+    "10.6 705.7,208.2 702.1,208.1 701.3,209.9 699.0,210.4 695.8,208.1 692.1,208.2 687.7,201.4 689"
+    ".3,197.9 687.2,195.8 690.9,191.6 696.1,191.5 697.5,188.1 703.8,188.7 711.7,184.6 717.2,184.5"
+    " 727.8,189.3 734.6,189.0 738.5,186.7 739.0,184.8 738.2,181.8 722.3,170.4 724.7,169.7 727.4,1"
+    "66.0 725.6,164.3 730.5,162.5 730.4,161.5 716.5,165.9 716.7,168.6 721.8,169.4 721.1,171.0 712"
+    ".9,174.3 711.1,173.4 711.8,171.3 708.2,170.1 712.0,167.7 711.0,166.7 705.8,165.6 705.6,164.0"
+    " 702.5,164.5 698.8,171.3 696.1,171.9 695.2,177.2 692.3,182.1 693.7,186.3 696.6,187.8 696.0,1"
+    "88.8 692.1,189.1 687.9,192.8 686.9,189.9 683.1,189.3 679.1,190.5 681.4,192.9 679.7,193.6 677"
+    ".8,193.6 676.1,191.4 675.4,192.3 677.8,197.0 676.6,198.0 680.1,201.3 680.1,203.8 677.0,202.6"
+    " 678.0,204.9 675.9,205.3 677.2,209.2 675.0,209.3 672.2,207.3 670.4,200.9 664.7,192.4 665.1,1"
+    "85.9 653.4,178.1 650.6,174.8 649.7,171.2 647.5,170.5 646.5,172.4 645.5,170.9 646.5,168.9 643"
+    ".8,168.2 641.1,169.8 642.0,175.5 650.5,184.9 653.1,184.9 653.9,185.8 653.0,186.7 661.6,192.7"
+    " 661.0,194.3 656.2,191.5 654.8,194.4 657.2,196.0 656.8,198.3 655.4,198.6 653.7,202.3 652.3,2"
+    "02.7 653.7,198.0 651.4,193.3 645.4,188.2 640.4,186.0 635.0,180.6 634.0,176.2 629.6,174.3 621"
+    ".8,179.7 615.2,178.5 610.3,180.0 610.1,185.2 607.0,188.1 602.7,189.0 599.1,196.5 600.4,199.0"
+    " 597.7,203.8 595.2,204.7 592.8,208.1 585.4,208.1 582.1,211.3 580.4,210.9 578.3,206.9 570.3,2"
+    "07.2 570.5,201.1 568.2,199.0 570.8,190.1 570.1,182.1 568.7,180.2 573.4,177.0 593.7,178.4 595"
+    ".4,175.8 596.0,167.0 590.1,160.2 585.0,158.5 584.7,155.3 589.0,154.3 594.6,155.5 593.5,150.5"
+    " 596.7,152.4 604.5,148.9 605.5,145.3 612.8,142.4 615.7,135.9 623.7,133.3 627.1,134.0 629.3,1"
+    "31.8 627.1,125.2 627.0,120.7 628.5,118.2 635.3,115.5 634.2,119.2 636.4,121.1 632.2,125.4 633"
+    ".1,129.3 636.5,130.3 636.5,131.9 641.7,129.8 647.1,133.0 658.7,128.2 665.5,130.0 666.3,128.1"
+    " 670.9,126.7 670.3,119.7 671.9,116.9 675.1,115.4 677.7,118.7 680.4,118.6 681.4,112.6 680.2,1"
+    "13.2 678.1,111.6 677.8,109.1 686.2,107.2 693.3,107.8 697.1,105.4 693.6,103.3 676.2,106.2 671"
+    ".1,102.4 671.8,98.0 670.2,94.1 671.8,91.5 684.7,83.1 684.3,81.2 679.7,79.1 673.9,80.4 670.7,"
+    "83.4 671.2,86.1 659.5,93.4 657.1,99.6 662.6,105.2 659.6,110.1 656.1,111.2 652.9,122.7 648.9,"
+    "122.2 647.0,125.7 643.1,125.9 636.8,110.6 634.5,107.9 627.9,113.0 623.5,114.0 618.9,111.7 61"
+    "6.6,96.9 619.7,94.0 628.5,90.3 635.1,85.8 649.2,71.2 663.9,62.4 671.3,60.4 676.7,60.7 681.8,"
+    "57.0 693.9,56.3 704.3,59.6 700.0,60.7 703.7,63.5 707.1,62.0 712.6,64.6 721.7,65.7 734.3,70.6"
+    " 736.9,72.7 737.1,75.7 733.4,78.0 727.9,79.1 713.1,75.8 710.6,76.4 716.0,79.6 716.5,86.1 723"
+    ".4,88.6 723.8,86.5 721.7,84.5 723.9,82.9 732.0,85.7 734.8,84.6 732.5,81.4 740.3,77.1 746.5,7"
+    "8.8 748.4,75.8 745.7,73.2 747.3,70.6 744.8,67.8 754.2,69.3 756.1,71.7 751.9,72.3 751.9,74.7 "
+    "754.5,76.2 759.6,75.3 760.5,72.5 779.1,66.6 781.6,66.8 778.3,69.5 782.4,69.9 784.8,68.4 791."
+    "1,68.3 796.0,66.5 799.8,69.1 803.6,66.2 800.1,63.7 801.8,62.2 811.7,63.5 828.4,69.9 830.6,67"
+    ".6 827.1,64.4 823.1,64.0 824.2,61.9 822.3,57.0 828.5,53.1 830.6,49.1 833.1,48.2 842.0,49.4 8"
+    "42.6,51.8 839.5,55.4 841.6,56.8 842.6,59.8 841.9,65.9 845.6,68.6 837.6,77.7 841.4,78.4 846.4"
+    ",75.7 850.2,71.4 848.2,68.9 849.8,66.0 846.1,65.6 845.3,63.2 848.0,58.8 843.7,55.2 849.6,52."
+    "2 848.9,49.1 850.5,49.0 852.3,51.4 851.0,55.7 854.5,56.5 853.0,53.3 858.6,51.6 865.5,51.4 87"
+    "1.7,53.9 868.7,50.2 868.4,45.5 889.4,44.3 886.7,42.0 890.6,39.1 909.7,36.2 910.8,35.0 919.5,"
+    "34.6 922.3,35.6 929.7,33.2 935.9,33.3 940.0,29.5 947.8,27.7 953.6,29.1 949.0,30.2 956.6,30.9"
+    " 957.5,33.1 970.3,32.1 980.4,35.8 979.6,38.1 964.7,43.2 973.7,44.9 976.7,44.1 978.4,46.9 985"
+    ".2,45.1 995.9,45.8 996.7,47.8 1010.7,48.5 1010.9,45.1 1023.3,45.9 1028.6,48.2 1030.2,51.0 10"
+    "28.2,52.9 1032.4,56.3 1037.6,58.1 1040.8,53.5 1046.2,55.5 1051.9,54.3 1058.3,55.6 1060.8,54."
+    "4 1066.2,55.0 1063.8,50.9 1068.2,49.0 1098.3,51.9 1101.2,54.5 1109.9,57.9 1130.0,57.8 1132.8"
+    ",59.6 1132.4,62.8 1136.5,64.0 1159.5,63.4 1165.3,67.3 1169.4,65.9 1166.7,63.1 1168.2,61.1 11"
+    "85.7,62.1 1195.3,64.2 0.0,66.1ZM298.2,63.8 298.2,68.3 302.6,64.8 306.6,67.6 305.6,70.9 308.8"
+    ",73.9 314.7,66.9 314.9,62.1 324.6,63.1 329.1,65.2 329.3,67.4 326.8,69.8 329.1,72.1 328.7,74."
+    "3 322.2,77.3 317.5,78.0 314.1,76.7 308.9,84.5 305.1,87.5 300.3,87.8 297.7,89.7 297.4,92.5 29"
+    "3.6,93.1 289.5,96.6 285.9,101.6 284.4,110.2 289.3,110.9 292.3,118.3 297.0,117.5 316.6,126.2 "
+    "325.8,126.9 326.2,135.1 328.7,140.0 333.6,144.2 336.2,142.8 338.0,138.2 336.3,131.3 333.9,12"
+    "9.0 339.2,126.9 344.9,120.8 342.3,114.1 338.3,110.8 342.2,106.2 339.6,95.3 342.0,94.3 351.1,"
+    "95.9 353.9,94.8 362.1,100.5 368.0,100.9 369.0,110.1 372.1,110.8 374.5,113.4 379.3,110.9 384."
+    "7,104.1 395.3,118.9 394.0,121.6 401.4,126.6 408.9,129.2 410.2,132.9 414.1,135.1 414.4,140.1 "
+    "409.6,143.3 404.1,144.8 399.9,148.4 378.7,148.5 375.9,151.7 371.6,153.6 363.0,163.5 365.8,16"
+    "2.8 371.2,157.0 378.2,153.3 383.2,152.9 386.1,155.0 382.9,158.0 385.1,166.0 389.4,168.2 394."
+    "9,167.6 398.3,162.7 398.5,165.9 400.7,167.4 385.8,174.7 382.1,177.9 379.6,177.6 379.5,173.8 "
+    "385.3,170.2 376.2,170.9 376.8,172.3 366.3,177.3 364.4,180.1 363.9,183.2 365.0,185.5 366.4,18"
+    "5.6 366.1,184.0 367.0,185.0 366.8,186.3 354.3,189.4 360.2,189.4 353.5,190.2 352.7,194.8 350."
+    "3,198.1 348.2,195.7 349.8,200.5 346.9,205.7 347.6,202.5 345.9,200.9 345.5,197.2 345.6,201.9 "
+    "343.5,201.2 345.7,202.6 347.6,213.0 345.5,216.3 336.5,222.1 328.9,231.1 329.0,237.3 333.1,25"
+    "1.2 332.1,258.5 329.4,258.5 327.6,255.6 323.8,246.7 323.6,241.4 319.7,237.0 316.3,239.0 312."
+    "0,235.7 302.7,236.1 301.3,236.7 302.6,240.6 299.5,241.3 297.1,241.2 294.6,238.9 287.2,238.7 "
+    "278.0,244.9 275.4,249.0 276.2,255.6 273.8,270.7 279.0,284.4 285.2,289.6 293.2,287.1 297.4,28"
+    "4.6 299.1,277.0 304.9,274.8 309.8,274.6 310.5,277.7 307.9,283.0 307.2,289.1 305.7,288.0 305."
+    "5,296.7 303.6,299.5 306.3,300.4 316.7,299.0 322.0,302.2 322.7,306.4 320.6,320.5 326.0,329.8 "
+    "328.5,330.7 334.8,327.1 343.9,331.4 347.8,327.8 348.4,322.7 350.3,320.6 355.3,320.0 360.8,31"
+    "4.7 362.9,316.1 362.1,318.6 360.2,319.1 361.2,323.4 359.8,326.0 361.0,329.5 362.5,329.2 363."
+    "2,326.0 362.0,321.1 366.1,319.3 365.7,317.3 366.9,315.9 368.1,319.0 370.4,319.0 372.7,322.9 "
+    "379.2,322.5 383.7,325.0 385.6,322.6 393.7,322.2 390.9,323.5 392.0,325.6 394.7,325.9 397.2,32"
+    "8.1 397.8,331.6 403.0,334.2 405.1,339.3 409.5,343.1 413.5,344.0 416.6,342.9 420.1,344.0 423."
+    "7,345.6 427.8,351.1 428.9,350.9 431.6,361.0 433.4,361.7 433.5,364.8 431.0,368.4 432.0,369.7 "
+    "437.9,370.4 438.1,374.8 440.6,371.9 450.3,376.2 451.9,378.8 451.4,381.2 455.3,379.8 461.8,38"
+    "2.2 466.7,382.0 475.9,390.6 481.3,392.0 484.2,401.7 482.9,408.9 471.1,426.8 469.1,447.9 463."
+    "5,465.8 460.8,467.7 460.0,470.4 451.2,472.0 441.2,478.8 438.4,483.1 437.0,495.4 420.6,520.6 "
+    "416.9,523.1 412.6,522.6 407.3,520.9 405.2,518.5 405.0,520.8 409.3,524.5 408.8,527.6 410.9,52"
+    "9.5 410.7,531.6 407.5,537.3 402.6,539.6 392.2,540.1 392.8,548.2 390.8,549.8 387.4,550.4 384."
+    "2,548.8 382.9,549.9 383.4,554.3 385.7,555.6 387.5,554.2 388.5,556.5 382.7,560.6 381.4,567.4 "
+    "378.3,567.4 375.7,569.7 374.7,573.0 378.0,576.2 381.2,577.1 380.0,581.0 376.1,583.5 373.9,58"
+    "8.6 369.5,592.4 370.6,597.0 372.8,599.6 368.5,599.3 363.9,602.0 363.3,606.1 358.1,604.7 350."
+    "2,599.2 348.0,583.4 349.4,579.2 352.9,575.8 347.8,574.5 351.0,570.6 352.2,563.3 355.9,564.8 "
+    "357.6,555.7 355.4,554.6 354.3,560.0 352.2,559.4 354.4,545.0 355.9,542.0 354.7,532.7 356.1,53"
+    "2.6 361.9,511.9 361.7,496.3 363.7,490.9 366.1,456.2 365.4,450.0 362.1,447.5 361.8,445.7 346."
+    "6,433.8 345.8,428.9 334.1,401.0 329.2,396.3 330.2,394.4 328.6,390.2 334.1,381.0 333.4,379.1 "
+    "332.1,381.2 330.1,379.2 330.2,374.0 331.4,373.3 333.0,366.0 337.1,363.3 338.6,357.8 340.2,35"
+    "7.5 342.9,352.4 341.7,351.4 341.7,339.9 339.3,336.3 339.4,332.8 336.3,329.8 334.8,330.1 331."
+    "7,333.8 333.3,336.2 330.4,337.6 329.8,335.0 328.3,335.5 327.6,333.7 323.9,332.9 323.8,333.9 "
+    "321.6,332.2 321.2,329.6 316.7,325.0 316.3,327.3 314.5,325.7 314.3,320.6 307.8,312.6 308.9,31"
+    "2.3 308.4,310.9 305.1,311.5 295.9,308.1 288.8,300.7 284.4,298.1 278.1,300.5 263.9,293.9 260."
+    "3,290.6 255.0,288.9 248.4,281.6 247.6,279.5 248.7,279.1 249.1,275.2 246.6,269.2 238.7,258.7 "
+    "235.8,256.9 235.7,253.1 225.9,242.0 222.8,232.3 220.4,230.5 217.4,229.5 217.8,236.7 227.9,25"
+    "2.1 231.1,262.5 232.8,262.7 235.3,266.6 233.2,269.0 232.3,266.3 226.1,260.6 225.7,255.0 216."
+    "5,247.5 218.1,247.4 219.5,243.8 214.9,239.4 209.0,224.1 204.9,219.7 197.9,217.2 185.3,192.1 "
+    "186.0,184.7 184.9,181.3 187.0,169.2 184.4,157.5 184.8,156.6 189.6,158.1 191.4,162.3 192.2,16"
+    "1.1 190.5,153.9 181.2,147.7 175.2,145.8 173.4,142.0 173.8,139.3 169.6,137.4 169.0,133.8 165."
+    "0,130.6 164.9,128.4 160.1,125.3 159.2,121.5 154.9,117.9 153.1,113.8 144.6,113.4 133.8,107.6 "
+    "124.8,105.2 120.1,105.5 109.6,101.6 105.9,102.6 106.6,105.6 94.3,109.2 93.8,106.7 95.3,102.3"
+    " 98.8,101.0 97.9,99.9 86.6,108.4 89.0,110.5 85.9,113.7 79.0,116.9 78.1,118.8 72.9,121.1 71.9"
+    ",123.1 50.7,130.1 50.2,129.4 60.6,123.6 64.8,123.1 74.3,116.2 76.5,110.3 72.7,111.6 71.6,110"
+    ".9 69.8,112.5 67.6,110.2 66.7,111.8 65.5,109.6 60.1,111.4 60.4,107.1 58.3,105.6 53.9,106.4 4"
+    "8.8,103.3 48.8,100.8 46.3,98.9 51.5,91.7 56.4,92.1 59.1,90.0 64.1,89.0 63.5,87.0 61.6,86.2 6"
+    "4.1,84.5 57.5,86.5 50.1,86.0 45.3,84.9 39.6,80.6 51.8,76.6 54.5,76.6 54.0,78.8 61.1,78.6 48."
+    "7,70.2 44.1,68.8 46.0,66.5 51.9,66.3 56.1,64.3 56.9,62.2 60.3,60.1 72.9,57.9 78.1,55.6 83.1,"
+    "56.5 85.5,58.5 92.6,57.9 92.4,58.9 97.5,59.7 116.9,61.6 121.4,60.9 145.0,66.4 151.9,63.2 156"
+    ".9,63.7 167.4,60.7 169.6,62.5 172.1,61.5 172.9,59.4 180.8,63.8 185.2,60.9 185.7,64.2 191.1,6"
+    "2.2 195.1,62.4 208.0,65.9 215.8,66.4 220.3,68.6 215.7,70.8 221.7,71.7 233.5,70.4 237.1,73.1 "
+    "240.7,70.8 237.3,69.0 239.4,67.5 246.2,66.8 252.2,70.3 255.9,69.9 261.8,71.9 271.9,71.3 271."
+    "5,68.6 274.4,67.8 279.6,69.3 279.6,73.5 281.7,70.0 284.4,70.1 285.9,65.7 278.4,61.2 278.7,56"
+    ".3 282.6,53.1 290.4,55.8 294.9,60.7 292.0,62.9 298.2,63.8ZM1078.5,429.9 1079.7,433.3 1081.9,"
+    "431.7 1084.6,435.3 1088.0,452.7 1096.2,459.0 1098.9,467.6 1100.3,466.6 1101.6,468.5 1102.4,4"
+    "67.9 1103.0,472.5 1109.5,480.5 1110.5,484.0 1110.3,489.2 1111.9,493.0 1110.3,505.3 1108.2,51"
+    "2.5 1105.7,514.7 1101.1,526.2 1100.0,533.9 1098.1,535.5 1094.4,535.6 1087.7,541.0 1082.9,538"
+    ".3 1083.4,536.0 1078.7,540.0 1068.8,536.5 1066.6,533.8 1065.3,528.3 1063.6,526.5 1060.4,526."
+    "0 1061.5,523.8 1060.7,520.6 1059.1,523.6 1056.1,524.4 1059.6,517.3 1059.4,514.0 1054.6,519.3"
+    " 1053.3,522.8 1050.7,521.0 1050.8,518.6 1047.0,513.8 1047.6,512.8 1037.8,507.9 1031.8,508.3 "
+    "1023.7,511.3 1020.5,511.0 1014.1,514.3 1012.2,518.4 999.6,518.8 993.4,523.5 988.7,523.4 983."
+    "4,519.7 983.5,517.2 985.7,515.6 985.6,508.4 983.5,498.9 977.8,484.2 979.3,486.1 978.1,482.0 "
+    "980.8,485.0 978.0,476.6 980.5,465.0 980.7,468.4 982.2,465.4 989.0,460.4 991.5,460.6 997.5,45"
+    "7.1 1002.9,455.9 1007.5,449.4 1007.7,445.2 1010.0,441.5 1011.4,445.3 1012.9,444.4 1011.7,442"
+    ".3 1012.7,440.2 1014.2,441.2 1014.6,437.8 1019.0,431.9 1020.4,432.4 1023.6,430.1 1027.9,434."
+    "7 1032.1,435.2 1031.4,432.8 1035.4,424.5 1037.4,422.9 1041.9,422.6 1041.9,420.4 1039.4,418.9"
+    " 1041.2,418.3 1051.0,423.2 1055.0,421.5 1056.5,423.7 1053.2,428.0 1051.7,435.3 1067.4,447.2 "
+    "1069.6,445.7 1072.3,435.5 1071.7,429.6 1073.8,417.9 1075.1,416.3 1076.0,418.4 1078.5,429.9ZM"
+    "509.7,2.1 530.5,5.6 524.4,7.3 493.7,7.9 495.3,8.7 507.1,8.2 517.2,9.7 523.7,8.4 526.4,10.0 5"
+    "22.8,12.5 547.4,9.2 557.4,10.0 559.3,11.9 543.8,16.1 533.2,16.8 540.9,17.0 534.3,23.1 534.4,"
+    "28.0 538.4,30.8 527.7,32.4 533.9,34.7 534.7,38.5 531.1,38.9 535.4,42.7 528.0,43.0 531.9,44.8"
+    " 530.8,46.3 521.4,47.0 525.6,50.0 525.7,52.0 519.1,50.1 517.4,51.3 526.2,55.1 527.5,58.6 521"
+    ".5,59.5 514.9,55.3 516.0,58.2 512.1,60.6 525.5,61.0 507.5,68.3 494.1,69.8 486.0,76.2 478.8,7"
+    "9.2 467.3,81.5 464.4,84.2 462.7,90.2 457.3,93.7 458.6,97.2 455.4,105.1 450.7,105.4 445.8,101"
+    ".8 439.1,101.8 427.9,89.6 425.7,82.8 421.1,78.7 422.3,75.5 420.1,73.9 423.4,68.8 428.4,67.1 "
+    "430.4,61.9 421.8,64.7 417.7,63.3 418.8,58.0 428.7,59.1 420.0,54.8 416.7,55.4 413.9,54.3 417."
+    "6,50.2 408.9,40.8 404.7,39.1 404.7,37.3 395.8,34.7 371.7,34.9 362.0,30.7 377.5,29.1 355.7,26"
+    ".2 356.1,24.5 381.0,20.2 382.3,18.7 373.3,17.1 376.2,15.3 392.5,11.8 391.2,9.8 409.3,8.0 419"
+    ".5,7.9 423.2,9.3 432.0,6.9 451.6,10.3 443.7,7.9 444.1,6.0 455.3,3.4 467.0,3.6 471.3,2.0 483."
+    "0,1.6 509.7,2.1ZM0.0,442.2 1197.9,443.2 1195.8,444.2 1195.3,442.5 1198.0,441.4 0.7,439.8 0.0"
+    ",442.2ZM311.5,47.7 314.1,50.4 317.2,46.9 325.6,45.1 331.3,49.6 330.8,52.5 340.6,49.5 352.6,5"
+    "3.8 353.0,55.7 359.2,54.7 362.7,57.5 373.6,61.0 376.8,65.1 370.6,67.2 383.8,71.0 388.6,75.1 "
+    "393.8,75.4 392.8,78.4 386.9,83.6 377.6,77.4 373.3,78.0 372.9,80.5 382.3,86.3 384.4,90.6 383."
+    "3,93.8 370.7,89.1 379.4,97.0 363.3,92.7 359.2,90.6 360.4,89.4 350.5,85.0 350.6,86.2 341.0,86"
+    ".9 338.2,85.4 340.3,82.2 353.5,81.5 352.4,80.0 357.8,73.5 356.9,71.6 350.5,67.9 343.8,66.4 3"
+    "45.9,65.3 342.4,62.6 336.8,60.8 335.0,62.1 329.0,62.7 304.4,59.8 301.6,58.2 305.1,56.2 300.4"
+    ",56.2 299.3,51.7 301.9,47.8 305.3,46.0 313.9,44.8 311.5,47.7ZM371.7,3.9 387.7,4.8 393.8,6.0 "
+    "393.7,7.2 374.5,11.0 381.7,11.0 368.4,14.9 362.7,18.5 343.6,20.6 348.2,21.1 345.9,21.9 348.7"
+    ",24.1 334.1,29.9 334.6,30.9 340.3,30.7 340.4,31.8 331.5,34.4 301.7,33.1 301.3,31.0 307.4,30."
+    "0 305.8,26.8 316.7,28.4 312.2,25.6 306.8,24.8 315.4,22.0 316.3,20.5 311.6,18.7 310.2,16.5 32"
+    "2.0,17.2 327.2,15.5 308.0,15.3 302.1,13.8 295.4,10.8 294.7,9.3 315.0,5.9 322.7,7.4 325.3,5.0"
+    " 335.6,3.8 371.7,3.9ZM1047.1,374.4 1048.1,381.5 1051.5,384.2 1054.3,379.5 1058.1,376.9 1061."
+    "1,376.8 1081.9,386.3 1086.1,390.8 1086.6,393.4 1092.2,396.1 1093.0,398.4 1089.9,398.9 1090.6"
+    ",401.8 1095.8,409.4 1097.7,409.3 1097.6,411.2 1102.7,414.6 1102.3,415.9 1093.0,413.9 1086.8,"
+    "404.8 1082.5,402.9 1077.6,405.6 1078.0,408.9 1075.4,410.4 1070.1,409.5 1067.1,405.8 1063.8,4"
+    "05.0 1062.9,406.2 1058.7,406.3 1060.1,402.8 1062.2,401.5 1059.8,393.1 1050.6,389.0 1045.5,38"
+    "4.9 1043.3,387.4 1042.5,383.9 1040.0,381.8 1045.9,380.3 1045.7,379.1 1040.8,379.1 1039.5,376"
+    ".5 1036.5,375.7 1035.1,373.5 1041.3,371.0 1046.6,372.8 1047.1,374.4ZM992.9,361.3 996.7,365.4"
+    " 992.7,365.9 991.7,372.9 988.5,375.9 987.2,387.0 986.7,385.4 982.9,387.4 981.6,384.7 977.5,3"
+    "83.1 973.6,384.7 972.3,382.5 967.4,382.3 966.9,376.4 963.6,371.4 963.6,363.5 965.5,360.5 968"
+    ".0,362.0 970.6,361.2 971.2,357.5 976.7,355.7 989.1,338.9 990.4,338.9 992.3,343.0 997.3,345.6"
+    " 997.0,347.3 994.8,347.5 995.4,349.7 992.9,351.2 991.0,355.1 993.5,359.3 992.9,361.3ZM219.4,"
+    "47.8 217.8,49.9 225.2,48.6 229.8,50.8 233.6,48.5 236.6,50.0 239.4,54.3 241.0,52.5 238.7,48.0"
+    " 244.9,48.0 248.7,49.8 251.8,57.2 263.4,61.4 263.0,63.4 257.6,63.7 259.7,65.4 258.6,67.0 246"
+    ".8,65.2 222.3,68.0 220.5,65.9 213.0,65.2 208.9,61.7 225.3,59.9 207.0,59.2 205.2,57.6 213.0,5"
+    "5.8 202.0,54.7 207.1,49.7 216.0,47.0 219.4,47.8ZM766.9,429.0 767.9,438.4 767.3,439.7 766.2,4"
+    "37.1 765.6,438.4 765.9,443.6 758.5,473.9 757.0,479.0 751.4,481.9 746.8,479.2 744.5,469.5 744"
+    ".8,463.2 746.3,462.4 748.2,454.8 746.5,445.9 748.2,440.7 754.4,438.8 759.0,433.5 759.6,429.4"
+    " 761.0,430.0 764.0,422.3 766.9,429.0ZM0.0,54.9 1200.0,57.9 1196.3,58.1 1195.8,56.7 0.0,54.9Z"
+    "M763.7,187.8 765.4,191.0 768.0,192.3 765.2,192.7 762.9,198.7 764.0,204.1 769.5,207.2 774.2,2"
+    "08.0 779.4,206.8 779.6,198.1 777.0,196.6 777.9,193.6 775.7,193.3 776.4,189.6 779.5,190.7 782"
+    ".5,189.3 779.1,184.1 776.4,185.3 776.0,188.5 775.0,181.2 771.1,179.7 767.7,173.2 770.9,173.6"
+    " 771.1,170.4 776.8,170.3 776.8,163.3 770.6,162.5 763.7,165.3 762.2,167.9 758.9,168.7 755.6,1"
+    "73.2 758.6,177.4 758.3,180.3 763.7,187.8ZM952.7,395.1 949.0,395.2 941.9,387.9 930.9,368.6 92"
+    "8.7,361.3 917.9,347.5 917.6,345.3 924.9,346.3 935.5,360.1 938.9,360.2 946.1,368.9 944.8,372."
+    "5 947.9,374.1 949.6,379.7 952.1,380.0 953.7,382.8 952.7,395.1ZM590.0,111.5 586.4,116.3 593.5"
+    ",115.7 592.6,119.3 589.6,123.2 593.0,123.5 596.3,129.2 598.6,129.9 601.6,136.6 605.6,137.5 6"
+    "05.2,140.3 603.5,141.6 604.8,143.8 601.8,146.1 591.7,147.3 590.1,146.4 587.9,148.5 584.9,148"
+    ".0 582.5,149.7 580.7,148.8 585.6,144.2 588.6,143.2 583.4,142.5 582.4,140.7 585.9,139.4 584.1"
+    ",137.0 584.7,134.1 589.7,134.5 590.2,132.0 587.9,129.2 583.9,128.4 583.1,127.2 584.3,125.3 5"
+    "83.2,124.1 581.4,126.1 581.2,121.9 579.5,119.7 583.3,111.6 590.0,111.5ZM1069.9,206.0 1069.2,"
+    "211.8 1067.5,214.9 1063.2,216.9 1057.4,217.2 1052.6,222.2 1050.4,220.5 1050.3,217.2 1036.6,2"
+    "20.4 1040.0,223.6 1037.8,231.1 1035.6,232.9 1034.0,231.2 1034.8,227.2 1031.4,223.0 1034.5,22"
+    "1.6 1042.1,213.6 1048.7,212.2 1052.3,213.1 1055.7,205.3 1058.0,207.4 1064.8,201.3 1066.8,195"
+    ".9 1066.3,191.0 1067.7,188.2 1071.2,187.4 1073.1,193.5 1072.9,197.1 1069.9,201.5 1069.9,206."
+    "0ZM791.8,58.4 778.9,58.2 778.0,56.3 772.0,55.1 771.5,52.7 774.9,51.8 774.8,49.4 781.4,45.6 7"
+    "78.4,45.1 786.3,41.2 785.4,39.2 803.9,34.1 820.7,31.6 827.2,31.0 829.5,32.8 805.3,38.4 794.9"
+    ",42.6 784.7,51.1 785.4,54.8 791.8,58.4ZM551.6,77.1 550.9,80.0 554.6,83.0 550.3,86.3 537.8,90"
+    ".2 524.1,88.1 527.4,86.2 520.1,84.0 526.0,83.2 525.9,81.9 518.9,80.9 521.2,78.0 526.2,77.3 5"
+    "31.4,80.3 536.5,77.9 540.7,79.2 546.1,76.8 551.6,77.1ZM198.5,55.4 189.7,57.6 187.9,55.7 180."
+    "2,53.3 186.9,45.4 183.6,42.7 194.9,42.0 208.1,43.2 215.0,46.3 202.6,50.5 198.5,53.6 198.5,55"
+    ".4ZM309.9,19.1 313.9,20.5 303.2,25.1 297.3,25.4 290.4,24.9 286.8,23.1 286.9,21.5 289.5,20.3 "
+    "283.4,20.3 277.6,16.9 282.3,13.6 285.7,13.3 284.2,12.3 292.0,12.1 296.2,14.4 307.3,16.2 309."
+    "9,19.1ZM284.4,30.3 288.1,31.8 294.7,31.8 297.5,33.2 296.8,34.9 302.7,36.9 329.6,36.4 333.1,3"
+    "8.1 333.9,39.9 326.8,42.0 306.2,42.2 291.9,40.3 290.4,35.7 287.0,33.8 276.3,31.9 277.5,30.1 "
+    "284.4,30.3ZM660.8,18.9 671.8,22.2 663.4,23.9 661.6,27.1 658.7,28.0 657.1,31.6 653.0,31.8 645"
+    ".9,29.1 648.9,27.5 637.4,22.6 634.8,19.1 643.9,17.5 645.7,19.1 650.5,19.0 651.7,17.5 656.6,1"
+    "7.4 660.8,18.9ZM1176.7,549.3 1177.5,551.1 1179.9,549.3 1180.8,551.2 1180.8,553.0 1175.7,560."
+    "1 1176.9,562.2 1171.5,563.9 1168.7,571.2 1164.4,574.5 1155.6,572.6 1155.0,571.0 1156.8,567.7"
+    " 1168.4,558.6 1173.7,549.5 1176.0,547.4 1176.7,549.3ZM1017.5,363.1 1014.8,367.5 1012.3,368.3"
+    " 1009.1,367.5 1000.6,368.3 1000.1,371.6 1003.1,375.6 1004.9,373.6 1011.1,372.1 1010.9,374.1 "
+    "1009.4,373.5 1005.0,377.7 1008.2,383.4 1007.6,384.9 1010.6,390.0 1010.5,392.8 1008.8,394.1 1"
+    "007.5,392.6 1009.1,389.0 1005.8,390.7 1005.0,389.5 1005.4,387.8 1003.0,385.2 1003.2,380.9 10"
+    "01.0,382.2 1001.4,393.7 999.3,394.3 997.9,393.0 998.3,384.7 996.9,384.7 995.9,381.7 1000.1,3"
+    "66.9 1003.0,363.6 1009.8,365.5 1013.6,365.3 1016.9,362.1 1017.5,363.1ZM412.9,146.5 410.7,150"
+    ".3 412.9,148.8 415.1,149.8 413.9,151.3 421.7,152.8 420.7,156.0 423.0,155.3 424.5,160.3 423.1"
+    ",164.2 419.4,163.5 420.1,159.9 419.2,159.4 415.3,163.2 413.3,163.0 415.7,161.0 412.5,159.9 4"
+    "02.4,160.0 401.9,158.7 404.0,157.2 402.6,156.0 405.4,153.3 408.8,146.3 413.8,142.3 415.3,142"
+    ".5 412.9,146.5ZM239.3,34.3 240.6,35.9 247.1,35.3 247.6,37.5 245.6,39.6 220.9,42.2 220.4,40.8"
+    " 227.4,38.9 207.6,38.6 215.3,33.1 224.7,34.6 230.6,37.2 236.4,37.5 231.7,33.3 234.7,31.7 238"
+    ".2,32.2 239.3,34.3ZM933.1,22.5 925.9,23.1 916.6,21.8 911.0,20.1 908.5,17.0 903.9,16.1 919.8,"
+    "12.1 934.0,18.6 933.1,22.5ZM1182.0,528.3 1184.5,533.0 1184.5,530.0 1186.0,531.2 1186.5,534.5"
+    " 1189.2,535.9 1195.1,535.1 1193.2,541.6 1190.7,541.5 1186.7,550.9 1184.1,552.7 1182.2,550.9 "
+    "1184.1,547.3 1183.0,544.8 1179.4,543.1 1179.5,541.5 1181.9,540.0 1182.3,533.7 1175.4,521.2 1"
+    "176.7,520.9 1181.1,524.4 1182.0,528.3ZM374.2,606.1 383.2,609.9 381.7,612.1 378.5,612.3 376.8"
+    ",610.8 372.8,613.9 369.2,613.4 359.1,609.0 351.1,601.7 363.0,607.1 365.8,602.1 368.8,600.3 3"
+    "71.2,600.8 374.2,606.1ZM962.1,399.2 968.5,399.6 969.2,397.8 975.4,399.9 976.6,402.8 981.6,40"
+    "3.6 985.7,406.2 981.9,407.8 978.2,406.1 960.9,403.5 954.8,401.7 954.3,399.8 951.2,399.5 953."
+    "5,395.3 957.5,395.5 961.6,397.6 962.1,399.2ZM1079.7,175.1 1082.0,176.1 1084.4,174.2 1085.1,1"
+    "79.1 1080.2,180.3 1077.3,184.7 1072.0,181.7 1070.2,186.5 1066.5,186.6 1066.1,182.2 1067.7,17"
+    "8.8 1071.3,178.6 1073.2,169.1 1079.7,175.1ZM1078.8,146.2 1082.2,154.0 1077.3,152.6 1075.2,15"
+    "8.9 1078.5,163.4 1078.4,166.5 1075.8,163.8 1073.6,167.2 1073.9,145.3 1072.0,141.0 1072.3,135"
+    ".0 1075.4,133.0 1074.0,130.9 1075.5,130.3 1078.8,146.2ZM265.5,44.7 275.4,45.0 276.3,46.3 273"
+    ".2,48.4 278.2,50.3 277.6,54.3 272.1,56.0 268.9,55.6 258.3,50.5 258.4,49.1 265.2,49.7 261.5,4"
+    "6.8 265.5,44.7ZM1004.4,288.0 1006.5,289.2 1007.5,288.1 1008.4,294.2 1007.5,297.9 1005.5,299."
+    "3 1005.8,306.4 1009.0,306.3 1013.2,308.8 1013.6,314.2 1009.8,309.8 1008.9,311.4 1006.8,308.7"
+    " 1003.8,309.4 1002.1,308.4 1003.3,305.5 1002.3,304.5 1001.9,306.1 1000.2,303.5 999.6,297.4 1"
+    "001.0,298.9 1002.4,288.0 1004.4,288.0ZM577.4,139.6 571.5,142.2 566.7,141.5 569.4,136.9 567.7"
+    ",132.4 574.8,126.9 577.6,126.8 581.1,129.5 579.3,132.5 579.9,135.6 577.4,139.6ZM334.4,269.3 "
+    "335.7,270.9 338.8,270.4 344.9,276.1 348.0,276.9 347.8,278.2 352.7,280.2 352.3,281.2 340.8,28"
+    "2.1 343.0,279.6 339.5,278.2 337.6,274.4 327.3,271.8 326.1,270.9 327.4,269.8 324.1,269.6 319."
+    "8,273.0 316.8,273.1 320.7,269.2 325.8,267.4 334.4,269.3ZM1083.6,37.1 1081.0,40.4 1063.2,41.3"
+    " 1056.6,38.4 1058.4,35.4 1062.8,34.6 1071.6,34.8 1083.6,37.1ZM1021.3,332.4 1021.8,337.8 1020"
+    ".7,341.8 1019.4,337.3 1017.9,339.5 1018.9,342.8 1018.0,344.8 1014.1,342.3 1013.1,339.1 1014."
+    "1,337.0 1012.0,334.9 1007.0,339.0 1006.4,337.7 1007.7,334.0 1011.6,331.1 1012.8,333.1 1015.3"
+    ",331.9 1015.9,330.0 1018.2,329.8 1018.0,326.4 1020.7,328.5 1021.3,332.4ZM684.8,15.8 691.4,17"
+    ".3 686.4,19.7 676.7,20.2 666.9,19.5 666.3,18.3 661.5,18.2 657.9,16.2 668.2,15.0 673.0,16.0 6"
+    "76.4,14.7 684.8,15.8ZM316.1,80.7 316.7,82.6 318.5,81.9 327.9,85.9 328.2,88.0 330.6,87.7 333."
+    "0,89.2 330.0,90.5 324.8,89.5 323.0,87.5 314.9,92.1 313.8,89.5 309.3,90.0 312.2,87.8 313.7,80"
+    ".3 316.1,80.7ZM1084.7,548.7 1087.9,550.2 1094.3,549.1 1094.5,554.3 1093.0,559.4 1091.9,558.2"
+    " 1089.6,561.2 1086.8,560.9 1082.4,550.4 1082.5,548.3 1084.7,548.7ZM289.3,49.4 285.8,52.7 282"
+    ".0,52.5 279.9,48.6 281.7,44.6 285.0,43.4 298.3,44.6 293.3,48.5 289.3,49.4ZM358.1,282.0 366.8"
+    ",283.0 372.3,287.5 371.0,289.3 366.8,288.3 364.9,289.4 364.4,288.3 362.0,292.0 361.0,290.0 3"
+    "58.8,289.3 353.6,290.1 351.8,288.7 352.1,287.3 357.7,288.3 358.9,287.3 357.4,283.7 355.3,283"
+    ".0 356.0,281.8 358.1,282.0ZM271.7,32.0 274.2,34.0 272.8,39.6 267.3,40.0 263.7,39.3 263.8,36."
+    "8 258.3,37.1 258.1,33.7 271.7,32.0ZM212.7,27.9 212.2,31.3 209.6,32.8 195.0,35.6 190.5,34.7 2"
+    "03.0,28.5 212.7,27.9ZM870.7,342.1 867.8,343.1 866.2,339.6 865.7,333.3 867.2,326.2 869.5,328."
+    "6 872.6,336.3 872.1,340.9 870.7,342.1ZM950.3,25.0 931.5,26.7 937.5,21.0 940.3,20.5 951.2,23."
+    "2 950.3,25.0ZM266.5,25.0 267.8,26.8 249.4,24.7 252.6,23.4 248.6,22.3 248.4,20.7 263.9,22.9 2"
+    "66.5,25.0ZM188.3,156.1 186.6,156.7 181.2,154.7 176.6,150.3 173.1,149.5 172.1,146.1 180.8,148"
+    ".2 188.3,156.1ZM345.5,47.9 345.8,49.1 335.0,49.5 330.4,46.9 330.6,45.3 339.8,45.5 345.5,47.9"
+    "ZM651.7,201.3 650.3,208.3 641.4,204.0 641.9,201.7 651.7,201.3ZM967.8,287.2 964.9,289.3 962.2"
+    ",288.0 962.1,284.2 963.7,282.2 969.3,281.1 970.0,282.8 967.8,287.2ZM281.2,65.5 279.1,67.0 27"
+    "1.9,66.2 267.3,64.2 272.6,60.9 281.2,65.5ZM1106.6,393.5 1100.8,397.1 1094.4,394.6 1094.7,393"
+    ".3 1099.5,393.6 1100.5,391.4 1100.8,393.7 1102.7,393.4 1105.5,390.3 1105.1,387.7 1107.8,388."
+    "3 1106.6,393.5ZM630.7,188.2 632.7,191.3 632.2,197.1 629.4,198.3 628.1,197.1 627.2,189.3 630."
+    "7,188.2ZM1003.9,269.1 1002.5,272.8 1000.4,265.8 1005.0,258.1 1006.5,259.4 1003.9,269.1ZM770."
+    "5,15.2 758.6,17.5 755.0,16.5 756.9,15.1 749.5,15.0 761.1,14.1 761.7,15.3 766.8,13.6 771.7,14"
+    ".5 770.5,15.2ZM682.4,27.0 675.0,28.8 669.1,27.8 671.4,26.7 669.4,25.3 676.3,24.4 677.6,26.0 "
+    "682.4,27.0ZM404.8,594.1 407.5,596.0 406.5,597.6 402.0,598.9 400.5,597.4 397.7,599.3 396.0,59"
+    "7.4 400.0,594.7 402.8,595.8 404.8,594.1ZM1014.8,413.9 1011.5,414.4 1013.3,410.2 1017.0,407.4"
+    " 1024.5,406.3 1017.0,410.7 1014.8,413.9ZM1048.8,219.2 1049.2,220.7 1047.3,223.4 1046.0,222.0"
+    " 1043.4,225.6 1041.2,224.3 1043.1,219.6 1045.0,220.1 1046.4,218.3 1048.8,219.2ZM288.0,39.7 2"
+    "86.1,41.4 277.3,39.9 279.0,37.9 283.8,36.7 288.0,39.7ZM1029.0,364.4 1028.8,368.2 1027.1,367."
+    "8 1026.6,370.5 1027.9,372.8 1027.0,373.3 1024.7,364.9 1025.3,361.4 1026.4,359.8 1026.7,362.2"
+    " 1028.7,362.6 1029.0,364.4ZM347.1,74.1 343.4,74.3 342.5,72.2 344.0,69.7 347.0,69.1 349.6,70."
+    "3 349.3,72.8 347.1,74.1ZM1018.3,315.9 1019.3,320.8 1016.7,319.6 1017.6,323.8 1016.0,324.8 10"
+    "14.3,318.8 1016.3,319.2 1016.3,317.5 1014.2,314.1 1017.4,314.2 1018.3,315.9ZM1013.3,324.2 10"
+    "10.0,329.7 1007.9,326.6 1009.8,321.5 1011.7,321.3 1011.1,324.2 1013.6,320.0 1013.3,324.2ZM28"
+    "0.6,26.1 275.6,27.0 272.9,26.0 271.2,22.5 281.5,24.5 280.6,26.1ZM1102.4,39.2 1098.6,40.9 108"
+    "7.1,38.8 1087.9,37.4 1102.4,39.2ZM1157.1,466.8 1155.8,467.9 1151.6,464.7 1146.8,457.8 1150.1"
+    ",459.3 1157.1,466.8ZM90.0,118.2 86.7,119.9 84.4,116.7 89.2,114.5 91.5,114.8 92.9,116.1 90.0,"
+    "118.2ZM157.6,131.7 160.8,131.4 159.8,136.4 162.7,139.9 161.4,139.9 156.5,134.5 156.1,131.2 1"
+    "57.6,131.7ZM232.7,27.7 226.5,29.0 221.6,27.6 229.1,25.7 233.8,26.4 232.7,27.7ZM995.0,328.4 9"
+    "90.6,332.6 998.4,319.4 999.0,323.0 995.0,328.4ZM834.3,587.9 829.1,588.2 829.8,583.2 835.1,58"
+    "5.1 834.3,587.9ZM1009.7,405.0 1009.2,407.4 1004.2,408.6 999.7,408.1 999.7,406.5 1002.4,405.6"
+    " 1004.5,406.9 1009.7,405.0ZM642.3,124.8 640.3,128.4 636.8,125.9 636.3,124.1 641.2,122.6 642."
+    "3,124.8ZM1034.9,383.0 1036.1,386.3 1033.3,384.5 1026.3,384.3 1027.1,381.9 1034.9,383.0ZM993."
+    "0,405.0 996.3,405.8 997.1,407.6 989.1,409.1 990.3,406.5 992.1,406.5 993.0,405.0ZM1006.3,317."
+    "1 1010.4,318.4 1010.3,320.3 1006.7,323.5 1006.3,317.1ZM1078.7,47.4 1066.2,46.7 1073.5,44.6 1"
+    "078.7,47.4ZM251.7,46.5 248.7,49.4 243.5,46.3 249.1,45.6 251.7,46.5ZM715.3,212.5 713.0,214.4 "
+    "713.3,215.6 709.9,217.3 708.3,216.8 707.5,215.0 715.3,212.5ZM1110.5,389.1 1109.4,390.3 1108."
+    "0,386.0 1102.2,381.4 1103.1,380.4 1107.5,383.6 1110.5,389.1ZM679.0,212.4 680.8,213.8 687.6,2"
+    "14.1 687.2,215.4 682.4,215.8 678.4,214.2 679.0,212.4ZM1119.6,399.4 1118.7,399.8 1115.8,395.3"
+    " 1115.5,391.5 1120.1,398.1 1119.6,399.4ZM27.6,88.9 37.7,91.0 34.9,92.4 31.1,90.7 28.2,90.9 2"
+    "7.6,88.9ZM387.8,164.7 393.3,165.1 390.4,167.2 386.2,165.4 385.4,163.9 386.6,162.5 387.8,164."
+    "7ZM343.7,290.8 340.8,290.8 338.9,289.2 339.3,288.2 343.7,288.5 346.0,290.7 343.7,290.8ZM1194"
+    ".6,445.6 1195.7,446.9 1195.2,449.2 1191.3,449.2 1192.2,445.8 1194.6,445.6ZM631.9,184.0 630.8"
+    ",187.4 628.5,183.6 631.3,180.2 631.9,184.0ZM0.0,54.9 8.1,56.0 0.0,57.9 0.0,54.9ZM327.0,93.6 "
+    "323.1,96.0 320.0,94.7 322.5,92.7 327.0,93.6ZM0.0,650.0 400.4,650.0 407.3,647.6 409.3,648.7 4"
+    "08.0,650.0 339.9,650.0 1194.3,650.0 0.0,650.0ZM81.5,285.4 80.2,285.6 80.5,280.2 84.0,283.6 8"
+    "1.5,285.4ZM1005.1,311.9 1004.2,315.7 1001.1,310.1 1003.9,310.3 1005.1,311.9ZM381.4,289.2 380"
+    ".5,290.3 376.0,290.4 375.9,288.6 379.1,287.9 381.4,289.2ZM394.0,153.4 388.0,152.1 384.9,150."
+    "1 390.5,150.8 394.0,153.4ZM396.9,324.9 393.5,325.0 394.4,322.0 397.0,321.6 396.9,324.9ZM287."
+    "2,28.5 279.4,28.3 278.5,27.1 285.3,27.2 287.2,28.5ZM48.1,105.9 46.0,106.6 41.8,104.6 47.7,10"
+    "4.2 48.1,105.9ZM341.5,264.9 338.6,261.3 339.4,258.5 340.4,258.7 341.5,264.9ZM1024.2,384.6 10"
+    "22.9,386.0 1020.6,385.2 1020.0,383.3 1023.3,383.1 1024.2,384.6ZM234.5,23.7 224.9,24.6 228.3,"
+    "22.6 234.5,23.7ZM1002.4,414.4 996.6,411.4 999.7,410.5 1002.4,414.4Z"
+)
+
+# ==========================================================================
+# MAP — The destination map.
+# ==========================================================================
+
+# the outline is drawn in this coordinate space
+MAP_W, MAP_H = 1200.0, 620.0
+LAT_TOP, LAT_BOT = 84.0, -57.0
+
+
+def project(lat: float, lon: float) -> tuple[float, float]:
+    """Equirectangular projection matching the baked outline."""
+    x = (lon + 180.0) / 360.0 * MAP_W
+    y = (LAT_TOP - lat) / (LAT_TOP - LAT_BOT) * MAP_H
+    return x, y
+
+
+def _graticule() -> str:
+    """Faint meridians and parallels — reads as a chart, not a picture."""
+    lines = []
+    for lon in range(-150, 181, 30):
+        x, _ = project(0, lon)
+        lines.append(f'<line x1="{x:.0f}" y1="0" x2="{x:.0f}" y2="{MAP_H:.0f}"/>')
+    for lat in range(-40, 81, 20):
+        _, y = project(lat, 0)
+        lines.append(f'<line x1="0" y1="{y:.0f}" x2="{MAP_W:.0f}" y2="{y:.0f}"/>')
+    return (f'<g stroke="#7FB4E6" stroke-width="1" opacity=".22">{"".join(lines)}</g>')
+
+
+def _route(points: list[tuple[float, float]]) -> str:
+    """A soft arc through the ranked destinations, best match first.
+
+    Each leg bows away from the straight line so the path reads as a flight
+    route rather than a polyline.
+    """
+    if len(points) < 2:
+        return ""
+    d = f"M{points[0][0]:.1f},{points[0][1]:.1f}"
+    for (x1, y1), (x2, y2) in zip(points, points[1:]):
+        mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+        dx, dy = x2 - x1, y2 - y1
+        length = max((dx * dx + dy * dy) ** 0.5, 1.0)
+        # perpendicular offset, always bowing upward on screen
+        ox, oy = -dy / length, dx / length
+        if oy > 0:
+            ox, oy = -ox, -oy
+        bow = min(length * 0.22, 90.0)
+        d += f" Q{mx + ox * bow:.1f},{my + oy * bow:.1f} {x2:.1f},{y2:.1f}"
+    return d
+
+
+def world_map(points: list[dict], height: int = 420, routed: bool = False) -> str:
+    """Render destinations on the map.
+
+    `points` are dicts with lat, lon, label and an optional `rank` used to size
+    and light the marker. `routed` links them in order, which suits a shortlist
+    but not the full catalogue.
+    """
+    uid = hashlib.sha256(
+        "|".join(str(p.get("label", "")) for p in points).encode("utf-8")
+    ).hexdigest()[:8]
+
+    placed = []
+    for i, p in enumerate(points):
+        try:
+            lat, lon = float(p["lat"]), float(p["lon"])
+        except (TypeError, ValueError, KeyError):
+            continue
+        if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+            continue
+        x, y = project(lat, lon)
+        placed.append((x, y, str(p.get("label", "")), int(p.get("rank", i))))
+
+    markers = []
+    for n, (x, y, label, rank) in enumerate(placed):
+        top = rank == 0
+        r = 7.0 if top else 5.0
+        delay = (n % 6) * 0.35
+        markers.append(
+            f'<g class="tw-map__pin" style="animation-delay:{delay:.2f}s">'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r * 3.2:.1f}" '
+            f'fill="url(#halo{uid})" class="tw-map__halo"/>'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r + 3:.1f}" fill="#FFFFFF" opacity=".9"/>'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="url(#pin{uid})"/>'
+            + (f'<text x="{x:.1f}" y="{y - r - 12:.1f}" text-anchor="middle" '
+               f'class="tw-map__label">{escape(label)}</text>' if top and label else "")
+            + "</g>"
+        )
+
+    route = ""
+    if routed and len(placed) > 1:
+        d = _route([(x, y) for x, y, _, _ in placed])
+        route = (
+            f'<path d="{d}" fill="none" stroke="url(#route{uid})" stroke-width="7" '
+            f'opacity=".22" filter="url(#soft{uid})"/>'
+            f'<path class="tw-map__route" d="{d}" fill="none" '
+            f'stroke="url(#route{uid})" stroke-width="2.4" stroke-linecap="round" '
+            f'stroke-dasharray="6 9"/>'
+        )
+
+    return f"""
+<div class="tw-map" style="--map-h:{height}px">
+<svg viewBox="0 0 {MAP_W:.0f} {MAP_H:.0f}" xmlns="http://www.w3.org/2000/svg"
+preserveAspectRatio="xMidYMid slice">
+<defs>
+<linearGradient id="sea{uid}" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" stop-color="#E7F3FD"/><stop offset="55%" stop-color="#CFE7FA"/>
+<stop offset="100%" stop-color="#B9DAF6"/>
+</linearGradient>
+<linearGradient id="land{uid}" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" stop-color="#8FC3EC"/><stop offset="100%" stop-color="#5E9FD4"/>
+</linearGradient>
+<radialGradient id="halo{uid}">
+<stop offset="0%" stop-color="#0EA5E9" stop-opacity=".5"/>
+<stop offset="100%" stop-color="#0EA5E9" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="pin{uid}">
+<stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#2563EB"/>
+</radialGradient>
+<linearGradient id="route{uid}" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#2563EB"/>
+</linearGradient>
+<filter id="soft{uid}" x="-20%" y="-20%" width="140%" height="140%">
+<feGaussianBlur stdDeviation="7"/>
+</filter>
+<filter id="drop{uid}" x="-10%" y="-10%" width="120%" height="120%">
+<feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#1E3A8A" flood-opacity=".28"/>
+</filter>
+</defs>
+<rect width="{MAP_W:.0f}" height="{MAP_H:.0f}" fill="url(#sea{uid})"/>
+{_graticule()}
+<path d="{WORLD_PATH}" fill="url(#land{uid})" fill-rule="evenodd"
+filter="url(#drop{uid})" opacity=".95"/>
+{route}
+{''.join(markers)}
+</svg>
+</div>"""
+
+# ==========================================================================
 # OPENING ANIMATION — Generate the TripWise boarding splash as one self-contained HTML string.
 # ==========================================================================
 
@@ -2169,13 +3013,20 @@ WIN_X = [72, 450, 828]
 GX, GY, GW, GH = 40, 46, 220, 326
 GRX, GRY = 62, 50
 
+# Seven layers instead of four. Each is a different scale of turbulence drifting
+# at its own speed, and parallax comes from the spread: the high wisps crawl at
+# 40s while the near deck runs at 11s, which is what makes the view read as
+# depth rather than a flat texture.
 CLOUD_LAYERS = [
     # id, baseFrequency, octaves, seed, matrix slope, matrix offset, opacity,
     # mask id, drift seconds, drift px
-    ("cA", 0.009, 5, 11, -1.9, 1.18, 0.85, "mDeep", 26, 16),
-    ("cB", 0.017, 6, 5, -2.5, 1.45, 1.00, "mDeck", 19, 26),
-    ("cC", 0.034, 5, 29, -3.0, 1.72, 0.90, "mLow", 13, 38),
-    ("cD", 0.013, 4, 41, -2.6, 1.30, 0.28, "mHigh", 34, 12),
+    ("cA", 0.007, 5, 11, -1.7, 1.10, 0.75, "mDeep", 34, 12),
+    ("cB", 0.011, 5, 23, -2.0, 1.24, 0.85, "mDeep", 27, 18),
+    ("cC", 0.017, 6, 5, -2.5, 1.45, 1.00, "mDeck", 21, 26),
+    ("cD", 0.024, 6, 37, -2.7, 1.56, 0.92, "mDeck", 16, 32),
+    ("cE", 0.034, 5, 29, -3.0, 1.72, 0.90, "mLow", 12, 40),
+    ("cF", 0.048, 4, 53, -3.2, 1.86, 0.65, "mLow", 9, 48),
+    ("cG", 0.013, 4, 41, -2.6, 1.30, 0.34, "mHigh", 40, 10),
 ]
 
 
@@ -2322,12 +3173,14 @@ def build_splash() -> str:
 }}
 @keyframes twShadeUp{{ to{{ transform:translateY(-{GH + 60}px); }} }}
 .tw-splash .tw-drift{{
-  animation-name:twDrift; animation-timing-function:ease-in-out;
+  animation-name:twDrift;
+  animation-timing-function:cubic-bezier(.42,0,.58,1);
   animation-iteration-count:infinite; animation-direction:alternate;
 }}
 @keyframes twDrift{{
-  from{{ transform:translateX(calc(var(--dx) * -1)); }}
-  to{{ transform:translateX(var(--dx)); }}
+  from{{ transform:translate(calc(var(--dx) * -1), 0); }}
+  50%{{ transform:translate(0, -2px); }}
+  to{{ transform:translate(var(--dx), 0); }}
 }}
 .tw-splash .tw-mark{{
   position:absolute; left:0; right:0; bottom:7%; text-align:center; opacity:0;
@@ -2438,8 +3291,45 @@ def _flatten(markup: str) -> str:
 
 
 
+VIEW_KEYS = ["home", "planner", "explore"]
+NAV_KEY = "nav_view"
+PENDING_KEY = "nav_pending"
+LANG_KEY = "lang"
+
+
 def html(markup: str) -> None:
     st.markdown(markup, unsafe_allow_html=True)
+
+
+def go_to(view: str) -> None:
+    """Request a section change.
+
+    Streamlit forbids assigning to a widget's own key once that widget has been
+    created in the current run, and the navigation radio is built before the
+    page body that holds this button. So the request is parked under a separate
+    key and applied by `apply_pending_nav` at the top of the next run, before
+    the radio exists.
+    """
+    st.session_state[PENDING_KEY] = view
+    st.rerun()
+
+
+def apply_pending_nav() -> None:
+    """Honour a queued section change. Must run before the nav radio is built."""
+    pending = st.session_state.pop(PENDING_KEY, None)
+    if pending in VIEW_KEYS:
+        st.session_state[NAV_KEY] = pending
+
+
+def language_bar() -> None:
+    """Header row: the wordmark, and the language control on the far side."""
+    brand, picker = st.columns([3, 1], vertical_alignment="center")
+    with brand:
+        html(header())
+    with picker:
+        st.radio(t("nav.language"), list(LANGUAGES),
+                 key=LANG_KEY, horizontal=True, label_visibility="collapsed",
+                 format_func=lambda c: LANGUAGES[c])
 
 
 # --------------------------------------------------------------------------- #
@@ -2557,90 +3447,84 @@ def data_notice(report, airports: AirportIndex, df: pd.DataFrame) -> None:
 # --------------------------------------------------------------------------- #
 
 def tab_home(df: pd.DataFrame, report, airports: AirportIndex) -> None:
-    """The landing view.
+    """The landing page.
 
-    Deliberately short. Three claims, a metrics strip and a route into the
-    planner — a dashboard earns trust by showing signal, not by explaining
-    itself at length.
+    Three things only: what TripWise is, why it helps, and one way in. Judges
+    read a first screen in seconds, so everything that is not signal has been
+    cut rather than shrunk.
     """
     html(hero(catalogue_stats(df)))
+
+    cta, _ = st.columns([1, 2.2])
+    with cta:
+        if st.button(t("hero.cta"), key="hero_cta", type="primary",
+                     use_container_width=True):
+            go_to("planner")
+
     data_notice(report, airports, df)
 
-    html(heading("How it works", "Three steps to a shortlist you trust"))
-    for col, (ic, title, body) in zip(st.columns(3, gap="medium"), [
-        ("compass", "Describe your trip",
-         "Nine travel dimensions, a budget tier and a climate target."),
-        ("sparkle", "See a ranked shortlist",
-         "Ranked by fit, spread across distinct destination profiles."),
-        ("wallet", "Plan around real numbers",
-         "Cost, season and nearest airport before you commit."),
+    for col, (ic, title, body) in zip(st.columns(3, gap="large"), [
+        ("compass", t("home.c1.title"), t("home.c1.body")),
+        ("sparkle", t("home.c2.title"), t("home.c2.body")),
+        ("wallet", t("home.c3.title"), t("home.c3.body")),
     ]):
         with col:
             html(feature(ic, title, body))
-
-    html(heading("Why it is trusted", "Advanced recommendation technology"))
-    left, right = st.columns(2, gap="medium")
-    with left:
-        html(about())
-    with right:
-        html(data_promise())
-
 
 
 def planner_form() -> tuple[dict, bool]:
     """Collect preferences. Every control is a native widget."""
     with st.form("planner", border=False):
-        st.markdown("**What you care about**")
+        st.markdown(f"**{t('plan.group.tastes')}**")
         answers: dict = {}
         cols = st.columns(3, gap="medium")
         for i, (key, label, hint) in enumerate(TASTES):
             with cols[i % 3]:
-                answers[key] = st.slider(label, TASTE_MIN, TASTE_MAX,
-                                         3, help=hint, key=f"t_{key}")
+                answers[key] = st.slider(t(f"taste.{key}"), TASTE_MIN,
+                                         TASTE_MAX, 3,
+                                         help=t(f"hint.{key}"), key=f"t_{key}")
 
-        st.markdown("**Budget and climate**")
+        st.markdown(f"**{t('plan.group.budget')}**")
         c1, c2, c3 = st.columns(3, gap="medium")
         with c1:
             answers["budget"] = st.select_slider(
-                "Budget level", options=[1, 2, 3], value=2,
-                format_func=lambda v: BUDGET_LABEL[v])
+                t("plan.budget"), options=[1, 2, 3], value=2,
+                format_func=lambda v: t(f"budget.{v}"))
         with c2:
-            answers["temp"] = st.slider("Preferred average temperature (°C)", -5, 40, 22)
+            answers["temp"] = st.slider(t("plan.temp"), -5, 40, 22)
         with c3:
-            answers["stars"] = st.slider("Minimum accommodation standard",
-                                         STARS_MIN, STARS_MAX, 4.0, 0.5)
+            answers["stars"] = st.slider(t("plan.stars"), STARS_MIN,
+                                         STARS_MAX, 4.0, 0.5)
 
-        st.markdown("**Where and how long**")
+        st.markdown(f"**{t('plan.group.where')}**")
         c4, c5, c6 = st.columns(3, gap="medium")
         with c4:
-            names = ["Anywhere"] + [REGION_LABEL[c] for c in REGION_COLS]
-            picked = st.selectbox("Preferred region", names)
-            answers["region"] = next(
-                (c for c in REGION_COLS if REGION_LABEL[c] == picked), None)
+            options = [None] + REGION_COLS
+            answers["region"] = st.selectbox(
+                t("plan.region"), options,
+                format_func=lambda c: t("plan.anywhere") if c is None else t(f"region.{c}"))
         with c5:
-            answers["nights"] = st.slider("Nights", NIGHTS_MIN, 30, 7)
+            answers["nights"] = st.slider(t("plan.nights"), NIGHTS_MIN, 30, 7)
             answers["trip_length"] = "short" if answers["nights"] <= 4 else "week"
         with c6:
             answers["travellers"] = st.number_input(
-                "Travellers", TRAVELLERS_MIN, TRAVELLERS_MAX, 2)
+                t("plan.travellers"), TRAVELLERS_MIN, TRAVELLERS_MAX, 2)
 
         answers["needs_airport"] = st.checkbox(
-            "Prefer destinations with a nearby airport", value=True)
+            t("plan.airport"), value=True)
 
         st.markdown("<div style='height:.8rem'></div>", unsafe_allow_html=True)
-        submitted = st.form_submit_button("Find my destinations  →", type="primary")
+        submitted = st.form_submit_button(t("plan.submit"), type="primary")
 
     return answers, submitted
 
 
 def tab_planner(df: pd.DataFrame, airports: AirportIndex) -> None:
-    html(heading("AI Planner", "Tell us how you travel",
-                    "Rate what matters to you. 1 means indifferent, 5 means it "
-                    "would shape the whole trip."))
+    html(heading(t("plan.eyebrow"), t("plan.title"), t("plan.sub")))
 
     raw, submitted = planner_form()
     if not submitted:
-        st.caption("Set your preferences above, then press Find my destinations.")
+        st.caption(t("plan.hint"))
         return
 
     blocking = validate_catalogue(df)
@@ -2666,12 +3550,10 @@ def tab_planner(df: pd.DataFrame, airports: AirportIndex) -> None:
                                            top_n=DEFAULT_TOP_N,
                                            pool_index=pool.index.to_numpy())
     if failed or result is None:
-        st.error("Something went wrong while ranking. Adjust a preference and "
-                 "try again.", icon="⚠️")
+        st.error(t("res.error"), icon="⚠️")
         return
     if result.empty:
-        st.warning("No destinations matched. Try widening the region or climate.",
-                   icon="ℹ️")
+        st.warning(t("res.none"), icon="ℹ️")
         return
 
     st.session_state["last_result"] = result
@@ -2687,15 +3569,14 @@ def render_results(result, prefs: dict, answers: dict, airports: AirportIndex) -
     costs = [daily_cost(r) for _, r in frame.iterrows()]
     nights, people = answers["nights"], answers["travellers"]
     html(metrics([
-        (f"{frame['match'].max():.0f}%", "Best match"),
-        (f"${min(costs) * nights * people:,}", "From, per trip"),
-        (f"{len(result.profiles)}", "Distinct profiles"),
-        (f"{frame['temp_avg_yearly'].mean():.0f}°C", "Average climate"),
+        (f"{frame['match'].max():.0f}%", t("res.metric.match")),
+        (f"${min(costs) * nights * people:,}", t("res.metric.from")),
+        (f"{len(result.profiles)}", t("res.metric.profiles")),
+        (f"{frame['temp_avg_yearly'].mean():.0f}°", t("res.metric.climate")),
     ]))
 
-    html(heading("Your matches", "Where you should go",
-                    f"Ranked from {result.considered:,} destinations for "
-                    f"{people} traveller(s) over {nights} nights."))
+    html(heading(t("res.eyebrow"), t("res.title"),
+                    t("res.sub", n=f"{result.considered:,}", p=people, k=nights)))
 
     rows = list(frame.iterrows())
     for start in range(0, len(rows), 3):
@@ -2707,13 +3588,19 @@ def render_results(result, prefs: dict, answers: dict, airports: AirportIndex) -
     with guard("insights"):
         readings = travel_insights(frame, prefs, answers, result.profiles)
     if readings:
-        html(heading("AI insights", "What your results say",
-                        "Read from the shortlist as a whole."))
+        html(heading(t("ins.eyebrow"), t("ins.title")))
         for start in range(0, len(readings), 2):
             for col, (title, body) in zip(st.columns(2, gap="medium"),
                                           readings[start:start + 2]):
                 with col:
                     html(insight(title, body))
+
+    with guard("result map"):
+        html(heading(t("map.eyebrow"), t("map.title")))
+        html(world_map([
+            {"lat": r["latitude"], "lon": r["longitude"], "label": r["city"], "rank": i}
+            for i, (_, r) in enumerate(frame.iterrows())
+        ], height=400, routed=True))
 
     with guard("charts") as failed:
         render_charts(frame, answers)
@@ -2732,7 +3619,7 @@ def chart(fig) -> None:
 def render_charts(frame: pd.DataFrame, answers: dict) -> None:
     import plotly.express as px
 
-    html(heading("Comparison", "Your shortlist side by side"))
+    html(heading(t("chart.eyebrow"), t("chart.title")))
     axis = dict(showgrid=True, gridcolor="rgba(30,58,138,.1)", zeroline=False,
                 tickfont=dict(color="#3F5069", size=12),
                 title_font=dict(color="#3F5069", size=12))
@@ -2745,41 +3632,40 @@ def render_charts(frame: pd.DataFrame, answers: dict) -> None:
 
     left, right = st.columns(2, gap="medium")
     with left:
-        st.markdown("**Match strength**")
+        st.markdown(f"**{t('chart.match')}**")
         fig = px.bar(frame.sort_values("match"), x="match", y="city",
                      orientation="h", color="match", color_continuous_scale=scale)
-        fig.update_layout(**layout, xaxis=dict(**axis, title="Match %"),
+        fig.update_layout(**layout, xaxis=dict(**axis, title=t("chart.matchpct")),
                           yaxis=dict(**axis, title=""), coloraxis_showscale=False)
         fig.update_traces(hovertemplate="%{y}: %{x:.0f}%<extra></extra>")
         chart(fig)
     with right:
         costs = frame.assign(daily=[daily_cost(r) for _, r in frame.iterrows()])
         costs["total"] = costs["daily"] * answers["nights"] * answers["travellers"]
-        st.markdown(f"**Estimated trip cost** — {answers['travellers']} "
-                    f"traveller(s), {answers['nights']} nights, before flights")
+        st.markdown(f"**{t('chart.cost')}** — "
+                    + t("chart.cost_sub", p=answers["travellers"], k=answers["nights"]))
         fig = px.bar(costs.sort_values("total"), x="total", y="city",
                      orientation="h", color="total", color_continuous_scale=scale)
-        fig.update_layout(**layout, xaxis=dict(**axis, title="US$"),
+        fig.update_layout(**layout, xaxis=dict(**axis, title=t("chart.usd")),
                           yaxis=dict(**axis, title=""), coloraxis_showscale=False)
         fig.update_traces(hovertemplate="%{y}: $%{x:,.0f}<extra></extra>")
         chart(fig)
 
 
 def tab_explore(df: pd.DataFrame, airports: AirportIndex) -> None:
-    html(heading("Explore", "Browse the whole catalogue",
-                    "Filter, then look at where things land."))
+    html(heading(t("exp.eyebrow"), t("exp.title")))
 
     c1, c2, c3 = st.columns([1.4, 1, 1.2], gap="medium")
     with c1:
         regions = st.multiselect(
-            "Region", REGION_COLS,
-            format_func=lambda c: REGION_LABEL[c], placeholder="All regions")
+            t("exp.region"), REGION_COLS,
+            format_func=lambda c: t(f"region.{c}"), placeholder=t("exp.allregions"))
     with c2:
-        tiers = st.multiselect("Budget", [1, 2, 3],
-                               format_func=lambda v: BUDGET_LABEL[v],
-                               placeholder="Any budget")
+        tiers = st.multiselect(t("exp.budget"), [1, 2, 3],
+                               format_func=lambda v: t(f"budget.{v}"),
+                               placeholder=t("exp.anybudget"))
     with c3:
-        lo, hi = st.slider("Average temperature (°C)", -10, 40, (-10, 40))
+        lo, hi = st.slider(t("exp.temp"), -10, 40, (-10, 40))
 
     view = df
     if regions:
@@ -2792,26 +3678,29 @@ def tab_explore(df: pd.DataFrame, airports: AirportIndex) -> None:
         view = view[view["budget_level_encoded"].astype(int).isin(tiers)]
     view = view[(view["temp_avg_yearly"] >= lo) & (view["temp_avg_yearly"] <= hi)]
 
-    st.caption(f"{len(view):,} of {len(df):,} destinations match")
+    st.caption(t("exp.count", a=f"{len(view):,}", b=f"{len(df):,}"))
     if view.empty:
-        st.info("Nothing matches those filters. Widen the range or clear a filter.")
+        st.info(t("exp.empty"))
         return
 
-    map_tab, table_tab = st.tabs(["Map", "Table"])
-    with map_tab:
-        with guard("map"):
-            st.map(view.rename(columns={"latitude": "lat", "longitude": "lon"}),
-                   size=30, color="#2563EB")
-    with table_tab:
+    with guard("map"):
+        html(world_map([
+            {"lat": r["latitude"], "lon": r["longitude"], "label": r["city"], "rank": i}
+            for i, (_, r) in enumerate(view.head(80).iterrows())
+        ], height=430))
+
+    with st.expander(t("exp.table")):
         cols = ["city", "country", "temp_avg_yearly", "budget_level_encoded"]
         cols += [c for c in ("name", "iata") if c in view.columns]
         cols += TASTE_KEYS
         table = view[[c for c in cols if c in view.columns]].copy()
         table["budget_level_encoded"] = (table["budget_level_encoded"].astype(int)
-                                         .map(BUDGET_LABEL))
-        table = table.rename(columns={"temp_avg_yearly": "avg °C",
-                                      "budget_level_encoded": "budget",
-                                      "name": "airport", "iata": "code"})
+                                         .map(lambda v: t(f"budget.{v}")))
+        table = table.rename(columns={
+            "city": t("exp.col.city"), "country": t("exp.col.country"),
+            "temp_avg_yearly": t("exp.col.temp"),
+            "budget_level_encoded": t("exp.col.budget"),
+            "name": t("exp.col.airport"), "iata": t("exp.col.code")})
         st.dataframe(table, hide_index=True)
 
 
@@ -2821,7 +3710,10 @@ def tab_explore(df: pd.DataFrame, airports: AirportIndex) -> None:
 
 
 def main() -> None:
-    html(THEME_CSS)
+    # language first: the stylesheet and every label below depend on it
+    apply_pending_nav()
+    set_language(st.session_state.get(LANG_KEY, DEFAULT))
+    html(stylesheet(rtl=is_rtl()))
 
     # The opening animation paints over the page that renders beneath it in this
     # same run, then removes itself. It is decorative and declared
@@ -2831,7 +3723,7 @@ def main() -> None:
         st.session_state["seen_splash"] = True
         html(build_splash())
 
-    html(header())
+    language_bar()
 
     df = report = airports = None
     with guard("startup") as failed:
@@ -2843,13 +3735,21 @@ def main() -> None:
                  icon="⚠️")
         return
 
-    home, planner, explore = st.tabs(["Home", "AI Planner", "Explore"])
-    with home:
-        tab_home(df, report, airports)
-    with planner:
+    # Navigation is a radio bound to session state rather than st.tabs. st.tabs
+    # cannot be switched from Python, so the hero's call to action had no way to
+    # open the planner. Options are stable keys, not labels, so switching
+    # language cannot reset the current view.
+    st.radio(t("nav.section"), VIEW_KEYS, key=NAV_KEY, horizontal=True,
+             label_visibility="collapsed",
+             format_func=lambda k: t(f"nav.{k}"))
+
+    view = st.session_state.get(NAV_KEY, VIEW_KEYS[0])
+    if view == "planner":
         tab_planner(df, airports)
-    with explore:
+    elif view == "explore":
         tab_explore(df, airports)
+    else:
+        tab_home(df, report, airports)
 
     html(footer())
 
