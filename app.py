@@ -218,7 +218,7 @@ STRINGS: dict[str, dict[str, str]] = {
     "plan.group.tastes": {"en": "What you care about", "ar": "ما الذي يهمّك"},
     "plan.group.budget": {"en": "Budget and climate", "ar": "الميزانية والمناخ"},
     "plan.group.where": {"en": "Where and how long", "ar": "الوجهة والمدة"},
-    "plan.budget": {"en": "Low Budget", "ar": "ميزانية محدودة"},
+    "plan.budget": {"en": "Budget", "ar": "الميزانية"},
     "plan.temp": {"en": "Preferred average temperature (°C)",
                   "ar": "متوسط الحرارة المفضّل (°م)"},
     "plan.stars": {"en": "Minimum accommodation standard",
@@ -273,7 +273,7 @@ STRINGS: dict[str, dict[str, str]] = {
     "region.region_south_america": {"en": "South America", "ar": "أمريكا الجنوبية"},
 
     # ---- budget tiers -----------------------------------------------------
-    "budget.1": {"en": "Budget", "ar": "اقتصادية"},
+    "budget.1": {"en": "Low-range", "ar": "منخفضة"},
     "budget.2": {"en": "Mid-range", "ar": "متوسطة"},
     "budget.3": {"en": "Luxury", "ar": "فاخرة"},
 
@@ -340,6 +340,7 @@ STRINGS: dict[str, dict[str, str]] = {
     "exp.avgday": {"en": "avg / day", "ar": "متوسط اليوم"},
     "exp.avgtemp": {"en": "avg temp", "ar": "متوسط الحرارة"},
     "exp.table": {"en": "See the data behind the map", "ar": "عرض البيانات"},
+    "exp.showmore": {"en": "Show more destinations", "ar": "عرض المزيد من الوجهات"},
     "exp.col.city": {"en": "city", "ar": "المدينة"},
     "exp.col.country": {"en": "country", "ar": "الدولة"},
     "exp.col.temp": {"en": "avg °C", "ar": "متوسط °م"},
@@ -466,6 +467,22 @@ STRINGS: dict[str, dict[str, str]] = {
     "list.sep": {"en": ", ", "ar": "، "},
     "profile.join": {"en": " & ", "ar": " و"},
     "profile.allrounder": {"en": "All-rounder", "ar": "متعدّد الجوانب"},
+
+    # ---- destination "why" explanation (per-card) -------------------------
+    "explain.lead_some": {
+        "en": "You asked for {what}, and {city} scores highly on it",
+        "ar": "طلبت {what}، و{city} يحقق ذلك بامتياز",
+    },
+    "explain.lead_none": {
+        "en": "{city} sits closest to the overall balance you described",
+        "ar": "{city} الأقرب إلى التوازن العام الذي وصفته",
+    },
+    "explain.climate_close": {"en": "with a climate close to your target",
+                              "ar": "بمناخ قريب من المستهدف"},
+    "explain.climate_off": {"en": "though the climate runs a little off your target",
+                            "ar": "رغم أن المناخ يختلف قليلًا عن المستهدف"},
+    "explain.tail": {"en": "{lead}, {climate}. It fits a {tier} budget.",
+                     "ar": "{lead}، {climate}. يناسب ميزانية {tier}."},
 
     # ---- data notices -----------------------------------------------------
     "note.demo": {"en": "Running on the built-in demo catalogue.",
@@ -1300,31 +1317,39 @@ def trip_style(row) -> list[str]:
             or [t("taste.balanced")])
 
 
-@safe("This destination matched your overall preferences.", "explain")
+@safe("", "explain")
 def explain(row, prefs: dict) -> str:
-    """Say plainly why this place surfaced, using the traveller's own answers."""
+    """Say plainly why this place surfaced, using the traveller's own answers.
+
+    Built entirely from t() templates so it renders correctly in whichever
+    language is active — the previous version assembled raw English sentences
+    regardless of language, which was the main source of English text leaking
+    into the Arabic UI.
+    """
     tastes = tastes_of(row)
     strong = []
     for key in TASTE_KEYS:
         want = to_float(prefs.get(key, 3), 3.0)
         has = tastes.get(key, 3)
         if want >= 4 and has >= 4:
-            strong.append(TASTE_LABEL[key].lower())
+            strong.append(t(f"taste.{key}"))
 
-    city = clean(row.get("city")) or "This destination"
-    tier = BUDGET_LABEL.get(int(to_float(row.get("budget_level_encoded", 2), 2.0)), "Mid-range")
+    city = clean(row.get("city")) or "—"
+    tier_n = to_int(row.get("budget_level_encoded", 2), 2, 1, 3)
+    tier = t(f"budget.{tier_n}")
+    if language() == "en":
+        tier = tier.lower()
 
+    joiner, sep = t("insight.and"), t("list.sep")
     if strong:
-        wanted = ", ".join(strong[:2]) if len(strong) <= 2 else \
-            f"{', '.join(strong[:2])} and {strong[2]}"
-        lead = f"You asked for {wanted}, and {city} scores highly on all of it"
+        what = strong[0] if len(strong) <= 1 else sep.join(strong[:-1]) + joiner + strong[-1]
+        lead = t("explain.lead_some", what=what, city=city)
     else:
-        lead = f"{city} sits closest to the overall balance you described"
+        lead = t("explain.lead_none", city=city)
 
     temp_gap = abs(to_float(row.get("temp_avg_yearly", 20), 20.0) - to_float(prefs.get("temp_avg_yearly", 22), 22.0))
-    climate = "with a climate close to your target" if temp_gap <= 4 else \
-              "though the climate runs a little off your target"
-    return f"{lead}, {climate}. It fits a {tier.lower()} budget."
+    climate = t("explain.climate_close") if temp_gap <= 4 else t("explain.climate_off")
+    return t("explain.tail", lead=lead, climate=climate, tier=tier)
 
 
 @safe([], "attractions_of")
@@ -1868,7 +1893,14 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
 /* ======================================================================
    INSIGHT
    ==================================================================== */
-.tw-insight{ padding:var(--pad); min-height:132px; display:flex; gap:.95rem; align-items:flex-start; }
+/* height:100% + the stretched [data-testid="stHorizontalBlock"] row below
+   are what make every insight card in a row match height, regardless of how
+   much text a given language/translation needs. min-height is only a floor
+   for short content, not the source of the sizing. */
+.tw-insight{
+  padding:var(--pad); min-height:150px; height:100%; box-sizing:border-box;
+  display:flex; gap:.95rem; align-items:flex-start;
+}
 .tw-insight__dot{
   width:38px; height:38px; border-radius:12px; flex:0 0 auto; display:grid;
   place-items:center;
@@ -1879,9 +1911,23 @@ h1, h2, h3, h4, h5, h6{ color:var(--text) !important; }
   stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
 .tw-insight h4{
   font-family:'Outfit',sans-serif; font-size:.94rem; font-weight:700;
-  margin:0 0 .28rem; color:var(--text);
+  margin:0 0 .28rem; color:var(--text); overflow-wrap:anywhere; word-break:break-word;
 }
-.tw-insight p{ margin:0; font-size:.87rem; line-height:1.62; color:var(--text-2); }
+.tw-insight p{
+  margin:0; font-size:.87rem; line-height:1.62; color:var(--text-2);
+  overflow-wrap:anywhere; word-break:break-word;
+}
+/* Streamlit's column row is a flex container; forcing stretch guarantees
+   every column (and the full-height card inside it) matches the tallest
+   sibling in that row, in any Streamlit version/theme. */
+[data-testid="stHorizontalBlock"]{ align-items:stretch !important; }
+[data-testid="stHorizontalBlock"] > div{ display:flex !important; }
+[data-testid="stHorizontalBlock"] > div > div{ width:100%; }
+
+/* Card text in general must never overflow its box, longest in Arabic where
+   words don't hyphen-break by default. */
+.tw-card h3, .tw-card h4, .tw-card p, .tw-card span, .tw-card b,
+.tw-chip, .tw-meta__row div{ overflow-wrap:anywhere; word-break:break-word; }
 
 /* ======================================================================
    BUTTONS — gradient, rounded, with a restrained cyan glow
@@ -2197,8 +2243,14 @@ RTL = """
 .tw-brand{ flex-direction:row-reverse; }
 .tw-facts{ direction:rtl; }
 
+/* Numbers, currency and percentages read the same in every language — force
+   them to stay left-to-right even while sitting inside RTL text, so "$130"
+   or "26°" never get visually reordered. */
+.tw-facts b, .tw-dest__match, .tw-metric b, .tw-stat b,
+[data-testid="stMetricValue"]{ direction:ltr; unicode-bidi:isolate; }
+
 /* these read wrong mirrored, so they keep their own direction */
-.tw-map, .js-plotly-plot, [data-testid="stDataFrame"],
+.tw-map, .js-plotly-plot,
 [data-testid="stSlider"], [data-testid="stSlider"] *{ direction:ltr; }
 [data-testid="stSlider"] label, .stSelectbox label, .stRadio label,
 .stCheckbox label, .stNumberInput label, .stMultiSelect label{
@@ -3291,7 +3343,7 @@ html,body{{height:100%;overflow:hidden;font-family:'Inter','Cairo',sans-serif}}
   border:1px solid rgba(255,255,255,.75);
   box-shadow:0 1px 2px rgba(9,16,32,.04),0 10px 30px rgba(37,99,235,.1);
   background:linear-gradient(180deg,#E7F3FD 0%,#CFE7FA 55%,#B9DAF6 100%);
-  cursor:grab;
+  cursor:grab; touch-action:none;
 }}
 #wrap.drag{{cursor:grabbing}}
 svg{{width:100%;height:100%;display:block;touch-action:none}}
@@ -3359,7 +3411,7 @@ svg{{width:100%;height:100%;display:block;touch-action:none}}
 </g>
 </svg>
 <div id="hint">اسحب للتحريك · مرّر للتكبير · اضغط دبوس للوصول لكاردها</div>
-<div id="ctl"><button id="zin">+</button><button id="zout">&minus;</button><button id="reset">&#8634;</button></div>
+<div id="ctl"><button id="zin" aria-label="Zoom in" title="Zoom in">+</button><button id="zout" aria-label="Zoom out" title="Zoom out">&minus;</button><button id="reset" aria-label="Reset view" title="Reset view">&#8634;</button></div>
 <div id="tip"></div>
 </div>
 <script>
@@ -3446,7 +3498,10 @@ wrap.addEventListener('pointerdown', e => {{
 wrap.addEventListener('pointermove', e => {{
   if (dragging) {{ tx = e.clientX - sx; ty = e.clientY - sy; clampPan(); apply(); }}
 }});
-wrap.addEventListener('pointerup', () => {{ dragging = false; wrap.classList.remove('drag'); }});
+const stopDrag = () => {{ dragging = false; wrap.classList.remove('drag'); }};
+wrap.addEventListener('pointerup', stopDrag);
+wrap.addEventListener('pointercancel', stopDrag);
+wrap.addEventListener('pointerleave', stopDrag);
 
 document.getElementById('zin').onclick = () => {{
   const r = wrap.getBoundingClientRect(); zoomAt(1.35, r.width/2, r.height/2);
@@ -3811,7 +3866,7 @@ def card_payload(row, prefs: dict, airports: AirportIndex) -> dict:
         "match": f"{to_float(row.get('match', 0), 0.0):.0f}",
         "art": destination_art(str(row.get("city", "x")),
                                tastes_of(row), temp),
-        "tier": BUDGET_LABEL[tier],
+        "tier": t(f"budget.{tier}"),
         "daily": daily_cost(row),
         "temp": f"{temp:.0f}",
         "style": style,
@@ -4093,11 +4148,70 @@ def render_charts(frame: pd.DataFrame, answers: dict) -> None:
         chart(fig)
 
 
-def tab_explore(df: pd.DataFrame, airports: AirportIndex) -> None:
-    """Browse the catalogue with filters and a data table.
+EXPLORE_PAGE_SIZE = 9
 
-    The interactive world map that used to live here has been removed by
-    request; this tab is filters + table only.
+
+def explore_card_payload(row, airports: AirportIndex) -> dict:
+    """A lighter card payload for browsing — no match score, no personalised
+    'why' (there are no traveller preferences to compare against here)."""
+    temp = to_float(row.get("temp_avg_yearly", 20), 20.0)
+    tier = to_int(row.get("budget_level_encoded", 2), 2, 1, 3)
+    airport = airports.resolve(row)
+    return {
+        "slug": normalise(str(row.get("city", "x"))),
+        "city": str(row.get("city", "Unknown")),
+        "country": str(row.get("country", "") or ""),
+        "art": destination_art(str(row.get("city", "x")), tastes_of(row), temp),
+        "tier": t(f"budget.{tier}"),
+        "daily": daily_cost(row),
+        "temp": f"{temp:.0f}",
+        "style": trip_style(row),
+        "region": region_of(row),
+        "airport": airport.label if airport else None,
+        "season": best_season(row),
+        "climate": climate_summary(row),
+    }
+
+
+def explore_card(d: dict) -> str:
+    """Same visual language as the results destination card, minus the match
+    ribbon and the preference-based 'why' — Explore has no traveller answers
+    to explain against, so those two elements would be meaningless here."""
+    chips = "".join(f'<span class="tw-chip">{_e(s)}</span>' for s in d["style"])
+    if d.get("region"):
+        chips += f'<span class="tw-chip tw-chip--muted">{_e(d["region"])}</span>'
+
+    rows = [("plane", t("card.airport"), d["airport"] or t("card.noairport")),
+            ("calendar", t("card.season"), d["season"]),
+            ("sun", t("card.weather"), d["climate"])]
+    meta = "".join(
+        f'<div class="tw-meta__row">{icon(ic)}<div><b>{_e(label)}</b> &mdash; {_e(val)}</div></div>'
+        for ic, label, val in rows
+    )
+
+    return f"""
+<div class="tw-card tw-rise" id="dest-{_e(d.get('slug', ''))}">
+<div class="tw-dest__art">
+{d['art']}
+<div class="tw-dest__scrim"></div>
+<div class="tw-dest__place"><h3>{_e(d['city'])}</h3><span>{_e(d['country'])}</span></div>
+</div>
+<div class="tw-dest__body">
+<div class="tw-facts">
+<div><span>{_e(t("card.budget"))}</span><b>{_e(d['tier'])}</b></div>
+<div><span>{_e(t("card.perday"))}</span><b>${_e(d['daily'])}</b></div>
+<div><span>{_e(t("card.climate"))}</span><b>{_e(d['temp'])}&deg;</b></div>
+</div>
+<div class="tw-chips">{chips}</div>
+<div class="tw-meta">{meta}</div>
+</div>
+</div>"""
+
+
+def tab_explore(df: pd.DataFrame, airports: AirportIndex) -> None:
+    """Browse the catalogue as a visual card grid — filters, then destination
+    cards. No table or dataframe: that component ignores our RTL styling and
+    was the actual cause of the Arabic layout breaking here, not font size.
     """
     html(heading(t("exp.eyebrow"), t("exp.title")))
 
@@ -4129,19 +4243,28 @@ def tab_explore(df: pd.DataFrame, airports: AirportIndex) -> None:
         st.info(t("exp.empty"))
         return
 
-    with st.expander(t("exp.table")):
-        cols = ["city", "country", "temp_avg_yearly", "budget_level_encoded"]
-        cols += [c for c in ("name", "iata") if c in view.columns]
-        cols += TASTE_KEYS
-        table = view[[c for c in cols if c in view.columns]].copy()
-        table["budget_level_encoded"] = (table["budget_level_encoded"].astype(int)
-                                         .map(lambda v: t(f"budget.{v}")))
-        table = table.rename(columns={
-            "city": t("exp.col.city"), "country": t("exp.col.country"),
-            "temp_avg_yearly": t("exp.col.temp"),
-            "budget_level_encoded": t("exp.col.budget"),
-            "name": t("exp.col.airport"), "iata": t("exp.col.code")})
-        st.dataframe(table, hide_index=True)
+    # Reset how many cards are shown whenever the filters actually change,
+    # so switching filters doesn't leave a stale "show more" position.
+    filter_sig = (tuple(sorted(regions)), tuple(sorted(tiers)), lo, hi)
+    if st.session_state.get("explore_filter_sig") != filter_sig:
+        st.session_state["explore_filter_sig"] = filter_sig
+        st.session_state["explore_limit"] = EXPLORE_PAGE_SIZE
+    limit = st.session_state.get("explore_limit", EXPLORE_PAGE_SIZE)
+
+    shown = view.head(limit)
+    rows = list(shown.iterrows())
+    for start in range(0, len(rows), 3):
+        for col, (_, row) in zip(st.columns(3, gap="medium"), rows[start:start + 3]):
+            with col, guard(f"explore card for {row.get('city')}"):
+                html(explore_card(explore_card_payload(row, airports)))
+
+    if len(view) > len(shown):
+        _, mid, _ = st.columns(3)
+        with mid:
+            if st.button(t("exp.showmore"), key="explore_more",
+                        use_container_width=True):
+                st.session_state["explore_limit"] = limit + EXPLORE_PAGE_SIZE
+                st.rerun()
 
 
 # --------------------------------------------------------------------------- #
